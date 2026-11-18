@@ -372,10 +372,10 @@ function renderLists(){
     h+='</ul></div>';});
   $('tabAttr').innerHTML=h+'<div class="label">운영시간·상태는 11/18 공식 사이트 기준</div>';
   let ph='<div class="card"><div class="label">11월 23일 (월)</div><ul class="plist">';
-  let nextMarked=false;
-  PERF.forEach(r=>{const [tm,nm,pl,cat]=r;const m=toM(tm),past=m<t;const nx=!past&&!nextMarked;if(nx)nextMarked=true;
+  let nextMarked=false;let dayOf=S.sim;try{dayOf=dayOf||new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Seoul'}).format(new Date())==='2026-11-23'}catch(e){}
+  PERF.forEach(r=>{const [tm,nm,pl,cat]=r;const m=toM(tm),past=dayOf&&m<t;const nx=!past&&!nextMarked;if(nx)nextMarked=true;
     const key=['마법 성냥','퍼레이드','라이츠업','쿠키런'].some(k=>nm.includes(k));
-    ph+='<li class="'+(past?'off':'')+(nx?' next':'')+'"><span class="tm num">'+tm+'</span><div><div class="arow"><span class="nm">'+nm+(key?' '+bdg('ok','','추천'):'')+'</span>'+(past?'':chk(pKey(r),S.must[pKey(r)]))+'</div><div class="sub">'+pl+' · '+cat+'</div></div></li>';});
+    ph+='<li class="'+(past?'off':'')+(nx?' next':'')+'"><span class="tm num">'+tm+'</span><div><div class="arow"><span class="nm">'+nm+(key?' '+bdg('ok','','추천'):'')+'</span>'+chk(pKey(r),S.must[pKey(r)])+'</div><div class="sub">'+pl+' · '+cat+'</div></div></li>';});
   $('tabPerf').innerHTML=ph+'</ul></div><div class="label">공연 사정에 따라 변경·취소될 수 있음 (11/18 공식 사이트 조회)</div>';
 }
 function setTab(k){S.tab=k;['Rec','Attr','Perf'].forEach(x=>{$('tab'+x).classList.toggle('hide',x!==k);$('tb'+x).setAttribute('aria-selected',x===k)});save()}
