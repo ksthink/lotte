@@ -103,7 +103,8 @@ summary{cursor:pointer;padding:6px 0}
 .alist li:last-child,.plist li:last-child{border-bottom:0}
 .arow{display:flex;justify-content:space-between;gap:8px;align-items:center;flex-wrap:wrap}
 .nm{font-weight:600}.sub{font-size:13px;color:var(--ink-2)}
-.off .nm,.off .tm{color:var(--ink-2);text-decoration:line-through}
+.off .nm{color:var(--ink-2)}
+.badge.end{background:var(--line);color:var(--ink-2)}
 .plist li{display:grid;grid-template-columns:56px minmax(0,1fr);gap:10px;padding:10px 0;border-bottom:1px solid var(--line)}
 .plist .tm{font-family:var(--font-display);font-size:20px}
 .plist li.next{background:var(--accent-soft);margin:0 -10px;padding:10px;border-radius:10px;border-bottom:0}
@@ -397,17 +398,17 @@ function renderLists(){
   order.forEach(ar=>{const L=ATTR.filter(a=>a.ar===ar);if(!L.length)return;
     h+='<div class="card"><div class="label">'+ar+' · '+L.length+'</div><ul class="alist">';
     L.forEach(a=>{const ix=ATTR.indexOf(a),op=openKey==='a'+ix;
-      const off=a.c23||(!a.h?a.st:'');
-      h+='<li data-o="a'+ix+'" class="tap'+(off?' off':'')+(op?' open':'')+'">'+pic(a,'th')+'<div class="ainfo"><div class="arow"><span class="nmw"><span class="nm">'+a.nm+'</span>'+(off?'':chk(aKey(a),S.must[aKey(a)]))+'</span>'+(a.c23?bdg('no','alert','11/23 '+a.c23):(!a.h?bdg('warn','alert','11/18 '+a.st):''))+'</div>'+
+      const off=a.c23||(!a.h?a.st:'');const shut=!off&&a.h&&t>=toM(a.h[1]),early=!off&&a.h&&t<toM(a.h[0]);
+      h+='<li data-o="a'+ix+'" class="tap'+(off||shut?' off':'')+(op?' open':'')+'">'+pic(a,'th')+'<div class="ainfo"><div class="arow"><span class="nmw"><span class="nm">'+a.nm+'</span>'+(off?'':chk(aKey(a),S.must[aKey(a)]))+'</span>'+(a.c23?bdg('no','alert','11/23 '+a.c23):(!a.h?bdg('warn','alert','11/18 '+a.st):shut?bdg('end','clock','마감'):early?bdg('','clock','운영 전'):''))+'</div>'+
         (a.d?'<div class="sub">'+a.d+'</div>':'')+
         '<div class="bdg">'+(a.h?bdg('','clock',a.h[0]+'~'+a.h[1]):'')+(hTxt(a)?bdg('','',hTxt(a)):'')+(a.sg?bdg('ok','','싱글라이더'):'')+(a.rv?bdg('warn','','예약제'):'')+'</div></div>'+(op?attrDetail(a):'')+'</li>';});
     h+='</ul></div>';});
   $('tabAttr').innerHTML=h+'<div class="label">운영시간·상태는 11/18 공식 사이트 기준</div>';
   let dayOf=S.sim;try{dayOf=dayOf||new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Seoul'}).format(new Date())==='2026-11-23'}catch(e){}
   let ph='<div class="card"><div class="label">11월 23일 (월) · '+PERF.length+'</div><ul class="alist">';
-  PERF.forEach((r,pi)=>{const [tm,nm,pl,cat]=r,past=dayOf&&toM(tm)<t,op=openKey==='p'+pi;
+  PERF.forEach((r,pi)=>{const [tm,nm,pl,cat]=r,pf=perfFixed(r,pi),past=t>=toM(pf.end),live=!past&&t>=toM(tm),op=openKey==='p'+pi;
     const key=['마법 성냥','퍼레이드','라이츠업','쿠키런'].some(k=>nm.includes(k));
-    ph+='<li data-o="p'+pi+'" class="tap'+(past?' off':'')+(op?' open':'')+'"><span class="ptm num">'+tm+'</span><div class="ainfo"><div class="arow"><span class="nmw"><span class="nm">'+nm+'</span>'+chk(pKey(r),S.must[pKey(r)])+'</span></div>'+
+    ph+='<li data-o="p'+pi+'" class="tap'+(past?' off':'')+(op?' open':'')+'"><span class="ptm num">'+tm+'</span><div class="ainfo"><div class="arow"><span class="nmw"><span class="nm">'+nm+'</span>'+chk(pKey(r),S.must[pKey(r)])+'</span>'+(past?bdg('end','clock','종료'):live?bdg('ok','','진행 중'):'')+'</div>'+
       (PDESC(nm)?'<div class="sub">'+PDESC(nm)+'</div>':'')+
       '<div class="bdg">'+bdg('','clock',tm)+bdg('','',pl)+bdg('','',cat)+(key?bdg('ok','','추천'):'')+'</div></div>'+(op?perfDetail(r,pi):'')+'</li>';});
   $('tabPerf').innerHTML=ph+'</ul></div><div class="label">공연 사정에 따라 변경·취소될 수 있음 (11/18 공식 사이트 조회)</div>';
