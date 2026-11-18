@@ -125,16 +125,13 @@ img.hero{width:33%;max-width:170px;aspect-ratio:4/3;object-fit:cover;border-radi
 .notice ul{margin:0;padding-left:18px;display:grid;gap:6px;color:var(--ink);font-size:14px}
 .notice b{font-weight:600;margin-right:4px}
 .cds{display:grid;gap:8px;flex:1;max-width:250px;min-width:150px}
-.cdh{font-size:12px;color:var(--ink-2);text-align:right}
-.cdn{font-size:12px;color:var(--ink-2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.cdn b{font-size:13px;color:var(--ink);font-weight:600;margin-right:4px;text-align:left}
-.cds{cursor:pointer;max-width:300px!important}
-.cd{display:grid;grid-template-columns:18px 86px minmax(0,1fr) 38px;gap:8px;align-items:center;color:var(--accent)}
-.cd svg{width:18px;height:18px}
-.cd b{font-size:13px;font-weight:600;color:var(--ink);text-align:right}
-.cdb{height:12px;border-radius:6px;background:var(--line);overflow:hidden}
-.cdb i{display:block;height:100%;border-radius:6px;background:var(--accent);transition:width .6s}
-.cd.hot{color:var(--warn)}.cd.hot .cdb i{background:var(--warn)}.cd.hot b{color:var(--warn)}
+.cds{cursor:pointer;flex:1;max-width:300px;min-width:150px;display:grid;gap:6px}
+.cdt{display:flex;justify-content:space-between;gap:8px;font-size:13px;color:var(--ink-2)}
+.cdt b{font-weight:600;color:var(--ink)}
+.cdb{position:relative;height:14px;border-radius:7px;background:var(--line);overflow:hidden;margin-top:5px}
+.cdb i{display:block;height:100%;border-radius:7px;background:var(--accent);transition:width .6s}
+.cdb u{position:absolute;top:0;bottom:0;width:3px;margin-right:-1.5px;background:var(--panel);opacity:.9}
+.cd1.hot .cdb i{background:var(--warn)}.cd1.hot .cdt b{color:var(--warn)}
 .cds .chip{justify-self:end}
 .tap{cursor:pointer}
 .ptm{width:56px;height:56px;border-radius:10px;background:var(--accent-soft);color:var(--accent);display:flex;align-items:center;justify-content:center;font-family:var(--font-display);font-size:19px}
@@ -434,12 +431,11 @@ function render(){
    stage:'<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 12.5V3l7-1.5v9.5"/><circle cx="4.2" cy="12.5" r="1.8"/><circle cx="11.2" cy="11" r="1.8"/></svg>',
    parade:'<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 15V1.5M3 2.5h10l-2.5 3 2.5 3H3"/></svg>',
    star:'<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" aria-hidden="true"><path d="M8 1.5l1.9 4.1 4.6.5-3.4 3 .9 4.4L8 11.3l-4 2.2.9-4.4-3.4-3 4.6-.5z"/></svg>'};
-  const T0=toM('16:00'),rows=[];
-  if(t<T0)rows.push(['16:00 입장',T0,T0-180,'door']);
-  fixedList().forEach(f=>{if(f.id!=='mk'&&toM(f.start)>t&&rows.length<3)rows.push([f.start+' '+(f.id==='pr'?'퍼레이드':f.id==='gs'?'가든무대':f.id==='mp'?'맵핑쇼':f.name.slice(0,4)),toM(f.start),T0,f.id==='pr'?'parade':f.id==='mp'?'star':'stage'])});
-  let ch=rows.map(([n,at,from,ic])=>{const left=at-t,pct=Math.max(0,Math.min(100,left/(at-from)*100));
-    return '<div class="cd'+(left<=30?' hot':'')+'" role="img" aria-label="'+n+'까지 '+dur(left)+'" title="'+n+'">'+CI[ic]+'<span class="cdn"><b class="num">'+n.split(' ')[0]+'</b>'+n.split(' ').slice(1).join(' ')+'</span><div class="cdb"><i style="width:'+pct.toFixed(1)+'%"></i></div><b class="num">'+(left>=60?Math.floor(left/60)+':'+String(left%60).padStart(2,'0'):left+'′')+'</b></div>'}).join('');
-  if(rows.length)ch='<div class="cdh">별표한 공연까지 남은 시간</div>'+ch;
+  const T0=toM('16:00'),T1=toM('21:00'),left=Math.max(0,T1-Math.max(t,T0)),pct=left/(T1-T0)*100;
+  const pre=t<T0;
+  let ch='<div class="cd1'+(left<=30?' hot':'')+'" role="img" aria-label="21:00 종료까지 '+dur(left)+'"><div class="cdt"><span>'+(pre?'16:00 입장 · ':'')+'21:00 종료</span><b class="num">'+(t>=T1?'종료':dur(left)+' 남음')+'</b></div>'+
+    '<div class="cdb"><i style="width:'+pct.toFixed(1)+'%"></i>'+
+    fixedList().filter(f=>f.id!=='mk'&&toM(f.start)>Math.max(t,T0)&&toM(f.start)<T1).map(f=>'<u title="'+f.start+' '+f.name+'" style="right:'+((toM(f.start)-T0)/(T1-T0)*100).toFixed(1)+'%"></u>').join('')+'</div></div>';
   if(S.obs.length){const pct=Math.round((S.cal-1)*100);ch+='<span class="chip num cal">오늘 혼잡 '+(pct>=0?'+':'')+pct+'%</span>'}
   $('chips').innerHTML=ch;
 
