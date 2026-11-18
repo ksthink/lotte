@@ -1,0 +1,1123 @@
+{
+ "meta": {
+  "source": "롯데월드 어드벤처 2026 가이드맵(국문) PDF, 마커 좌표는 1600px 렌더 기준",
+  "scale_m_per_px": {
+   "adventure": 0.283,
+   "magic_island": 0.35
+  },
+  "walk_m_per_min": 60.0,
+  "escalator_min_per_floor": 1.5,
+  "bridge_min": 4.0,
+  "overhead_min": 1.0,
+  "notes": [
+   "층별 그림은 조감도라 축척이 일정하지 않음",
+   "에스컬레이터는 층마다 서·중앙·동 3곳이 위아래로 이어진다고 단순화",
+   "매직아일랜드 축척과 다리 시간은 가정값"
+  ]
+ },
+ "nodes": [
+  {
+   "id": "gate",
+   "name": "정문 게이트(B1F)",
+   "area": "B1",
+   "x": 775,
+   "y": 235
+  },
+  {
+   "id": "f1_meet",
+   "name": "만남의 광장 · 디저트 왕국",
+   "area": "1F",
+   "x": 775,
+   "y": 235
+  },
+  {
+   "id": "f1_garden",
+   "name": "가든스테이지",
+   "area": "1F",
+   "x": 605,
+   "y": 465
+  },
+  {
+   "id": "f1_parade",
+   "name": "퍼레이드 코스(가든스테이지 앞)",
+   "area": "1F",
+   "x": 560,
+   "y": 505
+  },
+  {
+   "id": "sin",
+   "name": "신밧드의 모험",
+   "area": "1F",
+   "x": 403,
+   "y": 396
+  },
+  {
+   "id": "trn",
+   "name": "로티트레인",
+   "area": "1F",
+   "x": 862,
+   "y": 453
+  },
+  {
+   "id": "c1_w",
+   "name": "1F 서쪽 에스컬레이터",
+   "area": "1F",
+   "x": 412,
+   "y": 345
+  },
+  {
+   "id": "c1_m",
+   "name": "1F 북쪽 에스컬레이터",
+   "area": "1F",
+   "x": 790,
+   "y": 205
+  },
+  {
+   "id": "c1_e",
+   "name": "1F 동쪽 에스컬레이터",
+   "area": "1F",
+   "x": 1145,
+   "y": 265
+  },
+  {
+   "id": "c2_w",
+   "name": "2F 서쪽(매직아일랜드 연결)",
+   "area": "2F",
+   "x": 175,
+   "y": 300
+  },
+  {
+   "id": "c2_m",
+   "name": "2F 중앙 에스컬레이터",
+   "area": "2F",
+   "x": 590,
+   "y": 225
+  },
+  {
+   "id": "c2_e",
+   "name": "2F 동쪽 에스컬레이터",
+   "area": "2F",
+   "x": 770,
+   "y": 330
+  },
+  {
+   "id": "fre",
+   "name": "후렌치레볼루션",
+   "area": "2F",
+   "x": 754,
+   "y": 310
+  },
+  {
+   "id": "bmp",
+   "name": "범퍼카",
+   "area": "2F",
+   "x": 668,
+   "y": 157
+  },
+  {
+   "id": "c3_w",
+   "name": "3F 서쪽 에스컬레이터",
+   "area": "3F",
+   "x": 530,
+   "y": 397
+  },
+  {
+   "id": "c3_m",
+   "name": "3F 중앙 에스컬레이터",
+   "area": "3F",
+   "x": 900,
+   "y": 380
+  },
+  {
+   "id": "c3_e",
+   "name": "3F 동쪽 에스컬레이터",
+   "area": "3F",
+   "x": 1030,
+   "y": 480
+  },
+  {
+   "id": "kong",
+   "name": "콩X고질라",
+   "area": "3F",
+   "x": 932,
+   "y": 382
+  },
+  {
+   "id": "c4_w",
+   "name": "4F 서쪽 에스컬레이터",
+   "area": "4F",
+   "x": 900,
+   "y": 566
+  },
+  {
+   "id": "c4_m",
+   "name": "4F 중앙 에스컬레이터",
+   "area": "4F",
+   "x": 1230,
+   "y": 532
+  },
+  {
+   "id": "c4_e",
+   "name": "4F 동쪽 에스컬레이터",
+   "area": "4F",
+   "x": 1395,
+   "y": 600
+  },
+  {
+   "id": "phr",
+   "name": "파라오의 분노",
+   "area": "4F",
+   "x": 1299,
+   "y": 545
+  },
+  {
+   "id": "bal",
+   "name": "풍선비행",
+   "area": "4F",
+   "x": 1447,
+   "y": 599
+  },
+  {
+   "id": "mi_br",
+   "name": "매직아일랜드 입구(다리)",
+   "area": "MI",
+   "x": 785,
+   "y": 600
+  },
+  {
+   "id": "atl",
+   "name": "아틀란티스",
+   "area": "MI",
+   "x": 663,
+   "y": 277
+  },
+  {
+   "id": "gsw",
+   "name": "자이로스윙",
+   "area": "MI",
+   "x": 626,
+   "y": 200
+  },
+  {
+   "id": "gdr",
+   "name": "자이로드롭",
+   "area": "MI",
+   "x": 422,
+   "y": 338
+  },
+  {
+   "id": "com",
+   "name": "혜성특급",
+   "area": "MI",
+   "x": 407,
+   "y": 453
+  },
+  {
+   "id": "gsp",
+   "name": "자이로스핀",
+   "area": "MI",
+   "x": 389,
+   "y": 488
+  },
+  {
+   "id": "castle",
+   "name": "매직캐슬",
+   "area": "MI",
+   "x": 580,
+   "y": 330
+  },
+  {
+   "id": "out",
+   "name": "크리스마스 마켓(월드파크)",
+   "area": "OUT",
+   "x": 0,
+   "y": 0
+  }
+ ],
+ "edges": [
+  {
+   "a": "f1_meet",
+   "b": "f1_garden",
+   "min": 1.35,
+   "kind": "walk"
+  },
+  {
+   "a": "f1_meet",
+   "b": "f1_parade",
+   "min": 1.63,
+   "kind": "walk"
+  },
+  {
+   "a": "f1_meet",
+   "b": "sin",
+   "min": 1.91,
+   "kind": "walk"
+  },
+  {
+   "a": "f1_meet",
+   "b": "trn",
+   "min": 1.11,
+   "kind": "walk"
+  },
+  {
+   "a": "f1_meet",
+   "b": "c1_w",
+   "min": 1.79,
+   "kind": "walk"
+  },
+  {
+   "a": "f1_meet",
+   "b": "c1_m",
+   "min": 0.16,
+   "kind": "walk"
+  },
+  {
+   "a": "f1_meet",
+   "b": "c1_e",
+   "min": 1.75,
+   "kind": "walk"
+  },
+  {
+   "a": "f1_garden",
+   "b": "f1_parade",
+   "min": 0.28,
+   "kind": "walk"
+  },
+  {
+   "a": "f1_garden",
+   "b": "sin",
+   "min": 1.01,
+   "kind": "walk"
+  },
+  {
+   "a": "f1_garden",
+   "b": "trn",
+   "min": 1.21,
+   "kind": "walk"
+  },
+  {
+   "a": "f1_garden",
+   "b": "c1_w",
+   "min": 1.07,
+   "kind": "walk"
+  },
+  {
+   "a": "f1_garden",
+   "b": "c1_m",
+   "min": 1.51,
+   "kind": "walk"
+  },
+  {
+   "a": "f1_garden",
+   "b": "c1_e",
+   "min": 2.72,
+   "kind": "walk"
+  },
+  {
+   "a": "f1_parade",
+   "b": "sin",
+   "min": 0.9,
+   "kind": "walk"
+  },
+  {
+   "a": "f1_parade",
+   "b": "trn",
+   "min": 1.45,
+   "kind": "walk"
+  },
+  {
+   "a": "f1_parade",
+   "b": "c1_w",
+   "min": 1.03,
+   "kind": "walk"
+  },
+  {
+   "a": "f1_parade",
+   "b": "c1_m",
+   "min": 1.78,
+   "kind": "walk"
+  },
+  {
+   "a": "f1_parade",
+   "b": "c1_e",
+   "min": 2.98,
+   "kind": "walk"
+  },
+  {
+   "a": "sin",
+   "b": "trn",
+   "min": 2.18,
+   "kind": "walk"
+  },
+  {
+   "a": "sin",
+   "b": "c1_w",
+   "min": 0.24,
+   "kind": "walk"
+  },
+  {
+   "a": "sin",
+   "b": "c1_m",
+   "min": 2.04,
+   "kind": "walk"
+  },
+  {
+   "a": "sin",
+   "b": "c1_e",
+   "min": 3.55,
+   "kind": "walk"
+  },
+  {
+   "a": "trn",
+   "b": "c1_w",
+   "min": 2.18,
+   "kind": "walk"
+  },
+  {
+   "a": "trn",
+   "b": "c1_m",
+   "min": 1.22,
+   "kind": "walk"
+  },
+  {
+   "a": "trn",
+   "b": "c1_e",
+   "min": 1.6,
+   "kind": "walk"
+  },
+  {
+   "a": "c1_w",
+   "b": "c1_m",
+   "min": 1.9,
+   "kind": "walk"
+  },
+  {
+   "a": "c1_w",
+   "b": "c1_e",
+   "min": 3.48,
+   "kind": "walk"
+  },
+  {
+   "a": "c1_m",
+   "b": "c1_e",
+   "min": 1.7,
+   "kind": "walk"
+  },
+  {
+   "a": "c2_w",
+   "b": "c2_m",
+   "min": 1.99,
+   "kind": "walk"
+  },
+  {
+   "a": "c2_w",
+   "b": "c2_e",
+   "min": 2.81,
+   "kind": "walk"
+  },
+  {
+   "a": "c2_w",
+   "b": "fre",
+   "min": 2.73,
+   "kind": "walk"
+  },
+  {
+   "a": "c2_w",
+   "b": "bmp",
+   "min": 2.42,
+   "kind": "walk"
+  },
+  {
+   "a": "c2_m",
+   "b": "c2_e",
+   "min": 0.98,
+   "kind": "walk"
+  },
+  {
+   "a": "c2_m",
+   "b": "fre",
+   "min": 0.87,
+   "kind": "walk"
+  },
+  {
+   "a": "c2_m",
+   "b": "bmp",
+   "min": 0.49,
+   "kind": "walk"
+  },
+  {
+   "a": "c2_e",
+   "b": "fre",
+   "min": 0.12,
+   "kind": "walk"
+  },
+  {
+   "a": "c2_e",
+   "b": "bmp",
+   "min": 0.95,
+   "kind": "walk"
+  },
+  {
+   "a": "fre",
+   "b": "bmp",
+   "min": 0.83,
+   "kind": "walk"
+  },
+  {
+   "a": "c3_w",
+   "b": "c3_m",
+   "min": 1.75,
+   "kind": "walk"
+  },
+  {
+   "a": "c3_w",
+   "b": "c3_e",
+   "min": 2.39,
+   "kind": "walk"
+  },
+  {
+   "a": "c3_w",
+   "b": "kong",
+   "min": 1.9,
+   "kind": "walk"
+  },
+  {
+   "a": "c3_m",
+   "b": "c3_e",
+   "min": 0.77,
+   "kind": "walk"
+  },
+  {
+   "a": "c3_m",
+   "b": "kong",
+   "min": 0.15,
+   "kind": "walk"
+  },
+  {
+   "a": "c3_e",
+   "b": "kong",
+   "min": 0.65,
+   "kind": "walk"
+  },
+  {
+   "a": "c4_w",
+   "b": "c4_m",
+   "min": 1.56,
+   "kind": "walk"
+  },
+  {
+   "a": "c4_w",
+   "b": "c4_e",
+   "min": 2.34,
+   "kind": "walk"
+  },
+  {
+   "a": "c4_w",
+   "b": "phr",
+   "min": 1.88,
+   "kind": "walk"
+  },
+  {
+   "a": "c4_w",
+   "b": "bal",
+   "min": 2.58,
+   "kind": "walk"
+  },
+  {
+   "a": "c4_m",
+   "b": "c4_e",
+   "min": 0.84,
+   "kind": "walk"
+  },
+  {
+   "a": "c4_m",
+   "b": "phr",
+   "min": 0.33,
+   "kind": "walk"
+  },
+  {
+   "a": "c4_m",
+   "b": "bal",
+   "min": 1.07,
+   "kind": "walk"
+  },
+  {
+   "a": "c4_e",
+   "b": "phr",
+   "min": 0.52,
+   "kind": "walk"
+  },
+  {
+   "a": "c4_e",
+   "b": "bal",
+   "min": 0.25,
+   "kind": "walk"
+  },
+  {
+   "a": "phr",
+   "b": "bal",
+   "min": 0.74,
+   "kind": "walk"
+  },
+  {
+   "a": "mi_br",
+   "b": "atl",
+   "min": 2.01,
+   "kind": "walk"
+  },
+  {
+   "a": "mi_br",
+   "b": "gsw",
+   "min": 2.51,
+   "kind": "walk"
+  },
+  {
+   "a": "mi_br",
+   "b": "gdr",
+   "min": 2.61,
+   "kind": "walk"
+  },
+  {
+   "a": "mi_br",
+   "b": "com",
+   "min": 2.37,
+   "kind": "walk"
+  },
+  {
+   "a": "mi_br",
+   "b": "gsp",
+   "min": 2.4,
+   "kind": "walk"
+  },
+  {
+   "a": "mi_br",
+   "b": "castle",
+   "min": 1.98,
+   "kind": "walk"
+  },
+  {
+   "a": "atl",
+   "b": "gsw",
+   "min": 0.5,
+   "kind": "walk"
+  },
+  {
+   "a": "atl",
+   "b": "gdr",
+   "min": 1.45,
+   "kind": "walk"
+  },
+  {
+   "a": "atl",
+   "b": "com",
+   "min": 1.81,
+   "kind": "walk"
+  },
+  {
+   "a": "atl",
+   "b": "gsp",
+   "min": 2.02,
+   "kind": "walk"
+  },
+  {
+   "a": "atl",
+   "b": "castle",
+   "min": 0.57,
+   "kind": "walk"
+  },
+  {
+   "a": "gsw",
+   "b": "gdr",
+   "min": 1.44,
+   "kind": "walk"
+  },
+  {
+   "a": "gsw",
+   "b": "com",
+   "min": 1.95,
+   "kind": "walk"
+  },
+  {
+   "a": "gsw",
+   "b": "gsp",
+   "min": 2.18,
+   "kind": "walk"
+  },
+  {
+   "a": "gsw",
+   "b": "castle",
+   "min": 0.8,
+   "kind": "walk"
+  },
+  {
+   "a": "gdr",
+   "b": "com",
+   "min": 0.68,
+   "kind": "walk"
+  },
+  {
+   "a": "gdr",
+   "b": "gsp",
+   "min": 0.9,
+   "kind": "walk"
+  },
+  {
+   "a": "gdr",
+   "b": "castle",
+   "min": 0.92,
+   "kind": "walk"
+  },
+  {
+   "a": "com",
+   "b": "gsp",
+   "min": 0.23,
+   "kind": "walk"
+  },
+  {
+   "a": "com",
+   "b": "castle",
+   "min": 1.24,
+   "kind": "walk"
+  },
+  {
+   "a": "gsp",
+   "b": "castle",
+   "min": 1.45,
+   "kind": "walk"
+  },
+  {
+   "a": "c1_w",
+   "b": "c2_w",
+   "min": 1.5,
+   "kind": "escalator"
+  },
+  {
+   "a": "c2_w",
+   "b": "c3_w",
+   "min": 1.5,
+   "kind": "escalator"
+  },
+  {
+   "a": "c3_w",
+   "b": "c4_w",
+   "min": 1.5,
+   "kind": "escalator"
+  },
+  {
+   "a": "c1_m",
+   "b": "c2_m",
+   "min": 1.5,
+   "kind": "escalator"
+  },
+  {
+   "a": "c2_m",
+   "b": "c3_m",
+   "min": 1.5,
+   "kind": "escalator"
+  },
+  {
+   "a": "c3_m",
+   "b": "c4_m",
+   "min": 1.5,
+   "kind": "escalator"
+  },
+  {
+   "a": "c1_e",
+   "b": "c2_e",
+   "min": 1.5,
+   "kind": "escalator"
+  },
+  {
+   "a": "c2_e",
+   "b": "c3_e",
+   "min": 1.5,
+   "kind": "escalator"
+  },
+  {
+   "a": "c3_e",
+   "b": "c4_e",
+   "min": 1.5,
+   "kind": "escalator"
+  },
+  {
+   "a": "gate",
+   "b": "f1_meet",
+   "min": 2.0,
+   "kind": "escalator(B1F→1F)"
+  },
+  {
+   "a": "c2_w",
+   "b": "mi_br",
+   "min": 4.0,
+   "kind": "bridge"
+  },
+  {
+   "a": "gate",
+   "b": "out",
+   "min": 8.0,
+   "kind": "walk(지하 연결통로)"
+  }
+ ],
+ "travel_min": {
+  "gate": {
+   "gate": 2,
+   "f1_meet": 3,
+   "f1_garden": 4,
+   "f1_parade": 5,
+   "sin": 5,
+   "trn": 4,
+   "fre": 6,
+   "bmp": 5,
+   "kong": 6,
+   "phr": 8,
+   "bal": 9,
+   "atl": 12,
+   "gsw": 13,
+   "gdr": 13,
+   "com": 13,
+   "gsp": 13,
+   "castle": 12,
+   "out": 9
+  },
+  "f1_meet": {
+   "gate": 3,
+   "f1_meet": 2,
+   "f1_garden": 2,
+   "f1_parade": 3,
+   "sin": 3,
+   "trn": 2,
+   "fre": 4,
+   "bmp": 3,
+   "kong": 4,
+   "phr": 6,
+   "bal": 7,
+   "atl": 10,
+   "gsw": 11,
+   "gdr": 11,
+   "com": 11,
+   "gsp": 11,
+   "castle": 10,
+   "out": 11
+  },
+  "f1_garden": {
+   "gate": 4,
+   "f1_meet": 2,
+   "f1_garden": 2,
+   "f1_parade": 2,
+   "sin": 2,
+   "trn": 2,
+   "fre": 5,
+   "bmp": 4,
+   "kong": 6,
+   "phr": 7,
+   "bal": 8,
+   "atl": 10,
+   "gsw": 10,
+   "gdr": 10,
+   "com": 10,
+   "gsp": 10,
+   "castle": 10,
+   "out": 12
+  },
+  "f1_parade": {
+   "gate": 5,
+   "f1_meet": 3,
+   "f1_garden": 2,
+   "f1_parade": 2,
+   "sin": 2,
+   "trn": 2,
+   "fre": 5,
+   "bmp": 5,
+   "kong": 6,
+   "phr": 8,
+   "bal": 8,
+   "atl": 10,
+   "gsw": 10,
+   "gdr": 10,
+   "com": 10,
+   "gsp": 10,
+   "castle": 10,
+   "out": 13
+  },
+  "sin": {
+   "gate": 5,
+   "f1_meet": 3,
+   "f1_garden": 2,
+   "f1_parade": 2,
+   "sin": 2,
+   "trn": 3,
+   "fre": 5,
+   "bmp": 5,
+   "kong": 6,
+   "phr": 8,
+   "bal": 8,
+   "atl": 9,
+   "gsw": 9,
+   "gdr": 9,
+   "com": 9,
+   "gsp": 9,
+   "castle": 9,
+   "out": 13
+  },
+  "trn": {
+   "gate": 4,
+   "f1_meet": 2,
+   "f1_garden": 2,
+   "f1_parade": 2,
+   "sin": 3,
+   "trn": 2,
+   "fre": 4,
+   "bmp": 4,
+   "kong": 5,
+   "phr": 7,
+   "bal": 7,
+   "atl": 11,
+   "gsw": 11,
+   "gdr": 11,
+   "com": 11,
+   "gsp": 11,
+   "castle": 11,
+   "out": 12
+  },
+  "fre": {
+   "gate": 6,
+   "f1_meet": 4,
+   "f1_garden": 5,
+   "f1_parade": 5,
+   "sin": 5,
+   "trn": 4,
+   "fre": 2,
+   "bmp": 2,
+   "kong": 3,
+   "phr": 5,
+   "bal": 4,
+   "atl": 10,
+   "gsw": 10,
+   "gdr": 10,
+   "com": 10,
+   "gsp": 10,
+   "castle": 10,
+   "out": 14
+  },
+  "bmp": {
+   "gate": 5,
+   "f1_meet": 3,
+   "f1_garden": 4,
+   "f1_parade": 5,
+   "sin": 5,
+   "trn": 4,
+   "fre": 2,
+   "bmp": 2,
+   "kong": 3,
+   "phr": 5,
+   "bal": 5,
+   "atl": 9,
+   "gsw": 10,
+   "gdr": 10,
+   "com": 10,
+   "gsp": 10,
+   "castle": 9,
+   "out": 13
+  },
+  "kong": {
+   "gate": 6,
+   "f1_meet": 4,
+   "f1_garden": 6,
+   "f1_parade": 6,
+   "sin": 6,
+   "trn": 5,
+   "fre": 3,
+   "bmp": 3,
+   "kong": 2,
+   "phr": 3,
+   "bal": 3,
+   "atl": 10,
+   "gsw": 11,
+   "gdr": 11,
+   "com": 11,
+   "gsp": 11,
+   "castle": 10,
+   "out": 14
+  },
+  "phr": {
+   "gate": 8,
+   "f1_meet": 6,
+   "f1_garden": 7,
+   "f1_parade": 8,
+   "sin": 8,
+   "trn": 7,
+   "fre": 5,
+   "bmp": 5,
+   "kong": 3,
+   "phr": 2,
+   "bal": 2,
+   "atl": 12,
+   "gsw": 12,
+   "gdr": 12,
+   "com": 12,
+   "gsp": 12,
+   "castle": 12,
+   "out": 16
+  },
+  "bal": {
+   "gate": 9,
+   "f1_meet": 7,
+   "f1_garden": 8,
+   "f1_parade": 8,
+   "sin": 8,
+   "trn": 7,
+   "fre": 4,
+   "bmp": 5,
+   "kong": 3,
+   "phr": 2,
+   "bal": 2,
+   "atl": 13,
+   "gsw": 13,
+   "gdr": 13,
+   "com": 13,
+   "gsp": 13,
+   "castle": 13,
+   "out": 17
+  },
+  "atl": {
+   "gate": 12,
+   "f1_meet": 10,
+   "f1_garden": 10,
+   "f1_parade": 10,
+   "sin": 9,
+   "trn": 11,
+   "fre": 10,
+   "bmp": 9,
+   "kong": 10,
+   "phr": 12,
+   "bal": 13,
+   "atl": 2,
+   "gsw": 2,
+   "gdr": 2,
+   "com": 3,
+   "gsp": 3,
+   "castle": 2,
+   "out": 20
+  },
+  "gsw": {
+   "gate": 13,
+   "f1_meet": 11,
+   "f1_garden": 10,
+   "f1_parade": 10,
+   "sin": 9,
+   "trn": 11,
+   "fre": 10,
+   "bmp": 10,
+   "kong": 11,
+   "phr": 12,
+   "bal": 13,
+   "atl": 2,
+   "gsw": 2,
+   "gdr": 2,
+   "com": 3,
+   "gsp": 3,
+   "castle": 2,
+   "out": 21
+  },
+  "gdr": {
+   "gate": 13,
+   "f1_meet": 11,
+   "f1_garden": 10,
+   "f1_parade": 10,
+   "sin": 9,
+   "trn": 11,
+   "fre": 10,
+   "bmp": 10,
+   "kong": 11,
+   "phr": 12,
+   "bal": 13,
+   "atl": 2,
+   "gsw": 2,
+   "gdr": 2,
+   "com": 2,
+   "gsp": 2,
+   "castle": 2,
+   "out": 21
+  },
+  "com": {
+   "gate": 13,
+   "f1_meet": 11,
+   "f1_garden": 10,
+   "f1_parade": 10,
+   "sin": 9,
+   "trn": 11,
+   "fre": 10,
+   "bmp": 10,
+   "kong": 11,
+   "phr": 12,
+   "bal": 13,
+   "atl": 3,
+   "gsw": 3,
+   "gdr": 2,
+   "com": 2,
+   "gsp": 2,
+   "castle": 2,
+   "out": 21
+  },
+  "gsp": {
+   "gate": 13,
+   "f1_meet": 11,
+   "f1_garden": 10,
+   "f1_parade": 10,
+   "sin": 9,
+   "trn": 11,
+   "fre": 10,
+   "bmp": 10,
+   "kong": 11,
+   "phr": 12,
+   "bal": 13,
+   "atl": 3,
+   "gsw": 3,
+   "gdr": 2,
+   "com": 2,
+   "gsp": 2,
+   "castle": 2,
+   "out": 21
+  },
+  "castle": {
+   "gate": 12,
+   "f1_meet": 10,
+   "f1_garden": 10,
+   "f1_parade": 10,
+   "sin": 9,
+   "trn": 11,
+   "fre": 10,
+   "bmp": 9,
+   "kong": 10,
+   "phr": 12,
+   "bal": 13,
+   "atl": 2,
+   "gsw": 2,
+   "gdr": 2,
+   "com": 2,
+   "gsp": 2,
+   "castle": 2,
+   "out": 20
+  },
+  "out": {
+   "gate": 9,
+   "f1_meet": 11,
+   "f1_garden": 12,
+   "f1_parade": 13,
+   "sin": 13,
+   "trn": 12,
+   "fre": 14,
+   "bmp": 13,
+   "kong": 14,
+   "phr": 16,
+   "bal": 17,
+   "atl": 20,
+   "gsw": 21,
+   "gdr": 21,
+   "com": 21,
+   "gsp": 21,
+   "castle": 20,
+   "out": 2
+  }
+ }
+}
