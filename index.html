@@ -121,6 +121,8 @@ img.hero{width:33%;max-width:170px;aspect-ratio:4/3;object-fit:cover;border-radi
 .chk.on{background:var(--accent);border-color:var(--accent);color:#fff}
 .chk:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 .nmw{flex:1}.nmw .chk{margin-left:auto}
+.notice ul{margin:0;padding-left:18px;display:grid;gap:6px;color:var(--ink);font-size:14px}
+.notice b{font-weight:600;margin-right:4px}
 .hide{display:none!important}
 </style>
 </head>
@@ -132,10 +134,6 @@ img.hero{width:33%;max-width:170px;aspect-ratio:4/3;object-fit:cover;border-radi
       <div class="where" id="where">-</div>
     </div>
     <div class="chips" id="chips" style="justify-content:flex-end"></div>
-  </div>
-
-  <div class="bdg" id="closed" aria-label="11월 23일 운휴">
-    <span class="badge no">운휴 아트란티스</span><span class="badge no">운휴 회전바구니</span><span class="badge no">운휴 어크로스다크</span><span class="badge">입장 마감 20:00</span>
   </div>
 
   <div class="tabs" role="tablist">
@@ -161,7 +159,19 @@ img.hero{width:33%;max-width:170px;aspect-ratio:4/3;object-fit:cover;border-radi
   <div id="tabPerf" class="pane hide"></div>
 
   <details>
-    <summary>설정</summary>
+    <summary>공지 · 설정</summary>
+    <div class="card notice">
+      <div class="label">공지 · 11월 23일 (월)</div>
+      <ul>
+        <li><b>운휴</b> 아트란티스(정기점검) · 회전바구니(일일점검) · 어크로스다크(정기운휴)</li>
+        <li><b>운행 종료</b> 스페인해적선은 11/22까지 운행 후 리뉴얼 공사</li>
+        <li><b>점검 중(11/18 기준)</b> 파라오의 분노 · 와일드 밸리. 23일 재개 여부는 당일 확인</li>
+        <li><b>입장 마감</b> 20:00 (영업 종료 1시간 전)</li>
+        <li><b>야외</b> 매직아일랜드 기구는 대부분 20:50 종료, 날씨에 따라 중단될 수 있음</li>
+        <li><b>콩X고질라</b> 20:10 종료, 매직패스 대상 아님</li>
+        <li><b>싱글라이더</b> 후렌치레볼루션만 해당</li>
+      </ul>
+    </div>
     <div class="set">
       <label class="set" for="simOn"><input type="checkbox" id="simOn"> 연습 모드 (시각 직접 입력)</label>
       <input type="time" id="simTime" aria-label="연습 시각">
