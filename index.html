@@ -123,11 +123,12 @@ summary{cursor:pointer;padding:6px 0}
 
   <details>
     <summary>설정</summary>
-    <label class="set" for="fGarden"><input type="checkbox" id="fGarden"> 가든스테이지 18:30 공연 있음</label>
+    <label class="set" for="fGarden"><input type="checkbox" id="fGarden"> 가든스테이지 18:30 공연 보기</label>
     <div class="set">
       <label class="set" for="simOn"><input type="checkbox" id="simOn"> 연습 모드 (시각 직접 입력)</label>
       <input type="time" id="simTime" aria-label="연습 시각">
     </div>
+    <div class="label">운영시간·공연은 11/18 공식 사이트 기준. 당일 값은 <a href="https://adventure.lotteworld.com/enjoy/attrctn/list">어트랙션</a> · <a href="https://adventure.lotteworld.com/enjoy/performance/list">공연</a>에서 확인.</div>
     <div><button type="button" id="reset" class="ghost">기록 지우고 처음부터</button></div>
   </details>
 </main>
@@ -146,24 +147,23 @@ const TRAVEL={"gate":{"gate":2,"f1_meet":3,"f1_garden":4,"f1_parade":5,"sin":5,"
 function travel(a,b){return (TRAVEL[a]&&TRAVEL[a][b])||10}
 /* base = 2025 average standby (queue-times), kong from 2026 reviews; n = graph node */
 const PLACES=[
- {id:'atl',n:'atl',name:'아틀란티스',z:'MI',ride:5,pri:10,kind:'ride',base:87},
- {id:'gsw',n:'gsw',name:'자이로스윙',z:'MI',ride:5,pri:9,kind:'ride',base:65},
- {id:'com',n:'com',name:'혜성특급',z:'MI',ride:5,pri:8,kind:'ride',base:81},
- {id:'gdr',n:'gdr',name:'자이로드롭',z:'MI',ride:3,pri:7,kind:'ride',base:45},
- {id:'gsp',n:'gsp',name:'자이로스핀',z:'MI',ride:3,pri:6,kind:'ride',base:48},
- {id:'map1',n:'castle',name:'매직캐슬 맵핑쇼',z:'MI',ride:10,pri:9,kind:'spot',from:'17:15',repeat:2,base:5,fixedWait:true},
- {id:'fre',n:'fre',name:'후렌치레볼루션',z:'2F',ride:3,pri:8,kind:'ride',base:67},
- {id:'bmp',n:'bmp',name:'범퍼카',z:'2F',ride:5,pri:2,kind:'ride',base:66},
- {id:'kong',n:'kong',name:'콩X고질라',z:'3F',ride:15,pri:5,kind:'ride',base:65},
- {id:'phr',n:'phr',name:'파라오의 분노',z:'4F',ride:5,pri:5,kind:'ride',base:81,flag:'리뉴얼 가능성'},
- {id:'bal',n:'bal',name:'풍선비행',z:'4F',ride:5,pri:3,kind:'ride',base:78},
- {id:'sin',n:'sin',name:'신밧드의 모험',z:'1F',ride:8,pri:3,kind:'ride',base:55},
- {id:'trn',n:'trn',name:'로티트레인 디저트 열차',z:'1F',ride:8,pri:4,kind:'ride',base:30},
- {id:'dk',n:'f1_meet',name:'디저트 왕국 포토존',z:'1F',ride:10,pri:6,kind:'spot',base:10,fixedWait:true}
+ {id:'atl',close:'20:50',n:'atl',name:'아틀란티스',z:'MI',ride:5,pri:10,kind:'ride',base:87},
+ {id:'gsw',close:'20:50',n:'gsw',name:'자이로스윙',z:'MI',ride:5,pri:9,kind:'ride',base:65},
+ {id:'com',close:'20:50',n:'com',name:'혜성특급',z:'MI',ride:5,pri:8,kind:'ride',base:81},
+ {id:'gdr',close:'20:50',n:'gdr',name:'자이로드롭',z:'MI',ride:3,pri:7,kind:'ride',base:45},
+ {id:'gsp',close:'20:40',n:'gsp',name:'자이로스핀',z:'MI',ride:3,pri:6,kind:'ride',base:48},
+ {id:'fre',close:'20:55',n:'fre',name:'후렌치레볼루션',z:'2F',ride:3,pri:8,kind:'ride',base:67},
+ {id:'bmp',close:'20:50',n:'bmp',name:'범퍼카',z:'2F',ride:5,pri:2,kind:'ride',base:66},
+ {id:'kong',close:'20:10',n:'kong',name:'콩X고질라',z:'3F',ride:15,pri:5,kind:'ride',base:65},
+ {id:'phr',close:'20:50',n:'phr',name:'파라오의 분노',z:'4F',ride:5,pri:5,kind:'ride',base:81,flag:'11/18 정기점검 중'},
+ {id:'bal',close:'20:40',n:'bal',name:'풍선비행',z:'4F',ride:5,pri:3,kind:'ride',base:78},
+ {id:'sin',close:'20:30',n:'sin',name:'신밧드의 모험',z:'1F',ride:8,pri:3,kind:'ride',base:55},
+ {id:'dk',n:'f1_meet',name:'디저트 왕국 포토존',z:'1F',ride:10,pri:4,kind:'spot',base:10,fixedWait:true}
 ];
 const FIXED=[
  {id:'gs',n:'f1_garden',name:'가든스테이지 공연 + 도시락',z:'1F',start:'18:30',arrive:'18:25',end:'19:00',opt:'garden'},
  {id:'pr',n:'f1_parade',name:'해피 크리스마스 퍼레이드',z:'1F',start:'20:00',arrive:'19:30',end:'20:30',sub:'자리 잡고 도시락'},
+ {id:'mp',n:'castle',name:'매직캐슬 라이츠업 (맵핑쇼)',z:'MI',start:'20:40',arrive:'20:40',end:'20:50'},
  {id:'mk',n:'out',name:'크리스마스 마켓',z:'out',start:'21:00',arrive:'21:00',end:'22:00'}
 ];
 const OUT_CLOSE=toM('21:00');
@@ -183,9 +183,9 @@ function est(p,t){
 
 const fresh=()=>({loc:'gate',sel:null,wait:'',queue:null,log:[],done:{},sim:false,simTime:'15:30',garden:true,cal:1,obs:[]});
 let S=fresh(),loaded=false;
-try{const s=JSON.parse(localStorage.getItem('lw1123v4')||'null');if(s){S=Object.assign(fresh(),s);loaded=true}}catch(e){}
+try{const s=JSON.parse(localStorage.getItem('lw1123v5')||'null');if(s){S=Object.assign(fresh(),s);loaded=true}}catch(e){}
 S.sim=false;
-const save=()=>{try{localStorage.setItem('lw1123v4',JSON.stringify(S))}catch(e){}};
+const save=()=>{try{localStorage.setItem('lw1123v5',JSON.stringify(S))}catch(e){}};
 
 function kst(){const p=new Intl.DateTimeFormat('en-GB',{timeZone:'Asia/Seoul',hour:'2-digit',minute:'2-digit',hour12:false}).formatToParts(new Date());const g=t=>+p.find(x=>x.type===t).value;return g('hour')*60+g('minute')}
 const now=()=>S.sim?toM(S.simTime):kst();
@@ -195,7 +195,7 @@ function nextFixed(t){return fixedList().find(f=>toM(f.end)>t)}
 function deadlineFor(p,t){
   let dl=Infinity;const nf=nextFixed(t);
   if(nf)dl=toM(nf.arrive)-travel(p.n,nf.n);
-  if(p.z==='MI')dl=Math.min(dl,OUT_CLOSE);
+  if(p.close)dl=Math.min(dl,toM(p.close));
   return Math.min(dl,toM('21:00'));
 }
 
@@ -215,12 +215,10 @@ function candidates(){
     const n=S.done[p.id]||0;if(n>=(p.repeat||1))return;
     const tr=travel(from,p.n),arr=t+tr;
     if(p.from&&arr<toM(p.from))return;
-    if(p.id==='map1'&&n===1&&t<toM('20:30'))return;
     const mw=Math.floor(deadlineFor(p,t)-arr-p.ride);
     const x=est(p,arr);
     const fit=x.hi<=mw?'ok':x.e<=mw?'tight':'no';
     let sc=p.pri*10-tr*1.5-x.e*0.35;
-    if(p.id==='map1')sc+=n===0?45:70;
     if(p.flag)sc-=8;
     if(fit==='tight')sc-=25;
     out.push({p,mw,sc,tr,x,fit});
@@ -278,7 +276,7 @@ function render(){
   const chips=[];
   if(t<toM('16:00'))chips.push(['입장',toM('16:00')-t]);
   else if(S.loc==='gate'&&t<toM('20:00'))chips.push(['입장 마감',toM('20:00')-t]);
-  fixedList().forEach(f=>{const d=toM(f.start)-t;if(d>0&&chips.length<2)chips.push([f.id==='pr'?'퍼레이드':f.id==='gs'?'공연':'마켓',d])});
+  fixedList().forEach(f=>{const d=toM(f.start)-t;if(d>0&&chips.length<2)chips.push([f.id==='pr'?'퍼레이드':f.id==='gs'?'공연':f.id==='mp'?'맵핑쇼':'마켓',d])});
   if(t<OUT_CLOSE&&chips.length<3)chips.push(['야외 종료',OUT_CLOSE-t]);
   let ch=chips.map(([n,d])=>'<span class="chip num'+(d<=30?' hot':'')+'">'+n+' '+dur(d)+'</span>').join('');
   if(S.obs.length){const pct=Math.round((S.cal-1)*100);ch+='<span class="chip num cal">오늘 혼잡 '+(pct>=0?'+':'')+pct+'%</span>'}
