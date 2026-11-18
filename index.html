@@ -155,10 +155,10 @@ function est(p,t){
   return {e:r5(e),lo:r5(e*0.75),hi:r5(e*1.25)};
 }
 
-const fresh=()=>({loc:'gate',sel:null,wait:'',queue:null,log:[],done:{},sim:true,simTime:'15:30',garden:true,cal:1,obs:[]});
+const fresh=()=>({loc:'gate',sel:null,wait:'',queue:null,log:[],done:{},sim:false,simTime:'15:30',garden:true,cal:1,obs:[]});
 let S=fresh(),loaded=false;
 try{const s=JSON.parse(localStorage.getItem('lw1123v4')||'null');if(s){S=Object.assign(fresh(),s);loaded=true}}catch(e){}
-try{if(!loaded&&new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Seoul'}).format(new Date())==='2026-11-23')S.sim=false}catch(e){}
+S.sim=false;
 const save=()=>{try{localStorage.setItem('lw1123v4',JSON.stringify(S))}catch(e){}};
 
 function kst(){const p=new Intl.DateTimeFormat('en-GB',{timeZone:'Asia/Seoul',hour:'2-digit',minute:'2-digit',hour12:false}).formatToParts(new Date());const g=t=>+p.find(x=>x.type===t).value;return g('hour')*60+g('minute')}
@@ -322,7 +322,8 @@ $('simOn').onchange=e=>{S.sim=e.target.checked;save();render()};
 $('simTime').onchange=e=>{if(e.target.value){S.simTime=e.target.value;save();render()}};
 $('reset').onclick=()=>{const g=S.garden,sm=S.sim;S=fresh();S.garden=g;S.sim=sm;save();render()};
 render();
-setInterval(()=>{if(!S.sim&&document.activeElement?.tagName!=='INPUT')render()},20000);
+setInterval(()=>{if(!S.sim&&document.activeElement?.tagName!=='INPUT')render()},10000);
+document.addEventListener('visibilitychange',()=>{if(!document.hidden&&!S.sim)render()});
 </script>
 </body>
 </html>
