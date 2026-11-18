@@ -276,9 +276,9 @@ function est(p,t){
   return {e:r5(e),lo:r5(e*0.75),hi:r5(e*1.25)};
 }
 
-const fresh=()=>({loc:'gate',sel:null,wait:'',queue:null,log:[],done:{},sim:false,simTime:'15:30',cal:1,obs:[],must:{'P:18:30마법 성냥과 꿈꾸는 밤':true,'P:20:00해피 크리스마스 퍼레이드':true,'P:20:40매직캐슬 라이츠업':true}});
+const fresh=()=>({loc:'gate',sel:null,wait:'',queue:null,log:[],done:{},sim:false,simTime:'16:00',cal:1,obs:[],must:{'P:18:30마법 성냥과 꿈꾸는 밤':true,'P:20:00해피 크리스마스 퍼레이드':true,'P:20:40매직캐슬 라이츠업':true}});
 let S=fresh(),loaded=false;
-try{const s=JSON.parse(localStorage.getItem('lw1123v7')||'null');if(s){S=Object.assign(fresh(),s);loaded=true}}catch(e){}
+try{const s=JSON.parse(localStorage.getItem('lw1123v8')||'null');if(s){S=Object.assign(fresh(),s);loaded=true}}catch(e){}
 S.sim=false;
 const save=()=>{try{localStorage.setItem('lw1123v5',JSON.stringify(S))}catch(e){}};
 
@@ -539,7 +539,7 @@ function candBtn(c,top){
 }
 
 ['Rec','Attr','Perf'].forEach(k=>$('tb'+k).onclick=()=>setTab(k));
-$('simOn').onchange=e=>{S.sim=e.target.checked;save();render()};
+$('simOn').onchange=e=>{S.sim=e.target.checked;if(S.sim)S.simTime='16:00';save();render()};
 $('simTime').onchange=e=>{if(e.target.value){S.simTime=e.target.value;save();render()}};
 $('reset').onclick=()=>{const mu=S.must,sm=S.sim;S=fresh();S.must=mu;S.sim=sm;save();render()};
 render();setTab(S.tab||'Rec');
