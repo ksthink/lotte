@@ -125,7 +125,11 @@ img.hero{width:33%;max-width:170px;aspect-ratio:4/3;object-fit:cover;border-radi
 .notice ul{margin:0;padding-left:18px;display:grid;gap:6px;color:var(--ink);font-size:14px}
 .notice b{font-weight:600;margin-right:4px}
 .cds{display:grid;gap:8px;flex:1;max-width:250px;min-width:150px}
-.cd{display:grid;grid-template-columns:18px minmax(0,1fr) 38px;gap:8px;align-items:center;color:var(--accent)}
+.cdh{font-size:12px;color:var(--ink-2);text-align:right}
+.cdn{font-size:12px;color:var(--ink-2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cdn b{font-size:13px;color:var(--ink);font-weight:600;margin-right:4px;text-align:left}
+.cds{cursor:pointer;max-width:300px!important}
+.cd{display:grid;grid-template-columns:18px 86px minmax(0,1fr) 38px;gap:8px;align-items:center;color:var(--accent)}
 .cd svg{width:18px;height:18px}
 .cd b{font-size:13px;font-weight:600;color:var(--ink);text-align:right}
 .cdb{height:12px;border-radius:6px;background:var(--line);overflow:hidden}
@@ -432,9 +436,10 @@ function render(){
    star:'<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" aria-hidden="true"><path d="M8 1.5l1.9 4.1 4.6.5-3.4 3 .9 4.4L8 11.3l-4 2.2.9-4.4-3.4-3 4.6-.5z"/></svg>'};
   const T0=toM('16:00'),rows=[];
   if(t<T0)rows.push(['16:00 입장',T0,T0-180,'door']);
-  fixedList().forEach(f=>{if(f.id!=='mk'&&toM(f.start)>t&&rows.length<3)rows.push([f.start+' '+(f.id==='pr'?'퍼레이드':f.id==='gs'?'가든스테이지':f.id==='mp'?'맵핑쇼':f.name.slice(0,8)),toM(f.start),T0,f.id==='pr'?'parade':f.id==='mp'?'star':'stage'])});
+  fixedList().forEach(f=>{if(f.id!=='mk'&&toM(f.start)>t&&rows.length<3)rows.push([f.start+' '+(f.id==='pr'?'퍼레이드':f.id==='gs'?'가든무대':f.id==='mp'?'맵핑쇼':f.name.slice(0,4)),toM(f.start),T0,f.id==='pr'?'parade':f.id==='mp'?'star':'stage'])});
   let ch=rows.map(([n,at,from,ic])=>{const left=at-t,pct=Math.max(0,Math.min(100,left/(at-from)*100));
-    return '<div class="cd'+(left<=30?' hot':'')+'" role="img" aria-label="'+n+'까지 '+dur(left)+'" title="'+n+'">'+CI[ic]+'<div class="cdb"><i style="width:'+pct.toFixed(1)+'%"></i></div><b class="num">'+(left>=60?Math.floor(left/60)+':'+String(left%60).padStart(2,'0'):left+'′')+'</b></div>'}).join('');
+    return '<div class="cd'+(left<=30?' hot':'')+'" role="img" aria-label="'+n+'까지 '+dur(left)+'" title="'+n+'">'+CI[ic]+'<span class="cdn"><b class="num">'+n.split(' ')[0]+'</b>'+n.split(' ').slice(1).join(' ')+'</span><div class="cdb"><i style="width:'+pct.toFixed(1)+'%"></i></div><b class="num">'+(left>=60?Math.floor(left/60)+':'+String(left%60).padStart(2,'0'):left+'′')+'</b></div>'}).join('');
+  if(rows.length)ch='<div class="cdh">별표한 공연까지 남은 시간</div>'+ch;
   if(S.obs.length){const pct=Math.round((S.cal-1)*100);ch+='<span class="chip num cal">오늘 혼잡 '+(pct>=0?'+':'')+pct+'%</span>'}
   $('chips').innerHTML=ch;
 
@@ -552,6 +557,7 @@ function candBtn(c,top){
 }
 
 ['Rec','Attr','Perf'].forEach(k=>$('tb'+k).onclick=()=>setTab(k));
+$('chips').onclick=()=>setTab('Perf');
 $('simOn').onchange=e=>{S.sim=e.target.checked;if(S.sim)S.simTime='16:00';save();render()};
 $('simTime').onchange=e=>{if(e.target.value){S.simTime=e.target.value;save();render()}};
 let resetCode=null;
