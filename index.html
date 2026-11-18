@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>롯데월드 11/23 동선 판단기</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Do+Hyeon&family=IBM+Plex+Sans+KR:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  /* one column, phone-first: status bar, one action card, candidates, log */
+  --bg:#F3F5F8;--panel:#FFFFFF;--ink:#152238;--ink-2:#5B6880;--line:#DCE1EA;
+  --accent:#0F6E64;--accent-soft:#E2F2EF;
+  --ok:#2E7D32;--ok-bg:#E7F4E8;--warn:#A15C00;--warn-bg:#FCF0DC;--bad:#B42318;--bad-bg:#FCE9E7;
+  --font-display:"Do Hyeon","IBM Plex Sans KR",system-ui,sans-serif;
+  --font-body:"IBM Plex Sans KR",system-ui,-apple-system,"Apple SD Gothic Neo","Malgun Gothic",sans-serif;
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0E1420;--panel:#162033;--ink:#E8EDF5;--ink-2:#9AA7BD;--line:#2A3650;--accent:#4CC2B0;--accent-soft:#16352F;--ok:#7BCB7F;--ok-bg:#1B3220;--warn:#F2B866;--warn-bg:#3A2A10;--bad:#F2877B;--bad-bg:#3D1A17;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#0E1420;--panel:#162033;--ink:#E8EDF5;--ink-2:#9AA7BD;--line:#2A3650;--accent:#4CC2B0;--accent-soft:#16352F;--ok:#7BCB7F;--ok-bg:#1B3220;--warn:#F2B866;--warn-bg:#3A2A10;--bad:#F2877B;--bad-bg:#3D1A17;color-scheme:dark}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font-family:var(--font-body);font-size:16px;line-height:1.5}
+main{max-width:560px;margin:0 auto;padding:12px 16px 40px;display:grid;gap:14px}
+.num{font-variant-numeric:tabular-nums}
+.bar{display:flex;justify-content:space-between;align-items:center;gap:12px}
+.clock{font-family:var(--font-display);font-size:46px;line-height:1}
+.where{font-size:14px;color:var(--ink-2)}
+.chips{display:flex;gap:6px;flex-wrap:wrap}
+.chip{padding:4px 10px;border-radius:999px;font-size:13px;background:var(--panel);border:1px solid var(--line);white-space:nowrap}
+.chip.hot{background:var(--warn-bg);color:var(--warn);border-color:transparent}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:16px;display:grid;gap:12px}
+.label{font-size:13px;color:var(--ink-2)}
+.big{font-family:var(--font-display);font-size:30px;line-height:1.15}
+button,input{font:inherit;color:inherit}
+button{cursor:pointer;border:1px solid var(--line);background:var(--panel);border-radius:12px;padding:10px 14px;min-height:46px}
+button:focus-visible,input:focus-visible,summary:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.go{background:var(--accent);color:#fff;border-color:var(--accent);font-weight:600;font-size:17px}
+:root[data-theme="dark"] .go{color:#0E1420}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .go{color:#0E1420}}
+.ghost{background:transparent}
+.btns{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.cand{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:2px 10px;align-items:center;text-align:left;width:100%}
+.cand .nm{font-weight:600}
+.cand .sub{font-size:13px;color:var(--ink-2)}
+.cand .mx{grid-row:span 2;text-align:right;font-size:13px;color:var(--ink-2)}
+.cand.top{border-color:var(--accent);background:var(--accent-soft)}
+.list{display:grid;gap:8px}
+.wait{display:flex;align-items:center;gap:8px}
+.wait input{width:100px;font-family:var(--font-display);font-size:30px;text-align:center;border:1px solid var(--line);border-radius:12px;background:var(--bg);padding:4px}
+.quick{display:flex;gap:6px;flex-wrap:wrap}
+.quick button{min-height:38px;padding:6px 12px;font-size:14px}
+.res{border-radius:12px;padding:12px 14px;font-weight:600}
+.res.ok{background:var(--ok-bg);color:var(--ok)}
+.res.bad{background:var(--bad-bg);color:var(--bad)}
+.res span{display:block;font-weight:400;font-size:14px}
+.log{display:grid;gap:4px;margin:0;padding:0;list-style:none}
+.log li{display:flex;gap:12px;font-size:15px;padding:6px 0;border-bottom:1px solid var(--line)}
+.log li span:first-child{color:var(--ink-2);min-width:44px}
+details{font-size:14px;color:var(--ink-2)}
+details[open]{display:grid;gap:10px}
+summary{cursor:pointer;padding:6px 0}
+.set{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.set input[type=checkbox]{width:20px;height:20px;accent-color:var(--accent)}
+.set input[type=time]{border:1px solid var(--line);border-radius:10px;background:var(--bg);padding:6px 8px}
+.cand .mx b{display:block;font-family:var(--font-display);font-weight:400;font-size:20px}
+.cand.ok .mx b{color:var(--ok)}.cand.tight .mx b{color:var(--warn)}.cand.no .mx b{color:var(--bad)}
+.estrow{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.estrow>div{background:var(--bg);border-radius:12px;padding:10px 12px}
+.estrow b{font-family:var(--font-display);font-weight:400;font-size:30px;margin-right:6px}
+.estrow b.okc{color:var(--ok)}
+.chip.cal{background:var(--accent-soft);color:var(--accent);border-color:transparent}
+.hide{display:none!important}
+</style>
+</head>
+<body>
+<main>
+  <div class="bar">
+    <div>
+      <div class="clock num" id="clock">--:--</div>
+      <div class="where" id="where">-</div>
+    </div>
+    <div class="chips" id="chips" style="justify-content:flex-end"></div>
+  </div>
+
+  <section class="card" id="action"></section>
+
+  <section class="card" id="others">
+    <div class="label">다른 후보</div>
+    <div class="list" id="otherList"></div>
+  </section>
+
+  <section class="card">
+    <div class="label">오늘 기록</div>
+    <ul class="log" id="log"></ul>
+  </section>
+
+  <details>
+    <summary>설정</summary>
+    <label class="set" for="fGarden"><input type="checkbox" id="fGarden"> 가든스테이지 18:30 공연 있음</label>
+    <div class="set">
+      <label class="set" for="simOn"><input type="checkbox" id="simOn"> 연습 모드 (시각 직접 입력)</label>
+      <input type="time" id="simTime" aria-label="연습 시각">
+    </div>
+    <div><button type="button" id="reset" class="ghost">기록 지우고 처음부터</button></div>
+  </details>
+</main>
+
+<script>
+const $=id=>document.getElementById(id);
+const toM=s=>{const[h,m]=s.split(':').map(Number);return h*60+m};
+const fmt=m=>{m=Math.round(m);const h=Math.floor((((m%1440)+1440)%1440)/60),mm=((m%60)+60)%60;return String(h).padStart(2,'0')+':'+String(mm).padStart(2,'0')};
+const dur=m=>m>=60?(Math.floor(m/60)+'시간'+(m%60?' '+m%60+'분':'')):m+'분';
+const r5=x=>Math.max(0,Math.round(x/5)*5);
+
+const ZN={gate:'정문',MI:'매직아일랜드','1F':'어드벤처 1층','2F':'어드벤처 2층','3F':'어드벤처 3층','4F':'어드벤처 4층',out:'월드파크'};
+const FL={'1F':1,'2F':2,'3F':3,'4F':4};
+function travel(a,b){
+  if(a===b)return 2;
+  if(a==='gate')return b==='MI'?10:3+((FL[b]||1)-1)*3;
+  if(b==='gate')return travel(b,a);
+  if(a==='out'||b==='out')return 12;
+  if(a==='MI'||b==='MI'){const f=FL[a==='MI'?b:a];return 10+(f-1)*2}
+  return Math.abs(FL[a]-FL[b])*3+2;
+}
+
+/* base = 2025 average standby (queue-times), kong from 2026 reviews */
+const PLACES=[
+ {id:'atl',name:'아틀란티스',z:'MI',ride:5,pri:10,kind:'ride',base:87},
+ {id:'gsw',name:'자이로스윙',z:'MI',ride:5,pri:9,kind:'ride',base:65},
+ {id:'com',name:'혜성특급',z:'MI',ride:5,pri:8,kind:'ride',base:81},
+ {id:'gdr',name:'자이로드롭',z:'MI',ride:3,pri:7,kind:'ride',base:45},
+ {id:'bng',name:'번지드롭',z:'MI',ride:3,pri:6,kind:'ride',base:35,flag:'운영 확인 필요'},
+ {id:'swg',name:'회전그네',z:'MI',ride:3,pri:4,kind:'ride',base:25,night:true,flag:'운영 확인 필요'},
+ {id:'map1',name:'매직캐슬 맵핑쇼',z:'MI',ride:10,pri:9,kind:'spot',from:'17:15',repeat:2,base:5,fixedWait:true},
+ {id:'fre',name:'후렌치레볼루션',z:'2F',ride:3,pri:8,kind:'ride',base:67},
+ {id:'bmp',name:'범퍼카',z:'2F',ride:5,pri:2,kind:'ride',base:66},
+ {id:'kong',name:'콩X고질라',z:'3F',ride:15,pri:5,kind:'ride',base:65},
+ {id:'phr',name:'파라오의 분노',z:'4F',ride:5,pri:5,kind:'ride',base:81,flag:'리뉴얼 가능성'},
+ {id:'bal',name:'풍선비행',z:'4F',ride:5,pri:3,kind:'ride',base:78},
+ {id:'sin',name:'신밧드의 모험',z:'1F',ride:8,pri:3,kind:'ride',base:55},
+ {id:'trn',name:'로티트레인 디저트 열차',z:'1F',ride:8,pri:4,kind:'ride',base:30},
+ {id:'dk',name:'디저트 왕국 포토존',z:'1F',ride:10,pri:6,kind:'spot',base:10,fixedWait:true}
+];
+const FIXED=[
+ {id:'gs',name:'가든스테이지 공연 + 도시락',z:'1F',start:'18:30',arrive:'18:25',end:'19:00',opt:'garden'},
+ {id:'pr',name:'해피 크리스마스 퍼레이드',z:'1F',start:'20:00',arrive:'19:30',end:'20:30',sub:'자리 잡고 도시락'},
+ {id:'mk',name:'크리스마스 마켓',z:'out',start:'21:00',arrive:'21:00',end:'22:00'}
+];
+const OUT_CLOSE=toM('21:00');
+const DAY=0.95;
+
+function tod(t,z){
+  let f=t<toM('17:00')?1:t<toM('18:00')?0.95:t<toM('19:00')?0.75:t<toM('20:00')?0.65:t<toM('20:30')?(z==='MI'?0.6:0.5):0.55;
+  if(z==='MI'&&t>=toM('18:00'))f*=0.9;
+  return f;
+}
+function est(p,t){
+  if(p.fixedWait)return {e:p.base,lo:p.base,hi:p.base};
+  const e=p.base*tod(t,p.z)*DAY*S.cal;
+  return {e:r5(e),lo:r5(e*0.75),hi:r5(e*1.25)};
+}
+
+const fresh=()=>({loc:'gate',sel:null,wait:'',queue:null,log:[],done:{},sim:true,simTime:'15:30',garden:true,cal:1,obs:[]});
+let S=fresh(),loaded=false;
+try{const s=JSON.parse(localStorage.getItem('lw1123v3')||'null');if(s){S=Object.assign(fresh(),s);loaded=true}}catch(e){}
+try{if(!loaded&&new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Seoul'}).format(new Date())==='2026-11-23')S.sim=false}catch(e){}
+const save=()=>{try{localStorage.setItem('lw1123v3',JSON.stringify(S))}catch(e){}};
+
+function kst(){const p=new Intl.DateTimeFormat('en-GB',{timeZone:'Asia/Seoul',hour:'2-digit',minute:'2-digit',hour12:false}).formatToParts(new Date());const g=t=>+p.find(x=>x.type===t).value;return g('hour')*60+g('minute')}
+const now=()=>S.sim?toM(S.simTime):kst();
+const eff=()=>Math.max(now(),toM('16:00'));
+const fixedList=()=>FIXED.filter(f=>!(f.opt==='garden'&&!S.garden)&&!S.done[f.id]);
+function nextFixed(t){return fixedList().find(f=>toM(f.end)>t)}
+function deadlineFor(p,t){
+  let dl=Infinity;const nf=nextFixed(t);
+  if(nf)dl=toM(nf.arrive)-travel(p.z,nf.z);
+  if(p.z==='MI')dl=Math.min(dl,OUT_CLOSE);
+  return Math.min(dl,toM('21:00'));
+}
+
+function observe(p,t,actual){
+  if(p.fixedWait)return;
+  const raw=p.base*tod(t,p.z)*DAY;if(raw<=0)return;
+  const ratio=Math.min(3,Math.max(0.3,actual/raw));
+  S.obs.push(ratio);
+  let w=0,sum=0;S.obs.forEach((r,i)=>{const k=i+1;w+=k;sum+=r*k});
+  S.cal=Math.round(sum/w*100)/100;
+}
+
+function candidates(){
+  const t=eff(),from=S.loc,out=[];
+  PLACES.forEach(p=>{
+    const n=S.done[p.id]||0;if(n>=(p.repeat||1))return;
+    const tr=travel(from,p.z),arr=t+tr;
+    if(p.from&&arr<toM(p.from))return;
+    if(p.id==='map1'&&n===1&&t<toM('20:30'))return;
+    const mw=Math.floor(deadlineFor(p,t)-arr-p.ride);
+    const x=est(p,arr);
+    const fit=x.hi<=mw?'ok':x.e<=mw?'tight':'no';
+    let sc=p.pri*10-tr*1.5-x.e*0.35;
+    if(p.night&&t>=toM('19:00'))sc+=40;
+    if(p.id==='map1')sc+=n===0?45:70;
+    if(p.flag)sc-=8;
+    if(fit==='tight')sc-=25;
+    out.push({p,mw,sc,tr,x,fit});
+  });
+  const rank={ok:0,tight:1,no:2};
+  return out.sort((a,b)=>rank[a.fit]-rank[b.fit]||b.sc-a.sc);
+}
+function fixedDue(){
+  const t=eff(),nf=nextFixed(t);if(!nf)return null;
+  const leaveBy=toM(nf.arrive)-travel(S.loc,nf.z);
+  const anyFits=candidates().some(c=>c.fit!=='no'&&c.mw>=5);
+  if(t>=leaveBy-5||!anyFits)return {f:nf,leaveBy};
+  return null;
+}
+function addLog(name){S.log.push({t:fmt(now()),name})}
+
+function render(){
+  const t=now();
+  $('clock').textContent=fmt(t);
+  $('where').textContent=(S.sim?'연습 · ':'')+ZN[S.loc];
+  const chips=[];
+  if(t<toM('16:00'))chips.push(['입장',toM('16:00')-t]);
+  fixedList().forEach(f=>{const d=toM(f.start)-t;if(d>0&&chips.length<2)chips.push([f.id==='pr'?'퍼레이드':f.id==='gs'?'공연':'마켓',d])});
+  if(t<OUT_CLOSE&&chips.length<3)chips.push(['야외 종료',OUT_CLOSE-t]);
+  let ch=chips.map(([n,d])=>'<span class="chip num'+(d<=30?' hot':'')+'">'+n+' '+dur(d)+'</span>').join('');
+  if(S.obs.length){const pct=Math.round((S.cal-1)*100);ch+='<span class="chip num cal">오늘 혼잡 '+(pct>=0?'+':'')+pct+'%</span>'}
+  $('chips').innerHTML=ch;
+
+  const A=$('action');A.innerHTML='';
+  const others=$('others');others.classList.remove('hide');
+
+  if(S.queue){
+    const q=S.queue;
+    A.innerHTML='<div class="label">'+(q.kind==='fixed'?'진행 중':'줄 서는 중')+'</div><div class="big">'+q.name+'</div>'+
+      '<div class="chips"><span class="chip num">예상 '+(q.kind==='fixed'?'종료':'탑승 완료')+' '+fmt(q.end)+'</span></div>'+
+      '<div class="btns"><button class="ghost" id="bQuit">포기</button><button class="go" id="bDone">'+(q.kind==='ride'?'탑승 완료':'완료')+'</button></div>';
+    $('bDone').onclick=()=>{if(S.sim)S.simTime=fmt(Math.max(now(),q.end));S.done[q.id]=(S.done[q.id]||0)+1;S.loc=q.z;addLog(q.name);S.queue=null;S.sel=null;S.wait='';save();render()};
+    $('bQuit').onclick=()=>{S.queue=null;S.sel=null;S.wait='';save();render()};
+    others.classList.add('hide');
+  }
+  else if(S.sel){
+    const p=PLACES.find(x=>x.id===S.sel)||FIXED.find(x=>x.id===S.sel);
+    const isFixed=!!FIXED.find(x=>x.id===S.sel);
+    const tr=travel(S.loc,p.z);
+    if(isFixed){
+      A.innerHTML='<div class="label">'+ZN[p.z]+' · 이동 '+tr+'분</div><div class="big">'+p.name+'</div>'+
+        '<div class="chips"><span class="chip num">'+p.start+' 시작</span>'+(p.sub?'<span class="chip">'+p.sub+'</span>':'')+'</div>'+
+        '<div class="btns"><button class="ghost" id="bBack">다른 곳</button><button class="go" id="bArr">도착</button></div>';
+      $('bArr').onclick=()=>{if(S.sim)S.simTime=fmt(Math.max(now()+tr,toM(p.arrive)));S.queue={id:p.id,name:p.name,z:p.z,end:toM(p.end),kind:'fixed'};S.loc=p.z;save();render()};
+    }else{
+      const arr=S.sim?eff()+tr:eff();
+      const mw=Math.floor(deadlineFor(p,eff())-arr-p.ride);
+      const x=est(p,arr);
+      const isRide=p.kind==='ride'&&!p.fixedWait;
+      A.innerHTML='<div class="label">'+ZN[p.z]+(S.loc!==p.z?' · 이동 '+tr+'분':'')+(p.flag?' · '+p.flag:'')+'</div><div class="big">'+p.name+'</div>'+
+        '<div class="estrow num"><div><div class="label">예상 대기</div><b>'+x.e+'분</b><span class="label">'+(isRide?x.lo+'~'+x.hi+'분':'')+'</span></div><div><div class="label">이 정도면 OK</div><b class="okc">'+Math.max(0,mw)+'분</b><span class="label">이하</span></div></div>'+
+        '<div id="res"></div>'+
+        (isRide?'<div class="label">앱에 뜬 실제 대기 (선택)</div><div class="wait"><input type="number" inputmode="numeric" min="0" max="200" id="wIn" placeholder="'+x.e+'" aria-label="실제 대기시간(분)"><span>분</span></div><div class="quick" id="quick"></div>':'')+
+        '<div class="btns"><button class="ghost" id="bBack">다른 곳</button><button class="go" id="bQ">'+(isRide?'줄 서기':'시작')+'</button></div>';
+      const wIn=$('wIn');
+      if(wIn){
+        const qk=$('quick');[10,20,30,40,50,60,70,80,90].forEach(v=>{const b=document.createElement('button');b.type='button';b.textContent=v;b.onclick=()=>{S.wait=v;save();wIn.value=v;upd()};qk.appendChild(b)});
+        wIn.value=S.wait;wIn.oninput=()=>{S.wait=wIn.value===''?'':Math.max(0,Math.round(+wIn.value));save();upd()};
+      }
+      function upd(){
+        const r=$('res');const has=S.wait!=='';
+        const w=has?+S.wait:x.e,end=arr+w+p.ride;
+        if(w<=mw){r.innerHTML='<div class="res ok num">'+(has?'좋아요':'예상대로면 OK')+' · '+fmt(end)+' 끝<span>다음 일정까지 '+(mw-w)+'분 여유</span></div>'}
+        else{
+          const alt=candidates().filter(c=>c.p.id!==p.id&&c.fit==='ok').sort((a,b)=>(a.p.z===p.z?0:1)-(b.p.z===p.z?0:1)||b.sc-a.sc).slice(0,3);
+          r.innerHTML='<div class="res bad num">'+(w-mw)+'분 늦어요<span>'+(alt.length?'대신 이곳은 어때요':'다음 일정으로 이동하세요')+'</span></div><div class="list" id="alts"></div>';
+          alt.forEach(c=>$('alts').appendChild(candBtn(c)));
+        }
+      }
+      upd();
+      $('bQ').onclick=()=>{
+        const has=S.wait!=='';const w=has?+S.wait:x.e;
+        if(has&&isRide)observe(p,arr,w);
+        const start=S.sim?arr:eff();if(S.sim)S.simTime=fmt(arr);
+        S.queue={id:p.id,name:p.name,z:p.z,end:start+w+p.ride,kind:p.kind};S.loc=p.z;S.wait='';save();render()};
+    }
+    $('bBack').onclick=()=>{S.sel=null;S.wait='';save();render()};
+    others.classList.add('hide');
+  }
+  else{
+    const due=fixedDue();
+    const cs=candidates();
+    const usable=cs.filter(c=>c.mw>=5&&c.fit!=='no');
+    if(due&&eff()<toM(due.f.end)){
+      const f=due.f;const late=eff()>due.leaveBy;
+      A.innerHTML='<div class="label">'+(late?'지금 바로 이동':fmt(due.leaveBy)+'까지 출발')+' · '+ZN[f.z]+'</div><div class="big">'+f.name+'</div>'+
+        '<div class="chips"><span class="chip num hot">'+f.start+' 시작</span>'+(f.sub?'<span class="chip">'+f.sub+'</span>':'')+'</div>'+
+        '<div class="btns"><button class="ghost" id="bSkip">이번엔 건너뛰기</button><button class="go" id="bGo">가는 중</button></div>';
+      $('bGo').onclick=()=>{S.sel=f.id;save();render()};
+      $('bSkip').onclick=()=>{S.done[f.id]=1;addLog(f.name+' (건너뜀)');save();render()};
+    }else if(!usable.length){
+      A.innerHTML='<div class="big">오늘 일정 끝</div><div class="label">수고했어요</div>';
+    }else{
+      A.innerHTML='<div class="label">다음 추천</div><div class="list" id="topList"></div>';
+      usable.slice(0,3).forEach((c,i)=>$('topList').appendChild(candBtn(c,i===0)));
+    }
+    const ol=$('otherList');ol.innerHTML='';
+    const rest=(due?cs:cs.filter(c=>!usable.slice(0,3).includes(c))).filter(c=>c.mw>=5);
+    rest.forEach(c=>ol.appendChild(candBtn(c)));
+    if(!rest.length)others.classList.add('hide');
+  }
+
+  const lg=$('log');lg.innerHTML=S.log.length?'':'<li><span></span><span class="label">아직 없음</span></li>';
+  S.log.slice().reverse().forEach(e=>{const li=document.createElement('li');li.innerHTML='<span class="num">'+e.t+'</span><span></span>';li.lastChild.textContent=e.name;lg.appendChild(li)});
+
+  $('fGarden').checked=S.garden;$('simOn').checked=S.sim;$('simTime').value=S.simTime;$('simTime').disabled=!S.sim;
+}
+
+function candBtn(c,top){
+  const b=document.createElement('button');b.type='button';b.className='cand '+c.fit+(top?' top':'');
+  const w=c.p.fixedWait?(c.p.id==='map1'?'회차 대기':'예상 '+c.x.e+'분'):'예상 '+c.x.e+'분';
+  b.innerHTML='<span class="nm"></span><span class="mx num">'+w+'<b>'+(c.fit==='ok'?'여유':c.fit==='tight'?'빠듯':'초과')+'</b></span><span class="sub"></span>';
+  b.querySelector('.nm').textContent=c.p.name;
+  b.querySelector('.sub').textContent=ZN[c.p.z]+(c.tr>2?' · 이동 '+c.tr+'분':' · 바로 옆')+' · '+c.mw+'분 이하 OK'+(c.p.flag?' · '+c.p.flag:'');
+  b.onclick=()=>{S.sel=c.p.id;S.wait='';save();render();window.scrollTo({top:0,behavior:'smooth'})};
+  return b;
+}
+
+$('fGarden').onchange=e=>{S.garden=e.target.checked;save();render()};
+$('simOn').onchange=e=>{S.sim=e.target.checked;save();render()};
+$('simTime').onchange=e=>{if(e.target.value){S.simTime=e.target.value;save();render()}};
+$('reset').onclick=()=>{const g=S.garden,sm=S.sim;S=fresh();S.garden=g;S.sim=sm;save();render()};
+render();
+setInterval(()=>{if(!S.sim&&document.activeElement?.tagName!=='INPUT')render()},20000);
+</script>
+</body>
+</html>
