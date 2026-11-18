@@ -128,6 +128,8 @@ img.hero{width:33%;max-width:170px;aspect-ratio:4/3;object-fit:cover;border-radi
 .cds{cursor:pointer;flex:1;max-width:300px;min-width:150px;display:grid;gap:6px}
 .cdt{display:flex;justify-content:space-between;gap:8px;font-size:13px;color:var(--ink-2)}
 .cdt b{font-weight:600;color:var(--ink)}
+.cdt{align-items:center}.cdi{display:inline-flex;color:var(--accent)}.cdi svg{width:18px;height:18px}
+.cd1.hot .cdi{color:var(--warn)}
 .cdb{position:relative;height:14px;border-radius:7px;background:var(--line);overflow:hidden;margin-top:5px}
 .cdb i{display:block;height:100%;border-radius:7px;background:var(--accent);transition:width .6s}
 .cdb u{position:absolute;top:0;bottom:0;width:3px;margin-right:-1.5px;background:var(--panel);opacity:.9}
@@ -433,7 +435,7 @@ function render(){
    star:'<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" aria-hidden="true"><path d="M8 1.5l1.9 4.1 4.6.5-3.4 3 .9 4.4L8 11.3l-4 2.2.9-4.4-3.4-3 4.6-.5z"/></svg>'};
   const T0=toM('16:00'),T1=toM('21:00'),left=Math.max(0,T1-Math.max(t,T0)),pct=left/(T1-T0)*100;
   const pre=t<T0;
-  let ch='<div class="cd1'+(left<=30?' hot':'')+'" role="img" aria-label="21:00 종료까지 '+dur(left)+'"><div class="cdt"><span>'+(pre?'16:00 입장 · ':'')+'21:00 종료</span><b class="num">'+(t>=T1?'종료':dur(left)+' 남음')+'</b></div>'+
+  let ch='<div class="cd1'+(left<=30?' hot':'')+'" role="img" aria-label="21:00 종료까지 '+dur(left)+'"><div class="cdt"><span class="cdi">'+IC.clock+'</span><b class="num">'+dur(left)+'</b></div>'+
     '<div class="cdb"><i style="width:'+pct.toFixed(1)+'%"></i>'+
     fixedList().filter(f=>f.id!=='mk'&&toM(f.start)>Math.max(t,T0)&&toM(f.start)<T1).map(f=>'<u title="'+f.start+' '+f.name+'" style="right:'+((toM(f.start)-T0)/(T1-T0)*100).toFixed(1)+'%"></u>').join('')+'</div></div>';
   if(S.obs.length){const pct=Math.round((S.cal-1)*100);ch+='<span class="chip num cal">오늘 혼잡 '+(pct>=0?'+':'')+pct+'%</span>'}
