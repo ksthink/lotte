@@ -143,6 +143,8 @@ img.dimg{width:100%;aspect-ratio:16/9;object-fit:cover;border-radius:10px;margin
 .nextprev{border-top:1px dashed var(--line);padding-top:12px}
 .nextprev .cand{cursor:default;opacity:1}
 .nextprev .chk{pointer-events:auto}
+.rcode{font-family:var(--font-display);font-size:24px;color:var(--ink);margin:0 4px}
+#resetIn{width:72px;text-align:center;font-family:var(--font-display);font-size:22px;border:1px solid var(--line);border-radius:10px;background:var(--bg);padding:6px}
 .hide{display:none!important}
 </style>
 </head>
@@ -198,6 +200,7 @@ img.dimg{width:100%;aspect-ratio:16/9;object-fit:cover;border-radius:10px;margin
     </div>
     <div class="label">운영시간·공연은 11/18 공식 사이트 기준. 사진 © 롯데월드(공식 사이트 이미지 연결). 당일 값은 <a href="https://adventure.lotteworld.com/enjoy/attrctn/list">어트랙션</a> · <a href="https://adventure.lotteworld.com/enjoy/performance/list">공연</a>에서 확인.</div>
     <div><button type="button" id="reset" class="ghost">기록 지우고 처음부터</button></div>
+    <div id="resetBox" style="display:grid;gap:8px"></div>
   </details>
 </main>
 
@@ -551,7 +554,20 @@ function candBtn(c,top){
 ['Rec','Attr','Perf'].forEach(k=>$('tb'+k).onclick=()=>setTab(k));
 $('simOn').onchange=e=>{S.sim=e.target.checked;if(S.sim)S.simTime='16:00';save();render()};
 $('simTime').onchange=e=>{if(e.target.value){S.simTime=e.target.value;save();render()}};
-$('reset').onclick=()=>{const mu=S.must,sm=S.sim;S=fresh();S.must=mu;S.sim=sm;save();render()};
+let resetCode=null;
+function resetUI(msg){
+  const box=$('resetBox');
+  if(!resetCode){box.innerHTML='';return}
+  box.innerHTML='<div class="label">지우려면 숫자 <b class="rcode num">'+resetCode+'</b> 를 입력하세요</div>'+
+    '<div class="set"><input type="text" inputmode="numeric" maxlength="2" id="resetIn" autocomplete="off" aria-label="확인 숫자 두 자리">'+
+    '<button type="button" id="resetOk" class="ghost">지우기</button><button type="button" id="resetNo" class="ghost">취소</button></div>'+
+    (msg?'<div class="label" style="color:var(--bad)">'+msg+'</div>':'');
+  const inp=$('resetIn');inp.focus();
+  const go=()=>{if(inp.value.trim()===resetCode){const mu=S.must,sm=S.sim;S=fresh();S.must=mu;S.sim=sm;resetCode=null;save();render();resetUI()}else resetUI('숫자가 달라요. 다시 입력하세요.')};
+  $('resetOk').onclick=go;inp.onkeydown=e=>{if(e.key==='Enter')go()};
+  $('resetNo').onclick=()=>{resetCode=null;resetUI()};
+}
+$('reset').onclick=()=>{resetCode=String(10+Math.floor(Math.random()*90));resetUI()};
 render();setTab(S.tab||'Rec');
 setInterval(()=>{if(!S.sim&&document.activeElement?.tagName!=='INPUT')render()},10000);
 document.addEventListener('visibilitychange',()=>{if(!document.hidden&&!S.sim)render()});
