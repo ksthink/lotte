@@ -5,7 +5,8 @@
    "official": "adventure.lotteworld.com 어트랙션 목록(이름·위치·키 제한·동반·예약·싱글라이더·운영시간·상태)",
    "guide_map": "2026 가이드맵 PDF(guide_* 항목, description, map_xy: 1920x1080pt 페이지 좌표)",
    "avg_wait_2025_min": "queue-times.com 2025 평균, 30/60/90분 묶음 값이라 참고용",
-   "closed_1123": "사용자 확인 운휴 + 스페인해적선 리뉴얼 보도"
+   "closed_1123": "사용자 확인 운휴 + 스페인해적선 리뉴얼 보도",
+   "image_url": "공식 사이트 목록 썸네일 주소(파일은 저장하지 않고 주소만 기록, 저작권은 롯데월드)"
   },
   "caveats": [
    "hours_1118·status_1118_evening은 11/18 하루의 값이며 날마다 달라짐",
@@ -42,7 +43,8 @@
    ],
    "avg_wait_2025_min": null,
    "magic_pass": false,
-   "note": "2026-07-24 오픈, 매직패스 대상(42종) 아님"
+   "note": "2026-07-24 오픈, 매직패스 대상(42종) 아님",
+   "image_url": "https://adventure.lotteworld.com/api/upload/202607/24/2026072419f916e803840"
   },
   {
    "official_id": "6386",
@@ -69,7 +71,8 @@
    "map_xy": null,
    "avg_wait_2025_min": null,
    "magic_pass": null,
-   "note": null
+   "note": null,
+   "image_url": "https://adventure.lotteworld.com/api/upload/202609/26/202609261a0dadb12b890"
   },
   {
    "official_id": "6360",
@@ -96,7 +99,8 @@
    "map_xy": null,
    "avg_wait_2025_min": null,
    "magic_pass": null,
-   "note": null
+   "note": null,
+   "image_url": "https://adventure.lotteworld.com/api/upload/202606/29/2026062919f1121408820"
   },
   {
    "official_id": "6315",
@@ -126,7 +130,8 @@
    ],
    "avg_wait_2025_min": null,
    "magic_pass": null,
-   "note": null
+   "note": null,
+   "image_url": "https://adventure.lotteworld.com/api/upload/202604/03/2026040319d5132150920"
   },
   {
    "official_id": "6006",
@@ -153,7 +158,8 @@
    "map_xy": null,
    "avg_wait_2025_min": null,
    "magic_pass": null,
-   "note": null
+   "note": null,
+   "image_url": "https://adventure.lotteworld.com/api/upload/202606/29/2026062919f112472bb40"
   },
   {
    "official_id": "6314",
@@ -183,7 +189,8 @@
    ],
    "avg_wait_2025_min": null,
    "magic_pass": null,
-   "note": null
+   "note": null,
+   "image_url": "https://adventure.lotteworld.com/api/upload/202604/03/2026040319d513a268d60"
   },
   {
    "official_id": "6313",
@@ -210,7 +217,8 @@
    ],
    "avg_wait_2025_min": null,
    "magic_pass": null,
-   "note": null
+   "note": null,
+   "image_url": "https://adventure.lotteworld.com/api/upload/202604/03/2026040319d5130f8ae70"
   },
   {
    "official_id": "5997",
@@ -240,7 +248,8 @@
    ],
    "avg_wait_2025_min": 54,
    "magic_pass": null,
-   "note": null
+   "note": null,
+   "image_url": "https://adventure.lotteworld.com/api/upload/202507/04/20250704197d43a8f1150"
   },
   {
    "official_id": "5962",
@@ -270,7 +279,8 @@
    ],
    "avg_wait_2025_min": 60,
    "magic_pass": null,
-   "note": null
+   "note": null,
+   "image_url": "https://adventure.lotteworld.com/api/upload/202507/04/20250704197d43b21c180"
   },
   {
    "official_id": "1201",
@@ -300,7 +310,8 @@
    ],
    "avg_wait_2025_min": null,
    "magic_pass": null,
-   "note": null
+   "note": null,
+   "image_url": "https://adventure.lotteworld.com/api/upload/202507/04/20250704197d43bc81a90"
   },
   {
    "official_id": "1206",
@@ -330,7 +341,8 @@
    ],
    "avg_wait_2025_min": 45,
    "magic_pass": null,
-   "note": null
+   "note": null,
+   "image_url": "https://adventure.lotteworld.com/api/upload/202606/08/2026060819ea5a3d0e010"
   },
   {
    "official_id": "1204",
@@ -360,7 +372,8 @@
    ],
    "avg_wait_2025_min": 60,
    "magic_pass": null,
-   "note": null
+   "note": null,
+   "image_url": "https://adventure.lotteworld.com/api/upload/202507/04/20250704197d451c8a670"
   },
   {
    "official_id": "4735",
@@ -390,7 +403,8 @@
    ],
    "avg_wait_2025_min": 48,
    "magic_pass": null,
-   "note": null
+   "note": null,
+   "image_url": "https://adventure.lotteworld.com/api/upload/202604/06/2026040619d60e6a2ad80"
   },
   {
    "official_id": "2286",
@@ -420,7 +434,8 @@
    ],
    "avg_wait_2025_min": 87,
    "magic_pass": null,
-   "note": null
+   "note": null,
+   "image_url": "https://adventure.lotteworld.com/api/upload/202606/09/2026060919eaa89e36120"
   },
   {
    "official_id": "1214",
@@ -450,7 +465,8 @@
    ],
    "avg_wait_2025_min": 81,
    "magic_pass": null,
-   "note": null
+   "note": null,
+   "image_url": "https://adventure.lotteworld.com/api/upload/202509/09/202509091992da302a720"
   },
   {
    "official_id": "1190",
@@ -480,7 +496,8 @@
    ],
    "avg_wait_2025_min": null,
    "magic_pass": null,
-   "note": null
+   "note": null,
+   "image_url": "https://adventure.lotteworld.com/api/upload/202509/09/202509091992da3b2c830"
   },
   {
    "official_id": "1188",
@@ -510,7 +527,8 @@
    ],
    "avg_wait_2025_min": 55,
    "magic_pass": null,
-   "note": null
+   "note": null,
+   "image_url": "https://adventure.lotteworld.com/api/upload/202606/07/2026060719ea056cd4030"
   },
   {
    "official_id": "1189",
@@ -540,7 +558,8 @@
    ],
    "avg_wait_2025_min": null,
    "magic_pass": null,
-   "note": null
+   "note": null,
+   "image_url": "https://adventure.lotteworld.com/api/upload/202509/09/202509091992da521ab50"
   },
   {
    "official_id": "1192",
@@ -570,7 +589,8 @@
    ],
    "avg_wait_2025_min": 74,
    "magic_pass": null,
-   "note": null
+   "note": null,
+   "image_url": "https://adventure.lotteworld.com/api/upload/202606/08/2026060819ea5b7fec970"
   },
   {
    "official_id": "1193",
@@ -600,7 +620,8 @@
    ],
    "avg_wait_2025_min": null,
    "magic_pass": null,
-   "note": null
+   "note": null,
+   "image_url": "https://adventure.lotteworld.com/api/upload/202606/09/2026060919eaaa7fd2a90"
   },
   {
    "official_id": "4731",
@@ -630,7 +651,8 @@
    ],
    "avg_wait_2025_min": null,
    "magic_pass": null,
-   "note": null
+   "note": null,
+   "image_url": "https://adventure.lotteworld.com/api/upload/202507/04/20250704197d4587df020"
   },
   {
    "official_id": "5360",
@@ -660,7 +682,8 @@
    ],
    "avg_wait_2025_min": 42,
    "magic_pass": null,
-   "note": null
+   "note": null,
+   "image_url": "https://adventure.lotteworld.com/api/upload/202606/07/2026060719ea0c3b5ee50"
   },
   {
    "official_id": "3874",
@@ -690,7 +713,8 @@
    ],
    "avg_wait_2025_min": null,
    "magic_pass": null,
-   "note": null
+   "note": null,
+   "image_url": "https://adventure.lotteworld.com/api/upload/202507/04/20250704197d45a439940"
   },
   {
    "official_id": "1198",
@@ -720,7 +744,8 @@
    ],
    "avg_wait_2025_min": 67,
    "magic_pass": null,
-   "note": null
+   "note": null,
+   "image_url": "https://adventure.lotteworld.com/api/upload/202507/04/20250704197d45b155b70"
   },
   {
    "official_id": "1197",
@@ -750,7 +775,8 @@
    ],
    "avg_wait_2025_min": 66,
    "magic_pass": null,
-   "note": null
+   "note": null,
+   "image_url": "https://adventure.lotteworld.com/api/upload/202507/04/20250704197d45bdbba80"
   },
   {
    "official_id": "5574",
@@ -777,7 +803,8 @@
    ],
    "avg_wait_2025_min": null,
    "magic_pass": null,
-   "note": null
+   "note": null,
+   "image_url": "https://adventure.lotteworld.com/api/upload/202507/04/20250704197d45c72dd90"
   },
   {
    "official_id": "2444",
@@ -804,7 +831,8 @@
    ],
    "avg_wait_2025_min": 81,
    "magic_pass": null,
-   "note": null
+   "note": null,
+   "image_url": "https://adventure.lotteworld.com/api/upload/202507/04/20250704197d45d1b8310"
   },
   {
    "official_id": "1199",
@@ -834,7 +862,8 @@
    ],
    "avg_wait_2025_min": 78,
    "magic_pass": null,
-   "note": null
+   "note": null,
+   "image_url": "https://adventure.lotteworld.com/api/upload/202601/07/2026010719b9666609350"
   },
   {
    "official_id": "4154",
@@ -864,7 +893,8 @@
    ],
    "avg_wait_2025_min": 30,
    "magic_pass": null,
-   "note": null
+   "note": null,
+   "image_url": "https://adventure.lotteworld.com/api/upload/202606/08/2026060819ea4c3177a30"
   },
   {
    "official_id": "4342",
@@ -894,7 +924,8 @@
    ],
    "avg_wait_2025_min": null,
    "magic_pass": null,
-   "note": null
+   "note": null,
+   "image_url": "https://adventure.lotteworld.com/api/upload/202606/09/2026060919eaad86f4980"
   },
   {
    "official_id": "4470",
@@ -924,7 +955,8 @@
    ],
    "avg_wait_2025_min": null,
    "magic_pass": null,
-   "note": null
+   "note": null,
+   "image_url": "https://adventure.lotteworld.com/api/upload/202509/09/202509091992da83ec880"
   },
   {
    "official_id": "1209",
@@ -954,7 +986,8 @@
    ],
    "avg_wait_2025_min": null,
    "magic_pass": null,
-   "note": null
+   "note": null,
+   "image_url": "https://adventure.lotteworld.com/api/upload/202609/26/202609261a0dadef69960"
   },
   {
    "official_id": "5797",
@@ -984,7 +1017,8 @@
    ],
    "avg_wait_2025_min": null,
    "magic_pass": null,
-   "note": null
+   "note": null,
+   "image_url": "https://adventure.lotteworld.com/api/upload/202606/09/2026060919eab07feb050"
   },
   {
    "official_id": "1196",
@@ -1014,7 +1048,8 @@
    ],
    "avg_wait_2025_min": null,
    "magic_pass": null,
-   "note": null
+   "note": null,
+   "image_url": "https://adventure.lotteworld.com/api/upload/202509/09/202509091992daa6b0d20"
   },
   {
    "official_id": "4162",
@@ -1044,7 +1079,8 @@
    ],
    "avg_wait_2025_min": 30,
    "magic_pass": null,
-   "note": null
+   "note": null,
+   "image_url": "https://adventure.lotteworld.com/api/upload/202509/25/202509251997fb04b9d80"
   },
   {
    "official_id": "2146",
@@ -1074,7 +1110,8 @@
    ],
    "avg_wait_2025_min": null,
    "magic_pass": null,
-   "note": null
+   "note": null,
+   "image_url": "https://adventure.lotteworld.com/api/upload/202509/09/202509091992dac288240"
   },
   {
    "official_id": "4116",
@@ -1104,7 +1141,8 @@
    ],
    "avg_wait_2025_min": null,
    "magic_pass": null,
-   "note": null
+   "note": null,
+   "image_url": "https://adventure.lotteworld.com/api/upload/202606/09/2026060919eab0d3a8120"
   },
   {
    "official_id": "4161",
@@ -1134,7 +1172,8 @@
    ],
    "avg_wait_2025_min": 30,
    "magic_pass": null,
-   "note": null
+   "note": null,
+   "image_url": "https://adventure.lotteworld.com/api/upload/202509/09/202509091992db1abc240"
   },
   {
    "official_id": "4613",
@@ -1164,7 +1203,8 @@
    ],
    "avg_wait_2025_min": null,
    "magic_pass": null,
-   "note": null
+   "note": null,
+   "image_url": "https://adventure.lotteworld.com/api/upload/202509/09/202509091992db23be430"
   },
   {
    "official_id": "5029",
@@ -1194,7 +1234,8 @@
    ],
    "avg_wait_2025_min": null,
    "magic_pass": null,
-   "note": null
+   "note": null,
+   "image_url": "https://adventure.lotteworld.com/api/upload/202606/07/2026060719ea0dad3de70"
   },
   {
    "official_id": "5092",
@@ -1221,7 +1262,8 @@
    ],
    "avg_wait_2025_min": 44,
    "magic_pass": null,
-   "note": null
+   "note": null,
+   "image_url": "https://adventure.lotteworld.com/api/upload/202509/19/2025091919961247daa50"
   },
   {
    "official_id": "5093",
@@ -1251,7 +1293,8 @@
    ],
    "avg_wait_2025_min": 40,
    "magic_pass": null,
-   "note": null
+   "note": null,
+   "image_url": "https://adventure.lotteworld.com/api/upload/202509/19/2025091919961177e3e80"
   },
   {
    "official_id": "5091",
@@ -1281,7 +1324,8 @@
    ],
    "avg_wait_2025_min": null,
    "magic_pass": null,
-   "note": null
+   "note": null,
+   "image_url": "https://adventure.lotteworld.com/api/upload/202507/04/20250704197d4718dce70"
   },
   {
    "official_id": "4704",
@@ -1311,7 +1355,8 @@
    ],
    "avg_wait_2025_min": null,
    "magic_pass": null,
-   "note": null
+   "note": null,
+   "image_url": "https://adventure.lotteworld.com/api/upload/202507/04/20250704197d473ff5480"
   },
   {
    "official_id": "1173",
@@ -1338,7 +1383,8 @@
    ],
    "avg_wait_2025_min": null,
    "magic_pass": null,
-   "note": null
+   "note": null,
+   "image_url": "https://adventure.lotteworld.com/api/upload/202606/11/2026061119eb55e26d320"
   },
   {
    "official_id": "1801",
@@ -1365,7 +1411,8 @@
    "map_xy": null,
    "avg_wait_2025_min": null,
    "magic_pass": null,
-   "note": null
+   "note": null,
+   "image_url": "https://adventure.lotteworld.com/api/upload/202604/22/2026042219db2a228e850"
   }
  ]
 }

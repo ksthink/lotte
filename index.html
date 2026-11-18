@@ -92,6 +92,29 @@ summary{cursor:pointer;padding:6px 0}
 .cand .tbar,.cand .bdg{grid-column:1/-1}
 .prog{height:14px;border-radius:7px;background:var(--bg);overflow:hidden}
 .prog>div{height:100%;background:var(--accent)}
+.tabs{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.tabs button{min-height:42px;font-weight:600;color:var(--ink-2)}
+.tabs button[aria-selected="true"]{background:var(--accent);color:#fff;border-color:var(--accent)}
+:root[data-theme="dark"] .tabs button[aria-selected="true"]{color:#0E1420}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .tabs button[aria-selected="true"]{color:#0E1420}}
+.pane{display:grid;gap:14px}
+.alist,.plist{list-style:none;margin:0;padding:0;display:grid}
+.alist li{display:grid;gap:5px;padding:10px 0;border-bottom:1px solid var(--line)}
+.alist li:last-child,.plist li:last-child{border-bottom:0}
+.arow{display:flex;justify-content:space-between;gap:8px;align-items:center;flex-wrap:wrap}
+.nm{font-weight:600}.sub{font-size:13px;color:var(--ink-2)}
+.off .nm,.off .tm{color:var(--ink-2);text-decoration:line-through}
+.plist li{display:grid;grid-template-columns:56px minmax(0,1fr);gap:10px;padding:10px 0;border-bottom:1px solid var(--line)}
+.plist .tm{font-family:var(--font-display);font-size:20px}
+.plist li.next{background:var(--accent-soft);margin:0 -10px;padding:10px;border-radius:10px;border-bottom:0}
+a{color:var(--accent)}
+.alist li{grid-template-columns:auto minmax(0,1fr);gap:12px;align-items:start}
+.ainfo{display:grid;gap:5px;grid-column:-2/-1}
+img.th{width:84px;height:64px;object-fit:cover;border-radius:10px;background:var(--bg)}
+.nmw{display:flex;align-items:center;gap:10px;min-width:0}
+img.tc{width:44px;height:44px;object-fit:cover;border-radius:10px;background:var(--bg);flex:none}
+img.hero{width:100%;aspect-ratio:16/9;object-fit:cover;border-radius:12px;background:var(--bg)}
+.off img{filter:grayscale(1);opacity:.6}
 .hide{display:none!important}
 </style>
 </head>
@@ -109,6 +132,12 @@ summary{cursor:pointer;padding:6px 0}
     <span class="badge no">운휴 아트란티스</span><span class="badge no">운휴 회전바구니</span><span class="badge no">운휴 어크로스다크</span><span class="badge">입장 마감 20:00</span>
   </div>
 
+  <div class="tabs" role="tablist">
+    <button type="button" role="tab" id="tbRec" aria-selected="true">추천</button>
+    <button type="button" role="tab" id="tbAttr" aria-selected="false">어트랙션</button>
+    <button type="button" role="tab" id="tbPerf" aria-selected="false">공연</button>
+  </div>
+  <div id="tabRec" class="pane">
   <section class="card" id="action"></section>
 
   <section class="card" id="others">
@@ -121,6 +150,10 @@ summary{cursor:pointer;padding:6px 0}
     <ul class="log" id="log"></ul>
   </section>
 
+  </div>
+  <div id="tabAttr" class="pane hide"></div>
+  <div id="tabPerf" class="pane hide"></div>
+
   <details>
     <summary>설정</summary>
     <label class="set" for="fGarden"><input type="checkbox" id="fGarden"> 가든스테이지 18:30 공연 보기</label>
@@ -128,7 +161,7 @@ summary{cursor:pointer;padding:6px 0}
       <label class="set" for="simOn"><input type="checkbox" id="simOn"> 연습 모드 (시각 직접 입력)</label>
       <input type="time" id="simTime" aria-label="연습 시각">
     </div>
-    <div class="label">운영시간·공연은 11/18 공식 사이트 기준. 당일 값은 <a href="https://adventure.lotteworld.com/enjoy/attrctn/list">어트랙션</a> · <a href="https://adventure.lotteworld.com/enjoy/performance/list">공연</a>에서 확인.</div>
+    <div class="label">운영시간·공연은 11/18 공식 사이트 기준. 사진 © 롯데월드(공식 사이트 이미지 연결). 당일 값은 <a href="https://adventure.lotteworld.com/enjoy/attrctn/list">어트랙션</a> · <a href="https://adventure.lotteworld.com/enjoy/performance/list">공연</a>에서 확인.</div>
     <div><button type="button" id="reset" class="ghost">기록 지우고 처음부터</button></div>
   </details>
 </main>
@@ -141,23 +174,27 @@ const dur=m=>m>=60?(Math.floor(m/60)+'시간'+(m%60?' '+m%60+'분':'')):m+'분';
 const r5=x=>Math.max(0,Math.round(x/5)*5);
 
 const ZN={gate:'정문',MI:'매직아일랜드','1F':'어드벤처 1층','2F':'어드벤처 2층','3F':'어드벤처 3층','4F':'어드벤처 4층',out:'월드파크'};
-const NODEZ={gate:'gate',f1_meet:'1F',f1_garden:'1F',f1_parade:'1F',sin:'1F',trn:'1F',fre:'2F',bmp:'2F',kong:'3F',phr:'4F',bal:'4F',atl:'MI',gsw:'MI',gdr:'MI',com:'MI',gsp:'MI',castle:'MI',out:'out'};
+const NODEZ={gate:'gate',f1_meet:'1F',f1_garden:'1F',f1_parade:'1F',sin:'1F',trn:'1F',flu:'1F',fly:'1F',pubg:'1F',kart:'1F',fre:'2F',bmp:'2F',kong:'3F',phr:'4F',bal:'4F',atl:'MI',gsw:'MI',gdr:'MI',com:'MI',gsp:'MI',castle:'MI',out:'out'};
 /* minutes between places, built from the 2026 official guide map marker coordinates (data/lotteworld-graph.json) */
-const TRAVEL={"gate":{"gate":2,"f1_meet":3,"f1_garden":4,"f1_parade":5,"sin":5,"trn":4,"fre":6,"bmp":5,"kong":6,"phr":8,"bal":9,"atl":12,"gsw":13,"gdr":13,"com":13,"gsp":13,"castle":12,"out":9},"f1_meet":{"gate":3,"f1_meet":2,"f1_garden":2,"f1_parade":3,"sin":3,"trn":2,"fre":4,"bmp":3,"kong":4,"phr":6,"bal":7,"atl":10,"gsw":11,"gdr":11,"com":11,"gsp":11,"castle":10,"out":11},"f1_garden":{"gate":4,"f1_meet":2,"f1_garden":2,"f1_parade":2,"sin":2,"trn":2,"fre":5,"bmp":4,"kong":6,"phr":7,"bal":8,"atl":10,"gsw":10,"gdr":10,"com":10,"gsp":10,"castle":10,"out":12},"f1_parade":{"gate":5,"f1_meet":3,"f1_garden":2,"f1_parade":2,"sin":2,"trn":2,"fre":5,"bmp":5,"kong":6,"phr":8,"bal":8,"atl":10,"gsw":10,"gdr":10,"com":10,"gsp":10,"castle":10,"out":13},"sin":{"gate":5,"f1_meet":3,"f1_garden":2,"f1_parade":2,"sin":2,"trn":3,"fre":5,"bmp":5,"kong":6,"phr":8,"bal":8,"atl":9,"gsw":9,"gdr":9,"com":9,"gsp":9,"castle":9,"out":13},"trn":{"gate":4,"f1_meet":2,"f1_garden":2,"f1_parade":2,"sin":3,"trn":2,"fre":4,"bmp":4,"kong":5,"phr":7,"bal":7,"atl":11,"gsw":11,"gdr":11,"com":11,"gsp":11,"castle":11,"out":12},"fre":{"gate":6,"f1_meet":4,"f1_garden":5,"f1_parade":5,"sin":5,"trn":4,"fre":2,"bmp":2,"kong":3,"phr":5,"bal":4,"atl":10,"gsw":10,"gdr":10,"com":10,"gsp":10,"castle":10,"out":14},"bmp":{"gate":5,"f1_meet":3,"f1_garden":4,"f1_parade":5,"sin":5,"trn":4,"fre":2,"bmp":2,"kong":3,"phr":5,"bal":5,"atl":9,"gsw":10,"gdr":10,"com":10,"gsp":10,"castle":9,"out":13},"kong":{"gate":6,"f1_meet":4,"f1_garden":6,"f1_parade":6,"sin":6,"trn":5,"fre":3,"bmp":3,"kong":2,"phr":3,"bal":3,"atl":10,"gsw":11,"gdr":11,"com":11,"gsp":11,"castle":10,"out":14},"phr":{"gate":8,"f1_meet":6,"f1_garden":7,"f1_parade":8,"sin":8,"trn":7,"fre":5,"bmp":5,"kong":3,"phr":2,"bal":2,"atl":12,"gsw":12,"gdr":12,"com":12,"gsp":12,"castle":12,"out":16},"bal":{"gate":9,"f1_meet":7,"f1_garden":8,"f1_parade":8,"sin":8,"trn":7,"fre":4,"bmp":5,"kong":3,"phr":2,"bal":2,"atl":13,"gsw":13,"gdr":13,"com":13,"gsp":13,"castle":13,"out":17},"atl":{"gate":12,"f1_meet":10,"f1_garden":10,"f1_parade":10,"sin":9,"trn":11,"fre":10,"bmp":9,"kong":10,"phr":12,"bal":13,"atl":2,"gsw":2,"gdr":2,"com":3,"gsp":3,"castle":2,"out":20},"gsw":{"gate":13,"f1_meet":11,"f1_garden":10,"f1_parade":10,"sin":9,"trn":11,"fre":10,"bmp":10,"kong":11,"phr":12,"bal":13,"atl":2,"gsw":2,"gdr":2,"com":3,"gsp":3,"castle":2,"out":21},"gdr":{"gate":13,"f1_meet":11,"f1_garden":10,"f1_parade":10,"sin":9,"trn":11,"fre":10,"bmp":10,"kong":11,"phr":12,"bal":13,"atl":2,"gsw":2,"gdr":2,"com":2,"gsp":2,"castle":2,"out":21},"com":{"gate":13,"f1_meet":11,"f1_garden":10,"f1_parade":10,"sin":9,"trn":11,"fre":10,"bmp":10,"kong":11,"phr":12,"bal":13,"atl":3,"gsw":3,"gdr":2,"com":2,"gsp":2,"castle":2,"out":21},"gsp":{"gate":13,"f1_meet":11,"f1_garden":10,"f1_parade":10,"sin":9,"trn":11,"fre":10,"bmp":10,"kong":11,"phr":12,"bal":13,"atl":3,"gsw":3,"gdr":2,"com":2,"gsp":2,"castle":2,"out":21},"castle":{"gate":12,"f1_meet":10,"f1_garden":10,"f1_parade":10,"sin":9,"trn":11,"fre":10,"bmp":9,"kong":10,"phr":12,"bal":13,"atl":2,"gsw":2,"gdr":2,"com":2,"gsp":2,"castle":2,"out":20},"out":{"gate":9,"f1_meet":11,"f1_garden":12,"f1_parade":13,"sin":13,"trn":12,"fre":14,"bmp":13,"kong":14,"phr":16,"bal":17,"atl":20,"gsw":21,"gdr":21,"com":21,"gsp":21,"castle":20,"out":2}};
+const TRAVEL={"gate":{"gate":2,"f1_meet":3,"f1_garden":4,"f1_parade":5,"sin":5,"trn":4,"flu":5,"fly":4,"pubg":4,"kart":3,"fre":6,"bmp":5,"kong":6,"phr":8,"bal":9,"atl":12,"gsw":13,"gdr":13,"com":13,"gsp":13,"castle":12,"out":9},"f1_meet":{"gate":3,"f1_meet":2,"f1_garden":2,"f1_parade":3,"sin":3,"trn":2,"flu":3,"fly":2,"pubg":2,"kart":2,"fre":4,"bmp":3,"kong":4,"phr":6,"bal":7,"atl":10,"gsw":11,"gdr":11,"com":11,"gsp":11,"castle":10,"out":11},"f1_garden":{"gate":4,"f1_meet":2,"f1_garden":2,"f1_parade":2,"sin":2,"trn":2,"flu":2,"fly":3,"pubg":3,"kart":2,"fre":5,"bmp":4,"kong":6,"phr":7,"bal":8,"atl":10,"gsw":10,"gdr":10,"com":10,"gsp":10,"castle":10,"out":12},"f1_parade":{"gate":5,"f1_meet":3,"f1_garden":2,"f1_parade":2,"sin":2,"trn":2,"flu":2,"fly":3,"pubg":3,"kart":3,"fre":5,"bmp":5,"kong":6,"phr":8,"bal":8,"atl":10,"gsw":10,"gdr":10,"com":10,"gsp":10,"castle":10,"out":13},"sin":{"gate":5,"f1_meet":3,"f1_garden":2,"f1_parade":2,"sin":2,"trn":3,"flu":2,"fly":4,"pubg":4,"kart":3,"fre":5,"bmp":5,"kong":6,"phr":8,"bal":8,"atl":9,"gsw":9,"gdr":9,"com":9,"gsp":9,"castle":9,"out":13},"trn":{"gate":4,"f1_meet":2,"f1_garden":2,"f1_parade":2,"sin":3,"trn":2,"flu":3,"fly":2,"pubg":2,"kart":2,"fre":4,"bmp":4,"kong":5,"phr":7,"bal":7,"atl":11,"gsw":11,"gdr":11,"com":11,"gsp":11,"castle":11,"out":12},"flu":{"gate":5,"f1_meet":3,"f1_garden":2,"f1_parade":2,"sin":2,"trn":3,"flu":2,"fly":4,"pubg":3,"kart":3,"fre":6,"bmp":5,"kong":6,"phr":8,"bal":9,"atl":10,"gsw":10,"gdr":10,"com":10,"gsp":10,"castle":10,"out":13},"fly":{"gate":4,"f1_meet":2,"f1_garden":3,"f1_parade":3,"sin":4,"trn":2,"flu":4,"fly":2,"pubg":2,"kart":2,"fre":3,"bmp":4,"kong":5,"phr":7,"bal":7,"atl":11,"gsw":12,"gdr":12,"com":12,"gsp":12,"castle":11,"out":12},"pubg":{"gate":4,"f1_meet":2,"f1_garden":3,"f1_parade":3,"sin":4,"trn":2,"flu":3,"fly":2,"pubg":2,"kart":2,"fre":4,"bmp":4,"kong":5,"phr":7,"bal":7,"atl":11,"gsw":12,"gdr":12,"com":12,"gsp":12,"castle":11,"out":12},"kart":{"gate":3,"f1_meet":2,"f1_garden":2,"f1_parade":3,"sin":3,"trn":2,"flu":3,"fly":2,"pubg":2,"kart":2,"fre":4,"bmp":3,"kong":4,"phr":6,"bal":7,"atl":10,"gsw":11,"gdr":11,"com":11,"gsp":11,"castle":10,"out":11},"fre":{"gate":6,"f1_meet":4,"f1_garden":5,"f1_parade":5,"sin":5,"trn":4,"flu":6,"fly":3,"pubg":4,"kart":4,"fre":2,"bmp":2,"kong":3,"phr":5,"bal":4,"atl":10,"gsw":10,"gdr":10,"com":10,"gsp":10,"castle":10,"out":14},"bmp":{"gate":5,"f1_meet":3,"f1_garden":4,"f1_parade":5,"sin":5,"trn":4,"flu":5,"fly":4,"pubg":4,"kart":3,"fre":2,"bmp":2,"kong":3,"phr":5,"bal":5,"atl":9,"gsw":10,"gdr":10,"com":10,"gsp":10,"castle":9,"out":13},"kong":{"gate":6,"f1_meet":4,"f1_garden":6,"f1_parade":6,"sin":6,"trn":5,"flu":6,"fly":5,"pubg":5,"kart":4,"fre":3,"bmp":3,"kong":2,"phr":3,"bal":3,"atl":10,"gsw":11,"gdr":11,"com":11,"gsp":11,"castle":10,"out":14},"phr":{"gate":8,"f1_meet":6,"f1_garden":7,"f1_parade":8,"sin":8,"trn":7,"flu":8,"fly":7,"pubg":7,"kart":6,"fre":5,"bmp":5,"kong":3,"phr":2,"bal":2,"atl":12,"gsw":12,"gdr":12,"com":12,"gsp":12,"castle":12,"out":16},"bal":{"gate":9,"f1_meet":7,"f1_garden":8,"f1_parade":8,"sin":8,"trn":7,"flu":9,"fly":7,"pubg":7,"kart":7,"fre":4,"bmp":5,"kong":3,"phr":2,"bal":2,"atl":13,"gsw":13,"gdr":13,"com":13,"gsp":13,"castle":13,"out":17},"atl":{"gate":12,"f1_meet":10,"f1_garden":10,"f1_parade":10,"sin":9,"trn":11,"flu":10,"fly":11,"pubg":11,"kart":10,"fre":10,"bmp":9,"kong":10,"phr":12,"bal":13,"atl":2,"gsw":2,"gdr":2,"com":3,"gsp":3,"castle":2,"out":20},"gsw":{"gate":13,"f1_meet":11,"f1_garden":10,"f1_parade":10,"sin":9,"trn":11,"flu":10,"fly":12,"pubg":12,"kart":11,"fre":10,"bmp":10,"kong":11,"phr":12,"bal":13,"atl":2,"gsw":2,"gdr":2,"com":3,"gsp":3,"castle":2,"out":21},"gdr":{"gate":13,"f1_meet":11,"f1_garden":10,"f1_parade":10,"sin":9,"trn":11,"flu":10,"fly":12,"pubg":12,"kart":11,"fre":10,"bmp":10,"kong":11,"phr":12,"bal":13,"atl":2,"gsw":2,"gdr":2,"com":2,"gsp":2,"castle":2,"out":21},"com":{"gate":13,"f1_meet":11,"f1_garden":10,"f1_parade":10,"sin":9,"trn":11,"flu":10,"fly":12,"pubg":12,"kart":11,"fre":10,"bmp":10,"kong":11,"phr":12,"bal":13,"atl":3,"gsw":3,"gdr":2,"com":2,"gsp":2,"castle":2,"out":21},"gsp":{"gate":13,"f1_meet":11,"f1_garden":10,"f1_parade":10,"sin":9,"trn":11,"flu":10,"fly":12,"pubg":12,"kart":11,"fre":10,"bmp":10,"kong":11,"phr":12,"bal":13,"atl":3,"gsw":3,"gdr":2,"com":2,"gsp":2,"castle":2,"out":21},"castle":{"gate":12,"f1_meet":10,"f1_garden":10,"f1_parade":10,"sin":9,"trn":11,"flu":10,"fly":11,"pubg":11,"kart":10,"fre":10,"bmp":9,"kong":10,"phr":12,"bal":13,"atl":2,"gsw":2,"gdr":2,"com":2,"gsp":2,"castle":2,"out":20},"out":{"gate":9,"f1_meet":11,"f1_garden":12,"f1_parade":13,"sin":13,"trn":12,"flu":13,"fly":12,"pubg":12,"kart":11,"fre":14,"bmp":13,"kong":14,"phr":16,"bal":17,"atl":20,"gsw":21,"gdr":21,"com":21,"gsp":21,"castle":20,"out":2}};
 function travel(a,b){return (TRAVEL[a]&&TRAVEL[a][b])||10}
 /* base = 2025 average standby (queue-times), kong from 2026 reviews; n = graph node */
 const PLACES=[
- {id:'atl',close:'20:50',n:'atl',name:'아틀란티스',z:'MI',ride:5,pri:10,kind:'ride',base:87},
- {id:'gsw',close:'20:50',n:'gsw',name:'자이로스윙',z:'MI',ride:5,pri:9,kind:'ride',base:65},
- {id:'com',close:'20:50',n:'com',name:'혜성특급',z:'MI',ride:5,pri:8,kind:'ride',base:81},
- {id:'gdr',close:'20:50',n:'gdr',name:'자이로드롭',z:'MI',ride:3,pri:7,kind:'ride',base:45},
- {id:'gsp',close:'20:40',n:'gsp',name:'자이로스핀',z:'MI',ride:3,pri:6,kind:'ride',base:48},
- {id:'fre',close:'20:55',n:'fre',name:'후렌치레볼루션',z:'2F',ride:3,pri:8,kind:'ride',base:67},
- {id:'bmp',close:'20:50',n:'bmp',name:'범퍼카',z:'2F',ride:5,pri:2,kind:'ride',base:66},
- {id:'kong',close:'20:10',n:'kong',name:'콩X고질라',z:'3F',ride:15,pri:5,kind:'ride',base:65},
- {id:'phr',close:'20:50',n:'phr',name:'파라오의 분노',z:'4F',ride:5,pri:5,kind:'ride',base:81,flag:'11/18 정기점검 중'},
- {id:'bal',close:'20:40',n:'bal',name:'풍선비행',z:'4F',ride:5,pri:3,kind:'ride',base:78},
- {id:'sin',close:'20:30',n:'sin',name:'신밧드의 모험',z:'1F',ride:8,pri:3,kind:'ride',base:55},
+ {id:'atl',g:33,close:'20:50',n:'atl',name:'아틀란티스',z:'MI',ride:5,pri:10,kind:'ride',base:87},
+ {id:'gsw',g:34,close:'20:50',n:'gsw',name:'자이로스윙',z:'MI',ride:5,pri:9,kind:'ride',base:65},
+ {id:'com',g:38,close:'20:50',n:'com',name:'혜성특급',z:'MI',ride:5,pri:8,kind:'ride',base:81},
+ {id:'gdr',g:36,close:'20:50',n:'gdr',name:'자이로드롭',z:'MI',ride:3,pri:7,kind:'ride',base:45},
+ {id:'gsp',g:39,close:'20:40',n:'gsp',name:'자이로스핀',z:'MI',ride:3,pri:6,kind:'ride',base:48},
+ {id:'fre',g:26,close:'20:55',n:'fre',name:'후렌치레볼루션',z:'2F',ride:3,pri:8,kind:'ride',base:67},
+ {id:'bmp',g:27,close:'20:50',n:'bmp',name:'범퍼카',z:'2F',ride:5,pri:2,kind:'ride',base:66},
+ {id:'kong',g:28,close:'20:10',n:'kong',name:'콩X고질라',z:'3F',ride:15,pri:5,kind:'ride',base:65},
+ {id:'phr',g:31,close:'20:50',n:'phr',name:'파라오의 분노',z:'4F',ride:5,pri:5,kind:'ride',base:81,flag:'11/18 정기점검 중'},
+ {id:'bal',g:30,close:'20:40',n:'bal',name:'풍선비행',z:'4F',ride:5,pri:3,kind:'ride',base:78},
+ {id:'sin',g:6,close:'20:30',n:'sin',name:'신밧드의 모험',z:'1F',ride:8,pri:3,kind:'ride',base:55},
+ {id:'flu',g:8,close:'20:50',n:'flu',name:'후룸라이드',z:'1F',ride:6,pri:6,kind:'ride',base:74},
+ {id:'fly',g:12,close:'20:40',n:'fly',name:'플라이벤처',z:'1F',ride:5,pri:6,kind:'ride',base:42},
+ {id:'pubg',g:11,close:'20:40',n:'pubg',name:'배틀그라운드',z:'1F',ride:10,pri:4,kind:'ride',base:54},
+ {id:'kart',g:25,close:'20:50',n:'kart',name:'카트라이더',z:'1F',ride:5,pri:4,kind:'ride',base:60},
  {id:'dk',n:'f1_meet',name:'디저트 왕국 포토존',z:'1F',ride:10,pri:4,kind:'spot',base:10,fixedWait:true}
 ];
 const FIXED=[
@@ -166,6 +203,11 @@ const FIXED=[
  {id:'mp',n:'castle',name:'매직캐슬 라이츠업 (맵핑쇼)',z:'MI',start:'20:40',arrive:'20:40',end:'20:50'},
  {id:'mk',n:'out',name:'크리스마스 마켓',z:'out',start:'21:00',arrive:'21:00',end:'22:00'}
 ];
+/* official site snapshot 2026-11-18 (data/attractions.json, data/performances.json) */
+const ATTR=[{"no":28,"nm":"콩X고질라더라이드","ar":"어드벤처 3층","d":"히브 비행선을 타고 콩X고질라와 미지의 세계로!","lo":110,"hi":195,"sg":false,"rv":false,"h":["10:00","20:10"],"st":"운행마침","c23":null,"im":"202607/24/2026072419f916e803840"},{"no":null,"nm":"호러환타지드림","ar":"매직아일랜드","d":null,"lo":110,"hi":null,"sg":false,"rv":false,"h":["18:00","20:50"],"st":"운행마침","c23":null,"im":"202609/26/202609261a0dadb12b890"},{"no":null,"nm":"마도신당","ar":"매직아일랜드","d":null,"lo":null,"hi":null,"sg":false,"rv":false,"h":["11:30","20:30"],"st":"운행마침","c23":null,"im":"202606/29/2026062919f1121408820"},{"no":41,"nm":"아르카나라이드","ar":"매직아일랜드","d":"정령의 나무를 치유하러 떠나는 마법여행","lo":110,"hi":null,"sg":false,"rv":false,"h":["10:00","20:50"],"st":"운행마침","c23":null,"im":"202604/03/2026040319d5132150920"},{"no":null,"nm":"귀담","ar":"매직아일랜드","d":null,"lo":null,"hi":null,"sg":false,"rv":false,"h":["11:30","20:30"],"st":"운행마침","c23":null,"im":"202606/29/2026062919f112472bb40"},{"no":42,"nm":"에오스타워","ar":"매직아일랜드","d":"타워 꼭대기를 열어 핑크빈을 찾아 떠나는 모험","lo":120,"hi":null,"sg":false,"rv":false,"h":["10:00","20:50"],"st":"운행마침","c23":null,"im":"202604/03/2026040319d513a268d60"},{"no":40,"nm":"스톤익스프레스","ar":"매직아일랜드","d":"돌의 정령을 따라 핑크빈을 찾아 떠나는 모험","lo":110,"hi":null,"sg":false,"rv":false,"h":null,"st":"일일점검","c23":null,"im":"202604/03/2026040319d5130f8ae70"},{"no":11,"nm":"배틀그라운드 월드 에이전트","ar":"어드벤처 1층","d":"적들에게 맞서 생존을 위한 섬 탈출기 워크스루 슈팅 시어터","lo":130,"hi":null,"sg":false,"rv":false,"h":["10:00","20:40"],"st":"정상운행","c23":null,"im":"202507/04/20250704197d43a8f1150"},{"no":25,"nm":"카트라이더레이싱월드","ar":"어드벤처 1층","d":"롯데월드에서 즐기는 카트라이더 레이싱","lo":130,"hi":180,"sg":false,"rv":false,"h":["10:00","20:50"],"st":"대기마감","c23":null,"im":"202507/04/20250704197d43b21c180"},{"no":29,"nm":"월드모노레일(실내운영)","ar":"어드벤처 3층","d":"로티,로리로 변신한 모노레일을 타고 어드벤처 한바퀴","lo":null,"hi":null,"sg":false,"rv":false,"h":["10:30","20:45"],"st":"대기마감","c23":null,"im":"202507/04/20250704197d43bc81a90"},{"no":36,"nm":"자이로드롭","ar":"매직아일랜드","d":"상공 70m 높이에서 100km/h 속도로 자유낙하하는 공포와 스릴","lo":130,"hi":190,"sg":false,"rv":false,"h":["10:00","20:50"],"st":"운행마침","c23":null,"im":"202606/08/2026060819ea5a3d0e010"},{"no":34,"nm":"자이로스윙","ar":"매직아일랜드","d":"석촌호수에 떨어질 듯 말 듯 아찔한 스윙","lo":130,"hi":190,"sg":false,"rv":false,"h":["10:00","20:50"],"st":"운행마침","c23":null,"im":"202507/04/20250704197d451c8a670"},{"no":39,"nm":"자이로스핀","ar":"매직아일랜드","d":"거대한 나침반을 타고 돌고 도는 아찔한 서핑타임","lo":125,"hi":null,"sg":false,"rv":false,"h":["10:00","20:40"],"st":"운행마침","c23":null,"im":"202604/06/2026040619d60e6a2ad80"},{"no":33,"nm":"아트란티스","ar":"매직아일랜드","d":"급발진하는 보트를 타고 미스터리 신전 속으로!","lo":135,"hi":190,"sg":false,"rv":false,"h":["10:00","20:50"],"st":"운행마침","c23":"정기점검","im":"202606/09/2026060919eaa89e36120"},{"no":38,"nm":"혜성특급","ar":"매직아일랜드","d":"좌석이 회전하는 혜성특급열차를 타고 떠나는 어둠속 우주여행","lo":120,"hi":null,"sg":false,"rv":false,"h":["10:00","20:50"],"st":"운행마침","c23":null,"im":"202509/09/202509091992da302a720"},{"no":7,"nm":"스페인해적선","ar":"어드벤처 1층","d":"75도 각도까지 올라가는 스릴 넘치는 해적선","lo":110,"hi":null,"sg":true,"rv":false,"h":["10:00","20:55"],"st":"정상운행","c23":"2026-11-22 운행 종료(리뉴얼)","im":"202509/09/202509091992da3b2c830"},{"no":6,"nm":"신밧드의모험","ar":"어드벤처 1층","d":"보트를 타고 떠나는 지하 속 신밧드의 모험 이야기","lo":110,"hi":null,"sg":false,"rv":false,"h":["10:00","20:30"],"st":"정상운행","c23":null,"im":"202606/07/2026060719ea056cd4030"},{"no":13,"nm":"회전목마","ar":"어드벤처 1층","d":"64필의 아름다운 백마를 타고 보내는 로맨틱한 시간","lo":100,"hi":null,"sg":false,"rv":false,"h":["10:00","20:55"],"st":"정상운행","c23":null,"im":"202509/09/202509091992da521ab50"},{"no":8,"nm":"후룸라이드","ar":"어드벤처 1층","d":"보트를 타고 급류에 밀려 폭포에서 떨어지는 스릴!","lo":110,"hi":null,"sg":false,"rv":false,"h":["10:00","20:50"],"st":"대기마감","c23":null,"im":"202606/08/2026060819ea5b7fec970"},{"no":9,"nm":"회전바구니","ar":"어드벤처 1층","d":"빙글빙글 손잡이를 돌릴수록 빠르게 회전하는 바구니","lo":110,"hi":null,"sg":false,"rv":false,"h":["11:00","19:50"],"st":"운행마침","c23":"일일점검","im":"202606/09/2026060919eaaa7fd2a90"},{"no":16,"nm":"드래곤 와일드슈팅","ar":"어드벤처 1층","d":"로티성에 쳐들어온 드래곤들을 슈팅건으로 무찔러봐요","lo":110,"hi":null,"sg":false,"rv":false,"h":["10:00","20:50"],"st":"정상운행","c23":null,"im":"202507/04/20250704197d4587df020"},{"no":12,"nm":"플라이벤처","ar":"어드벤처 1층","d":"괴짜과학자가 발명한 플라잉머신을 타고 떠나는 시공간 초월 비행","lo":140,"hi":195,"sg":false,"rv":false,"h":["11:00","20:40"],"st":"정상운행","c23":null,"im":"202606/07/2026060719ea0c3b5ee50"},{"no":14,"nm":"3D 황야의 무법자 Ⅱ","ar":"어드벤처 1층","d":"서부시대 보안관이 되어 악당을 물리치는 슈팅 배틀","lo":120,"hi":null,"sg":false,"rv":false,"h":["10:00","19:45"],"st":"운행마침","c23":null,"im":"202507/04/20250704197d45a439940"},{"no":26,"nm":"후렌치레볼루션","ar":"어드벤처 2층","d":"어드벤처 실내를 질주하는 롤러코스터","lo":120,"hi":null,"sg":true,"rv":false,"h":["10:00","20:55"],"st":"대기마감","c23":null,"im":"202507/04/20250704197d45b155b70"},{"no":27,"nm":"범퍼카(어드벤처)","ar":"어드벤처 2층","d":"앞에서 쾅! 뒤에서 쾅! 좌충우돌 범퍼카","lo":140,"hi":null,"sg":false,"rv":false,"h":["10:00","20:50"],"st":"대기마감","c23":null,"im":"202507/04/20250704197d45bdbba80"},{"no":32,"nm":"어크로스다크","ar":"어드벤처 4층","d":"잃어버린 유물을 찾아 우주로 떠나는 모험","lo":110,"hi":null,"sg":false,"rv":false,"h":null,"st":"정기운휴","c23":"정기운휴","im":"202507/04/20250704197d45c72dd90"},{"no":31,"nm":"파라오의 분노","ar":"어드벤처 4층","d":"파라오의 보물을 찾아 떠나는 스릴만점 다크 라이드!","lo":110,"hi":195,"sg":false,"rv":false,"h":null,"st":"정기점검","c23":null,"im":"202507/04/20250704197d45d1b8310"},{"no":30,"nm":"풍선비행","ar":"어드벤처 4층","d":"열기구를 타고 하늘 위에서 바라보는 어드벤처","lo":null,"hi":null,"sg":false,"rv":false,"h":["10:00","20:40"],"st":"대기마감","c23":null,"im":"202601/07/2026010719b9666609350"},{"no":10,"nm":"로티트레인","ar":"어드벤처 1층","d":"꼬마 기차를 타고 떠나는 어드벤처 한바퀴","lo":null,"hi":null,"sg":false,"rv":false,"h":["10:00","16:45"],"st":"운행마침","c23":null,"im":"202606/08/2026060819ea4c3177a30"},{"no":15,"nm":"키즈토리아","ar":"어드벤처 1층","d":"맨발로 마음껏 뛰어 놀 수 있는 거대한 동화 속 세상","lo":null,"hi":125,"sg":false,"rv":true,"h":["11:00","19:15"],"st":"운행마침","c23":null,"im":"202606/09/2026060919eaad86f4980"},{"no":35,"nm":"쁘띠빵빵","ar":"매직아일랜드","d":"호숫가를 드라이브 하는 귀여운 자동차","lo":110,"hi":null,"sg":false,"rv":false,"h":["11:00","19:50"],"st":"운행마침","c23":null,"im":"202509/09/202509091992da83ec880"},{"no":37,"nm":"환타지드림","ar":"매직아일랜드","d":"꼬마 기차를 타고 떠나는 동화속 세상","lo":110,"hi":null,"sg":false,"rv":false,"h":["11:00","17:00"],"st":"운행마침","c23":null,"im":"202609/26/202609261a0dadef69960"},{"no":20,"nm":"언더씨킹덤","ar":"키디존","d":"맨발로 마음껏 뛰어 놀 수 있는 바다왕국 놀이터","lo":null,"hi":125,"sg":false,"rv":false,"h":["11:00","19:50"],"st":"운행마침","c23":null,"im":"202606/09/2026060919eab07feb050"},{"no":17,"nm":"어린이범퍼카","ar":"키디존","d":"뛰뛰빵빵! 어린이들을 위한 범퍼카","lo":110,"hi":125,"sg":false,"rv":false,"h":["10:00","20:50"],"st":"대기마감","c23":null,"im":"202509/09/202509091992daa6b0d20"},{"no":23,"nm":"매직붕붕카","ar":"키디존","d":"좌충우돌 색색깔의 복어범퍼카","lo":125,"hi":140,"sg":false,"rv":false,"h":["11:00","19:50"],"st":"운행마침","c23":null,"im":"202509/25/202509251997fb04b9d80"},{"no":21,"nm":"유레카","ar":"키디존","d":"영차!영차! 하늘을 나는 꼬마 요술배","lo":110,"hi":null,"sg":false,"rv":false,"h":["11:00","19:50"],"st":"운행마침","c23":null,"im":"202509/09/202509091992dac288240"},{"no":18,"nm":"햇님달님","ar":"키디존","d":"호랑이를 피해 햇님달님 오누이와 하늘 위로 점프!","lo":90,"hi":140,"sg":false,"rv":false,"h":["10:00","20:50"],"st":"대기마감","c23":null,"im":"202606/09/2026060919eab0d3a8120"},{"no":22,"nm":"스윙팡팡","ar":"키디존","d":"로티와 친구들과 함께 위,아래로 통통 튀기는 바구니","lo":110,"hi":null,"sg":false,"rv":false,"h":["11:00","19:50"],"st":"운행마침","c23":null,"im":"202509/09/202509091992db1abc240"},{"no":19,"nm":"점핑피쉬","ar":"키디존","d":"무서운 상어를 피해 빙글빙글 점프하는 물고기","lo":110,"hi":null,"sg":false,"rv":false,"h":["11:00","19:50"],"st":"운행마침","c23":null,"im":"202509/09/202509091992db23be430"},{"no":1,"nm":"드림보트","ar":"언더랜드 B1층","d":"신비한 요정의 숲으로 떠나는 판타지 보트 라이드","lo":110,"hi":null,"sg":false,"rv":false,"h":["11:00","19:50"],"st":"운행마침","c23":null,"im":"202606/07/2026060719ea0dad3de70"},{"no":3,"nm":"와일드 밸리","ar":"언더랜드 B1층","d":"보트를 타고 급류를 지나는 미스터리 동굴 모험","lo":110,"hi":null,"sg":false,"rv":false,"h":null,"st":"정기점검","c23":null,"im":"202509/19/2025091919961247daa50"},{"no":4,"nm":"와일드 정글","ar":"언더랜드 B1층","d":"지프차를 타고 고대 유적을 찾아 떠나는 신전 탐험","lo":110,"hi":null,"sg":false,"rv":false,"h":["10:00","20:50"],"st":"정상운행","c23":null,"im":"202509/19/2025091919961177e3e80"},{"no":5,"nm":"와일드 윙","ar":"언더랜드 B1층","d":"강렬한 바람을 가르며 하늘을 비행하는 아찔한 체험","lo":110,"hi":null,"sg":false,"rv":false,"h":["10:00","20:50"],"st":"정상운행","c23":null,"im":"202507/04/20250704197d4718dce70"},{"no":2,"nm":"4D슈팅시어터","ar":"언더랜드 B1층","d":"4D로 즐기는 짜릿한 슈팅 어드벤처","lo":120,"hi":null,"sg":false,"rv":false,"h":["10:00","20:40"],"st":"정상운행","c23":null,"im":"202507/04/20250704197d473ff5480"},{"no":24,"nm":"어린이 동화극장","ar":"키디존","d":"어린이 뮤지컬이 펼쳐지는 극장","lo":null,"hi":null,"sg":false,"rv":false,"h":null,"st":"정기휴연","c23":null,"im":"202606/11/2026061119eb55e26d320"},{"no":null,"nm":"월드모노레일(매직아일랜드)","ar":"어드벤처 3층","d":null,"lo":null,"hi":null,"sg":false,"rv":false,"h":["10:30","18:00"],"st":"정기운휴","c23":null,"im":"202604/22/2026042219db2a228e850"}];
+const PERF=[["12:30","로티스 페어리테일 매지컬 타임","키디존 어린이 동화극장","스테이지"],["12:30","Smile, with Friends (캐릭터 포토타임)","어드벤처 1층 만남의 광장","포토타임"],["14:00","해피 크리스마스 퍼레이드","어드벤처 1층 퍼레이드 코스","퍼레이드"],["15:30","로티스 페어리테일 매지컬 타임","키디존 어린이 동화극장","스테이지"],["15:30","쿠키런 Smile with Friend","어드벤처 1층 만남의 광장","포토타임"],["16:30","Smile, with Friends (연기자 포토타임)","키즈토리아","포토타임"],["17:00","쿠키런 Smile with Friend","어드벤처 1층 만남의 광장","포토타임"],["17:30","Smile, with Friends (연기자 포토타임)","키즈토리아","포토타임"],["18:30","마법 성냥과 꿈꾸는 밤","가든스테이지","스테이지"],["20:00","해피 크리스마스 퍼레이드","어드벤처 1층 퍼레이드 코스","퍼레이드"],["20:40","매직캐슬 라이츠업","매직아일랜드 매직캐슬","기타"]];
+const INFO=no=>ATTR.find(a=>a.no===no);
+const pic=(a,cls)=>a&&a.im?'<img class="'+cls+'" loading="lazy" decoding="async" alt="" src="https://adventure.lotteworld.com/api/upload/'+a.im+'" onerror="this.remove()">':'';
 const OUT_CLOSE=toM('21:00');
 const CLOSED=['atl']; /* 11/23 운휴: 아트란티스(정기점검), 회전바구니(일일점검), 어크로스다크(정기운휴) */
 const DAY=0.95;
@@ -183,7 +225,7 @@ function est(p,t){
 
 const fresh=()=>({loc:'gate',sel:null,wait:'',queue:null,log:[],done:{},sim:false,simTime:'15:30',garden:true,cal:1,obs:[]});
 let S=fresh(),loaded=false;
-try{const s=JSON.parse(localStorage.getItem('lw1123v5')||'null');if(s){S=Object.assign(fresh(),s);loaded=true}}catch(e){}
+try{const s=JSON.parse(localStorage.getItem('lw1123v6')||'null');if(s){S=Object.assign(fresh(),s);loaded=true}}catch(e){}
 S.sim=false;
 const save=()=>{try{localStorage.setItem('lw1123v5',JSON.stringify(S))}catch(e){}};
 
@@ -267,6 +309,30 @@ function bar(o){
   return h+'</div>';
 }
 const LEGEND='<div class="legend"><span><i style="background:var(--line)"></i>이동</span><span><i style="background:var(--ok)"></i>대기</span><span><i style="background:var(--ink-2)"></i>탑승</span><span><i style="background:var(--ink);width:3px"></i>마감</span></div>';
+const hTxt=a=>a.lo&&a.hi?a.lo+'~'+a.hi+'cm':a.lo?a.lo+'cm↑':a.hi?a.hi+'cm↓':'';
+function infoBadges(p){const a=p.g&&INFO(p.g);if(!a)return '';
+  return (hTxt(a)?bdg('','',hTxt(a)):'')+(p.close?bdg('','clock','~'+p.close):'')+(a.sg?bdg('ok','','싱글라이더'):'')+(a.rv?bdg('warn','','예약제'):'');}
+function renderLists(){
+  const t=now();
+  const order=['매직아일랜드','어드벤처 1층','어드벤처 2층','어드벤처 3층','어드벤처 4층','키디존','언더랜드 B1층'];
+  let h='';
+  order.forEach(ar=>{const L=ATTR.filter(a=>a.ar===ar);if(!L.length)return;
+    h+='<div class="card"><div class="label">'+ar+' · '+L.length+'</div><ul class="alist">';
+    L.forEach(a=>{
+      const off=a.c23||(!a.h?a.st:'');
+      h+='<li'+(off?' class="off"':'')+'>'+pic(a,'th')+'<div class="ainfo"><div class="arow"><span class="nm">'+a.nm+'</span>'+(a.c23?bdg('no','alert','11/23 '+a.c23):(!a.h?bdg('warn','alert','11/18 '+a.st):''))+'</div>'+
+        (a.d?'<div class="sub">'+a.d+'</div>':'')+
+        '<div class="bdg">'+(a.h?bdg('','clock',a.h[0]+'~'+a.h[1]):'')+(hTxt(a)?bdg('','',hTxt(a)):'')+(a.sg?bdg('ok','','싱글라이더'):'')+(a.rv?bdg('warn','','예약제'):'')+'</div></div></li>';});
+    h+='</ul></div>';});
+  $('tabAttr').innerHTML=h+'<div class="label">운영시간·상태는 11/18 공식 사이트 기준</div>';
+  let ph='<div class="card"><div class="label">11월 23일 (월)</div><ul class="plist">';
+  let nextMarked=false;
+  PERF.forEach(([tm,nm,pl,cat])=>{const m=toM(tm),past=m<t;const nx=!past&&!nextMarked;if(nx)nextMarked=true;
+    const key=['마법 성냥','퍼레이드','라이츠업','쿠키런'].some(k=>nm.includes(k));
+    ph+='<li class="'+(past?'off':'')+(nx?' next':'')+'"><span class="tm num">'+tm+'</span><div><div class="nm">'+nm+(key?' '+bdg('ok','','추천'):'')+'</div><div class="sub">'+pl+' · '+cat+'</div></div></li>';});
+  $('tabPerf').innerHTML=ph+'</ul></div><div class="label">공연 사정에 따라 변경·취소될 수 있음 (11/18 공식 사이트 조회)</div>';
+}
+function setTab(k){S.tab=k;['Rec','Attr','Perf'].forEach(x=>{$('tab'+x).classList.toggle('hide',x!==k);$('tb'+x).setAttribute('aria-selected',x===k)});save()}
 function addLog(name){S.log.push({t:fmt(now()),name})}
 
 function render(){
@@ -310,8 +376,9 @@ function render(){
       const mw=Math.floor(deadlineFor(p,eff())-arr-p.ride);
       const x=est(p,arr);
       const isRide=p.kind==='ride'&&!p.fixedWait;
-      A.innerHTML='<div class="label">'+ZN[p.z]+'</div><div class="big">'+p.name+'</div>'+
-        '<div class="bdg">'+bdg('','walk',tr+'분')+bdg('','wait',(isRide?x.lo+'~'+x.hi:x.e)+'분')+bdg('','flag',Math.max(0,mw)+'분 이하 OK')+(p.flag?bdg('warn','alert',p.flag):'')+'</div>'+
+      A.innerHTML=pic(p.g&&INFO(p.g),'hero')+'<div class="label">'+ZN[p.z]+'</div><div class="big">'+p.name+'</div>'+
+        '<div class="bdg">'+bdg('','walk',tr+'분')+bdg('','wait',(isRide?x.lo+'~'+x.hi:x.e)+'분')+bdg('','flag',Math.max(0,mw)+'분 이하 OK')+infoBadges(p)+(p.flag?bdg('warn','alert',p.flag):'')+'</div>'+
+        (p.g&&INFO(p.g)&&INFO(p.g).d?'<div class="sub">'+INFO(p.g).d+'</div>':'')+
         '<div id="res"></div>'+
         (isRide?'<div class="label">앱에 뜬 실제 대기 (선택)</div><div class="wait"><input type="number" inputmode="numeric" min="0" max="200" id="wIn" placeholder="'+x.e+'" aria-label="실제 대기시간(분)"><span>분</span></div><div class="quick" id="quick"></div>':'')+
         '<div class="btns"><button class="ghost" id="bBack">다른 곳</button><button class="go" id="bQ">'+(isRide?'줄 서기':'시작')+'</button></div>';
@@ -368,26 +435,28 @@ function render(){
   const lg=$('log');lg.innerHTML=S.log.length?'':'<li><span></span><span class="label">아직 없음</span></li>';
   S.log.slice().reverse().forEach(e=>{const li=document.createElement('li');li.innerHTML='<span class="num">'+e.t+'</span><span></span>';li.lastChild.textContent=e.name;lg.appendChild(li)});
 
+  renderLists();
   $('fGarden').checked=S.garden;$('simOn').checked=S.sim;$('simTime').value=S.simTime;$('simTime').disabled=!S.sim;
 }
 
 function candBtn(c,top){
   const b=document.createElement('button');b.type='button';b.className='cand '+c.fit+(top?' top':'');
   const isR=!c.p.fixedWait;
-  b.innerHTML='<span class="nm"></span>'+fitBadge(c.fit,c.mw-c.x.e)+
+  b.innerHTML='<span class="nmw">'+pic(c.p.g&&INFO(c.p.g),'tc')+'<span class="nm"></span></span>'+fitBadge(c.fit,c.mw-c.x.e)+
     bar({tr:c.tr,w:c.x.e,lo:isR?c.x.lo:null,hi:isR?c.x.hi:null,ride:c.p.ride,mw:c.mw})+
-    '<div class="bdg">'+bdg('','walk',c.tr+'분')+bdg('','wait',(isR?c.x.lo+'~'+c.x.hi:c.x.e)+'분')+bdg('','flag','≤'+c.mw+'분')+(c.p.flag?bdg('warn','alert',c.p.flag):'')+'</div>';
+    '<div class="bdg">'+bdg('','walk',c.tr+'분')+bdg('','wait',(isR?c.x.lo+'~'+c.x.hi:c.x.e)+'분')+bdg('','flag','≤'+c.mw+'분')+infoBadges(c.p)+(c.p.flag?bdg('warn','alert',c.p.flag):'')+'</div>';
   b.querySelector('.nm').textContent=c.p.name;
   b.setAttribute('aria-label',c.p.name+', '+FITTXT[c.fit]+', 이동 '+c.tr+'분, 예상 대기 '+c.x.e+'분, '+c.mw+'분 이하면 가능');
   b.onclick=()=>{S.sel=c.p.id;S.wait='';save();render();window.scrollTo({top:0,behavior:'smooth'})};
   return b;
 }
 
+['Rec','Attr','Perf'].forEach(k=>$('tb'+k).onclick=()=>setTab(k));
 $('fGarden').onchange=e=>{S.garden=e.target.checked;save();render()};
 $('simOn').onchange=e=>{S.sim=e.target.checked;save();render()};
 $('simTime').onchange=e=>{if(e.target.value){S.simTime=e.target.value;save();render()}};
 $('reset').onclick=()=>{const g=S.garden,sm=S.sim;S=fresh();S.garden=g;S.sim=sm;save();render()};
-render();
+render();setTab(S.tab||'Rec');
 setInterval(()=>{if(!S.sim&&document.activeElement?.tagName!=='INPUT')render()},10000);
 document.addEventListener('visibilitychange',()=>{if(!document.hidden&&!S.sim)render()});
 </script>

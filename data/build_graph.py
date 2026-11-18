@@ -12,6 +12,10 @@ N=[ # id, name, area, x, y (px on 1600-wide render of the official guide map PDF
  ('f1_parade','퍼레이드 코스(가든스테이지 앞)','1F',560,505),
  ('sin','신밧드의 모험','1F',403,396),
  ('trn','로티트레인','1F',862,453),
+ ('flu','후룸라이드','1F',475,568),
+ ('fly','플라이벤처','1F',1033,381),
+ ('pubg','배틀그라운드','1F',972,401),
+ ('kart','카트라이더','1F',759,250),
  ('c1_w','1F 서쪽 에스컬레이터','1F',412,345),
  ('c1_m','1F 북쪽 에스컬레이터','1F',790,205),
  ('c1_e','1F 동쪽 에스컬레이터','1F',1145,265),
@@ -69,7 +73,7 @@ def dij(src):
         for v,w,_ in E.get(u,[]):
             if c+w<d.get(v,1e9):d[v]=c+w;heapq.heappush(pq,(c+w,v))
     return d
-P=['gate','f1_meet','f1_garden','f1_parade','sin','trn','fre','bmp','kong','phr','bal','atl','gsw','gdr','com','gsp','castle','out']
+P=['gate','f1_meet','f1_garden','f1_parade','sin','trn','flu','fly','pubg','kart','fre','bmp','kong','phr','bal','atl','gsw','gdr','com','gsp','castle','out']
 M={a:{} for a in P}
 for a in P:
     d=dij(a)
