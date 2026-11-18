@@ -166,7 +166,7 @@ img.hero{width:33%;max-width:170px;aspect-ratio:4/3;object-fit:cover;border-radi
         <li><b>운휴</b> 아트란티스(정기점검) · 회전바구니(일일점검) · 어크로스다크(정기운휴)</li>
         <li><b>운행 종료</b> 스페인해적선은 11/22까지 운행 후 리뉴얼 공사</li>
         <li><b>점검 중(11/18 기준)</b> 파라오의 분노 · 와일드 밸리. 23일 재개 여부는 당일 확인</li>
-        <li><b>입장 마감</b> 20:00 (영업 종료 1시간 전)</li>
+        <li><b>입장</b> After4 기준 16:00부터 (모든 계산은 16:00 입장 기준). 매표·입장 마감은 20:00</li>
         <li><b>야외</b> 매직아일랜드 기구는 대부분 20:50 종료, 날씨에 따라 중단될 수 있음</li>
         <li><b>콩X고질라</b> 20:10 종료, 매직패스 대상 아님</li>
         <li><b>싱글라이더</b> 후렌치레볼루션만 해당</li>
@@ -378,8 +378,7 @@ function render(){
   $('clock').textContent=fmt(t);
   $('where').textContent=(S.sim?'연습 · ':'')+ZN[NODEZ[S.loc]||'gate'];
   const chips=[];
-  if(t<toM('16:00'))chips.push(['입장',toM('16:00')-t]);
-  else if(S.loc==='gate'&&t<toM('20:00'))chips.push(['입장 마감',toM('20:00')-t]);
+  if(t<toM('16:00'))chips.push(['16:00 입장',toM('16:00')-t]);
   fixedList().forEach(f=>{const d=toM(f.start)-t;if(d>0&&chips.length<2)chips.push([f.id==='pr'?'퍼레이드':f.id==='gs'?'공연':f.id==='mp'?'맵핑쇼':'마켓',d])});
   if(t<OUT_CLOSE&&chips.length<3)chips.push(['야외 종료',OUT_CLOSE-t]);
   let ch=chips.map(([n,d])=>'<span class="chip num'+(d<=30?' hot':'')+'">'+n+' '+dur(d)+'</span>').join('');
