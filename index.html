@@ -140,6 +140,9 @@ img.hero{width:33%;max-width:170px;aspect-ratio:4/3;object-fit:cover;border-radi
 .drow span{color:var(--ink-2)}.drow b{font-weight:500;text-align:right}
 img.dimg{width:100%;aspect-ratio:16/9;object-fit:cover;border-radius:10px;margin-bottom:4px;filter:none!important;opacity:1!important}
 .gobtn{margin-top:6px}
+.nextprev{border-top:1px dashed var(--line);padding-top:12px}
+.nextprev .cand{cursor:default;opacity:1}
+.nextprev .chk{pointer-events:auto}
 .hide{display:none!important}
 </style>
 </head>
@@ -303,10 +306,10 @@ function observe(p,t,actual){
   S.cal=Math.round(sum/w*100)/100;
 }
 
-function candidates(){
-  const t=eff(),from=S.loc,out=[];
+function candidates(tOv,fromOv,exId){
+  const t=tOv??eff(),from=fromOv??S.loc,out=[];
   allPlaces().forEach(p=>{
-    if(CLOSED.includes(p.id))return;
+    if(CLOSED.includes(p.id)||p.id===exId)return;
     const n=S.done[p.id]||0;if(n>=(p.repeat||1))return;
     const tr=travel(from,p.n),arr=t+tr;
     if(p.from&&arr<toM(p.from))return;
@@ -347,7 +350,7 @@ function bar(o){
   const hi=o.hi!=null?o.hi:o.w;
   const S=Math.max(B,o.tr+Math.max(o.w,hi)+o.ride,20)*1.08;
   const pc=m=>Math.min(100,Math.max(0,m/S*100)).toFixed(2)+'%';
-  const fit=fitFor(o.w,o.mw);
+  const fit=o.fit||fitFor(o.w,o.mw);
   let h='<div class="tbar'+(o.big?' big':'')+'" role="img" aria-label="이동 '+o.tr+'분, 대기 '+o.w+'분, 탑승 '+o.ride+'분, 마감까지 '+B+'분"><div class="trk">'+
    '<div class="seg tr" style="left:0;width:'+pc(o.tr)+'"></div>'+
    '<div class="seg '+fit+'" style="left:'+pc(o.tr)+';width:'+pc(o.w)+'"></div>'+
@@ -442,6 +445,13 @@ function render(){
       '<div class="prog" role="img" aria-label="진행 '+Math.round(el/tot*100)+'%"><div style="width:'+(el/tot*100).toFixed(1)+'%"></div></div>'+
       '<div class="bdg">'+bdg('','clock','남은 '+left+'분')+bdg('','flag',fmt(q.end)+' '+(q.kind==='fixed'?'종료':'완료'))+'</div>'+
       '<div class="btns"><button class="ghost" id="bQuit">포기</button><button class="go" id="bDone">'+(q.kind==='ride'?'탑승 완료':'완료')+'</button></div>';
+    {const t1=Math.max(q.end,eff()),nf=nextFixed(t1),nx=candidates(t1,q.n,q.id).filter(c=>c.fit!=='no'&&c.mw>=5).slice(0,3);
+      const lb=nf?toM(nf.arrive)-travel(q.n,nf.n):1e9;
+      let h='<div class="label">끝나면 다음은</div>';
+      if(nf&&(lb-t1<=5||!nx.length))h+='<div class="bdg">'+bdg('tight','flag',fmt(Math.max(lb,t1))+' 출발')+bdg('','',nf.name)+bdg('','walk',travel(q.n,nf.n)+'분')+'</div>';
+      else if(!nx.length)h+='<div class="label">남은 후보 없음</div>';
+      const box=document.createElement('div');box.className='list nextprev';box.innerHTML=h;A.appendChild(box);
+      if(!(nf&&lb-t1<=5))nx.forEach(c=>{const b=candBtn(c);b.disabled=true;b.onclick=null;box.appendChild(b)});}
     $('bDone').onclick=()=>{if(S.sim)S.simTime=fmt(Math.max(now(),q.end));S.done[q.id]=(S.done[q.id]||0)+1;S.loc=q.n;addLog(q.name);S.queue=null;S.sel=null;S.wait='';save();render()};
     $('bQuit').onclick=()=>{S.queue=null;S.sel=null;S.wait='';save();render()};
     others.classList.add('hide');
@@ -530,7 +540,7 @@ function candBtn(c,top){
   const b=document.createElement('button');b.type='button';b.className='cand '+c.fit+(top?' top':'');
   const isR=!c.p.fixedWait;
   b.innerHTML='<span class="nmw">'+pic(attrOf(c.p),'tc')+'<span class="nm"></span>'+(attrOf(c.p)?chk(aKey(attrOf(c.p)),c.must):'')+'</span>'+fitBadge(c.fit,c.mw-c.x.e)+
-    bar({tr:c.tr,w:c.x.e,lo:isR?c.x.lo:null,hi:isR?c.x.hi:null,ride:c.p.ride,mw:c.mw})+
+    bar({tr:c.tr,w:c.x.e,lo:isR?c.x.lo:null,hi:isR?c.x.hi:null,ride:c.p.ride,mw:c.mw,fit:c.fit})+
     '<div class="bdg">'+bdg('','walk',c.tr+'분')+bdg('','wait',(isR?c.x.lo+'~'+c.x.hi:c.x.e)+'분')+bdg('','flag','≤'+c.mw+'분')+infoBadges(c.p)+(c.p.flag?bdg('warn','alert',c.p.flag):'')+'</div>';
   b.querySelector('.nm').textContent=c.p.name;
   b.setAttribute('aria-label',c.p.name+', '+FITTXT[c.fit]+', 이동 '+c.tr+'분, 예상 대기 '+c.x.e+'분, '+c.mw+'분 이하면 가능');
