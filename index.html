@@ -105,6 +105,10 @@ summary{cursor:pointer;padding:6px 0}
     <div class="chips" id="chips" style="justify-content:flex-end"></div>
   </div>
 
+  <div class="bdg" id="closed" aria-label="11월 23일 운휴">
+    <span class="badge no">운휴 아트란티스</span><span class="badge no">운휴 회전바구니</span><span class="badge no">운휴 어크로스다크</span><span class="badge">입장 마감 20:00</span>
+  </div>
+
   <section class="card" id="action"></section>
 
   <section class="card" id="others">
@@ -163,6 +167,7 @@ const FIXED=[
  {id:'mk',n:'out',name:'크리스마스 마켓',z:'out',start:'21:00',arrive:'21:00',end:'22:00'}
 ];
 const OUT_CLOSE=toM('21:00');
+const CLOSED=['atl']; /* 11/23 운휴: 아트란티스(정기점검), 회전바구니(일일점검), 어크로스다크(정기운휴) */
 const DAY=0.95;
 
 function tod(t,z){
@@ -206,6 +211,7 @@ function observe(p,t,actual){
 function candidates(){
   const t=eff(),from=S.loc,out=[];
   PLACES.forEach(p=>{
+    if(CLOSED.includes(p.id))return;
     const n=S.done[p.id]||0;if(n>=(p.repeat||1))return;
     const tr=travel(from,p.n),arr=t+tr;
     if(p.from&&arr<toM(p.from))return;
@@ -271,6 +277,7 @@ function render(){
   $('where').textContent=(S.sim?'연습 · ':'')+ZN[NODEZ[S.loc]||'gate'];
   const chips=[];
   if(t<toM('16:00'))chips.push(['입장',toM('16:00')-t]);
+  else if(S.loc==='gate'&&t<toM('20:00'))chips.push(['입장 마감',toM('20:00')-t]);
   fixedList().forEach(f=>{const d=toM(f.start)-t;if(d>0&&chips.length<2)chips.push([f.id==='pr'?'퍼레이드':f.id==='gs'?'공연':'마켓',d])});
   if(t<OUT_CLOSE&&chips.length<3)chips.push(['야외 종료',OUT_CLOSE-t]);
   let ch=chips.map(([n,d])=>'<span class="chip num'+(d<=30?' hot':'')+'">'+n+' '+dur(d)+'</span>').join('');
