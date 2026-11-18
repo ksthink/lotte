@@ -502,7 +502,7 @@ function render(){
     if(due&&eff()<toM(due.f.end)){
       const f=due.f;const late=eff()>due.leaveBy;
       A.innerHTML='<div class="label">'+ZN[f.z]+'</div><div class="big">'+f.name+'</div>'+
-        '<div class="bdg">'+(late?bdg('no lg','alert','지금 출발'):bdg('tight lg','flag',fmt(due.leaveBy)+' 출발'))+bdg('','walk',travel(S.loc,f.n)+'분')+bdg('warn','clock',f.start+' 시작')+(f.sub?bdg('','',f.sub):'')+'</div>'+
+        '<div class="bdg">'+(late?bdg('no','alert','지금 출발'):bdg('tight','flag',fmt(due.leaveBy)+' 출발'))+bdg('','walk',travel(S.loc,f.n)+'분')+bdg('warn','clock',f.start+' 시작')+(f.sub?bdg('','',f.sub):'')+'</div>'+
         '<div class="btns"><button class="ghost" id="bSkip">이번엔 건너뛰기</button><button class="go" id="bGo">가는 중</button></div>';
       $('bGo').onclick=()=>{S.sel=f.id;save();render()};
       $('bSkip').onclick=()=>{S.done[f.id]=1;addLog(f.name+' (건너뜀)');save();render()};
