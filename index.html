@@ -124,7 +124,7 @@ img.hero{width:33%;max-width:170px;aspect-ratio:4/3;object-fit:cover;border-radi
 .notice b{font-weight:600;margin-right:4px}
 .cds{display:grid;gap:8px;flex:1;max-width:250px;min-width:150px}
 .cds{cursor:pointer;flex:1;max-width:300px;min-width:150px;display:grid;gap:6px}
-.cdt{display:flex;justify-content:space-between;gap:8px;font-size:13px;color:var(--ink-2)}
+.cdt{display:flex;justify-content:flex-end;gap:5px;font-size:13px;color:var(--ink-2)}
 .cdt b{font-weight:600;color:var(--ink)}
 .cdt{align-items:center}.cdi{display:inline-flex;color:var(--accent)}.cdi svg{width:18px;height:18px}
 .cd1.hot .cdi{color:var(--warn)}
@@ -181,7 +181,7 @@ img.dimg{width:100%;aspect-ratio:16/9;object-fit:cover;border-radius:10px;margin
 .loclist button[aria-current="true"]{color:var(--accent);font-weight:600}
 #locPick{padding:4px 16px}
 #clock{cursor:pointer}
-.wait select{min-width:130px;font-family:var(--font-display);font-size:26px;text-align:center;text-align-last:center;border:1px solid var(--line);border-radius:12px;background:var(--bg);color:var(--ink);padding:6px 10px;min-height:48px}
+.wait select{font-family:inherit;font-size:16px;text-align:center;text-align-last:center;border:1px solid var(--line);border-radius:10px;background:var(--bg);color:var(--ink);padding:6px 10px;min-height:38px}
 .ptm.sh{background:var(--warn-bg);color:var(--warn)}.ptm.no{background:var(--bad-bg);color:var(--bad)}
 .tabs button{padding:8px 4px}
 .pset{display:flex;gap:5px;align-items:center;flex-wrap:nowrap;padding:8px 10px;white-space:nowrap;overflow-x:auto}
@@ -604,7 +604,7 @@ function tickLeft(){
   const el=$('cdLeft');if(!el)return;
   const ns=S.sim?toM(S.simTime)*60:kstSec(),left=Math.max(0,PE()*60-ns);
   const p=n=>String(n).padStart(2,'0');
-  el.textContent=ns>=PE()*60?'종료':'종료까지 '+p(Math.floor(left/3600))+':'+p(Math.floor(left%3600/60))+':'+p(left%60);
+  el.textContent=ns>=PE()*60?'종료':'종료까지 '+p(Math.floor(left/3600))+':'+p(Math.floor(left%3600/60));
 }
 let locOpen=false;
 function renderLoc(){
@@ -685,7 +685,7 @@ function render(){
         const w=has?+S.wait:x.e;
         const fit=fitFor(w,mw);
         let h=bar({tr:S.sim?tr:0,w,lo:has||!isRide?null:x.lo,hi:has||!isRide?null:x.hi,ride:p.ride,mw,big:true,t0:eff()})+
-          '<div class="bdg">'+fitBadge(fit,mw-w,true)+bdg('',has?'wait':'clock',has?'실제 '+w+'분':'예상 '+w+'분')+'</div>';
+          '<div class="bdg">'+fitBadge(fit,mw-w)+bdg('',has?'wait':'clock',has?'실제 '+w+'분':'예상 '+w+'분')+'</div>';
         if(fit==='no'){
           const alt=candidates().filter(c=>c.p.id!==p.id&&c.fit==='ok').sort((a,b)=>(a.p.z===p.z?0:1)-(b.p.z===p.z?0:1)||a.tr-b.tr||b.sc-a.sc).slice(0,3);
           h+=alt.length?'<div class="label">대신</div><div class="list" id="alts"></div>':'';
