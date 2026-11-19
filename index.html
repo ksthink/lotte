@@ -717,7 +717,7 @@ function render(){
       A.innerHTML='<div class="big">오늘 일정 끝</div><div class="label">수고했어요</div>';
     }else{
       const mleft=allPlaces().filter(p=>isMust(p)&&!S.done[p.id]&&!CLOSED.includes(p.id)).length;
-      A.innerHTML='<div class="bar"><div class="label">다음 추천'+(mleft?' · 꼭 탈 것 '+mleft+'개 남음':'')+'</div>'+LEGEND+'</div><div class="list" id="topList"></div>';
+      A.innerHTML='<div class="bar" style="justify-content:flex-end">'+LEGEND+'</div><div class="list" id="topList"></div>';
       usable.slice(0,3).forEach((c,i)=>$('topList').appendChild(candBtn(c,i===0)));
     }
     const ol=$('otherList');ol.innerHTML='';
