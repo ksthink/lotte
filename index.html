@@ -248,7 +248,7 @@ main{min-width:0}.pane{min-width:0}
 .closedban{position:relative;margin:-16px;overflow:hidden;border-radius:inherit}
 .closedban img{display:block;width:100%;aspect-ratio:374/130;object-fit:cover}
 .closedban::after{content:"";position:absolute;inset:0;background:rgba(0,0,0,.35)}
-.closedban p{position:absolute;inset:0;z-index:1;margin:0;display:flex;align-items:center;justify-content:center;text-align:center;color:#fff;font-size:22px;font-weight:800;letter-spacing:-.01em;text-shadow:0 1px 2px rgba(0,0,0,.6),0 2px 12px rgba(0,0,0,.55)}
+.closedban p{position:absolute;inset:0;z-index:1;margin:0;display:flex;align-items:center;justify-content:center;text-align:center;color:#fff;font-size:19px;line-height:1.4;font-weight:800;letter-spacing:-.01em;padding:0 12px;text-shadow:0 1px 2px rgba(0,0,0,.6),0 2px 12px rgba(0,0,0,.55)}
 #action.closed{overflow:hidden}
 </style>
 </head>
@@ -739,7 +739,7 @@ function render(){
       $('bGo').onclick=()=>{S.sel=f.id;save();render()};
       $('bSkip').onclick=()=>{S.done[f.id]=1;addLog(f.name+' (건너뜀)');save();render()};
     }else if(!usable.length){
-      A.classList.add('closed');A.innerHTML='<div class="closedban"><img src="assets/closed.jpg" alt="손 흔들며 인사하는 로티"><p>마감됐어요. 또 만나요</p></div>';
+      A.classList.add('closed');A.innerHTML='<div class="closedban"><img src="assets/closed.jpg" alt="손 흔들며 인사하는 로티"><p>이제는 우리가 헤어져야 할 시간,<br>내일 또 만나요</p></div>';
     }else{
       const mleft=allPlaces().filter(p=>isMust(p)&&!S.done[p.id]&&!CLOSED.includes(p.id)).length;
       A.innerHTML='<div class="bar" style="justify-content:flex-end">'+LEGEND+'</div><div class="list" id="topList"></div>';
