@@ -90,7 +90,7 @@ summary{cursor:pointer;padding:6px 0}
 .cand .tbar,.cand .bdg{grid-column:1/-1}
 .prog{height:14px;border-radius:7px;background:var(--bg);overflow:hidden}
 .prog>div{height:100%;background:var(--accent)}
-.tabs{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.tabs{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
 .tabs button{min-height:42px;font-weight:600;color:var(--ink-2)}
 .tabs button[aria-selected="true"]{background:var(--accent);color:#fff;border-color:var(--accent)}
 :root[data-theme="dark"] .tabs button[aria-selected="true"]{color:#0E1420}
@@ -174,6 +174,8 @@ img.dimg{width:100%;aspect-ratio:16/9;object-fit:cover;border-radius:10px;margin
 #locPick{padding:4px 16px}
 #clock{cursor:pointer}
 .wait select{min-width:130px;font-family:var(--font-display);font-size:26px;text-align:center;text-align-last:center;border:1px solid var(--line);border-radius:12px;background:var(--bg);color:var(--ink);padding:6px 10px;min-height:48px}
+.ptm.sh{background:var(--warn-bg);color:var(--warn)}.ptm.no{background:var(--bad-bg);color:var(--bad)}
+.tabs button{padding:8px 4px}
 .hide{display:none!important}
 </style>
 </head>
@@ -191,6 +193,7 @@ img.dimg{width:100%;aspect-ratio:16/9;object-fit:cover;border-radius:10px;margin
 
   <div class="tabs" role="tablist">
     <button type="button" role="tab" id="tbRec" aria-selected="true">추천</button>
+    <button type="button" role="tab" id="tbPlan" aria-selected="false">계획</button>
     <button type="button" role="tab" id="tbAttr" aria-selected="false">어트랙션</button>
     <button type="button" role="tab" id="tbPerf" aria-selected="false">공연</button>
   </div>
@@ -205,14 +208,11 @@ img.dimg{width:100%;aspect-ratio:16/9;object-fit:cover;border-radius:10px;margin
     <div class="list" id="otherList"></div>
   </section>
 
-  <section class="card">
-    <div class="label">오늘 기록</div>
-    <ul class="log" id="log"></ul>
-  </section>
 
   </div>
   <div id="tabAttr" class="pane hide"></div>
   <div id="tabPerf" class="pane hide"></div>
+  <div id="tabPlan" class="pane hide"></div>
 
   <details>
     <summary>공지 · 설정</summary>
@@ -435,7 +435,46 @@ document.addEventListener('click',e=>{
   const li=e.target.closest&&e.target.closest('[data-o]');
   if(li&&!e.target.closest('.detail')){openKey=openKey===li.dataset.o?null:li.dataset.o;renderLists()}
 });
+function planSim(){
+  const items=[];let t=eff(),loc=S.loc;
+  if(S.queue){items.push({k:'now',name:S.queue.name,s:S.queue.start??t,e:Math.max(S.queue.end,t)});t=Math.max(S.queue.end,t);loc=S.queue.n}
+  let rides=allPlaces().filter(p=>isMust(p)&&!S.done[p.id]&&!CLOSED.includes(p.id)&&!(S.queue&&S.queue.id===p.id));
+  let fx=fixedList().filter(f=>toM(f.end)>t&&!(S.queue&&S.queue.id===f.id));
+  let best=null,nodes=0;
+  (function go(t,loc,rs,fi,acc,cnt){
+    if(++nodes>30000)return;
+    const nf=fx[fi];let moved=false;
+    for(const p of rs){const tr=travel(loc,p.n),arr=t+tr,w=est(p,arr).e,fin=arr+w+p.ride;
+      let dl=p.close?toM(p.close):toM('21:00');if(nf)dl=Math.min(dl,toM(nf.arrive)-travel(p.n,nf.n));
+      if(fin<=dl){moved=true;go(fin,p.n,rs.filter(x=>x!==p),fi,acc.concat([{k:'ride',p,name:p.name,s:arr,e:fin,tr,w}]),cnt+1)}}
+    if(nf){const tr=travel(loc,nf.n),mk=nf.id==='mk',st=mk?Math.max(toM(nf.start),t+tr):toM(nf.start);
+      go(Math.max(t+tr,toM(nf.end)),nf.n,rs,fi+1,acc.concat([{k:'show',f:nf,name:nf.name,s:st,e:toM(nf.end),tr,late:!mk&&t+tr>toM(nf.start)}]),cnt)}
+    else if(!moved||!rs.length){const endT=acc.length?acc[acc.length-1].e:t;
+      const pr=acc.reduce((x,i)=>x+(i.p?i.p.pri:0),0);if(!best||cnt>best.cnt||(cnt===best.cnt&&pr>best.pr))best={cnt,pr,endT,acc,left:rs}}
+  })(t,loc,rides,0,[],0);
+  if(best){best.acc.forEach(x=>items.push(x));rides=best.left}
+  return {items,unfit:rides};
+}
+function renderPlan(){
+  const {items,unfit}=planSim();
+  const tm=(s,e)=>'<span class="ptm num">'+fmt(s)+'</span>';
+  let h='';
+  if(S.log.length){h+='<div class="card"><div class="label">완료 · '+S.log.length+'</div><ul class="alist">'+S.log.map(e=>'<li class="off"><span class="ptm num">'+e.t+'</span><div class="ainfo"><div class="arow"><span class="nm">'+e.name+'</span>'+bdg('end','','완료')+'</div></div></li>').join('')+'</ul></div>'}
+  h+='<div class="card"><div class="label">앞으로 · '+items.length+'</div>';
+  if(!items.length&&!unfit.length)h+='<div class="sub">어트랙션·공연 탭에서 별표를 누르면 계획이 만들어져요.</div>';
+  h+='<ul class="alist">'+items.map(it=>{
+    const a=it.p?attrOf(it.p):null;
+    const star=it.k==='ride'&&a?chk(aKey(a),true):it.k==='show'&&it.f.id!=='mk'?chk(pKey(PERF.find(r=>perfFixed(r,PERF.indexOf(r)).id===it.f.id)),true):'';
+    return '<li><span class="ptm num'+(it.k==='show'?' sh':'')+'">'+fmt(it.s)+'</span><div class="ainfo"><div class="arow"><span class="nmw"><span class="nm">'+it.name+'</span>'+star+'</span>'+
+      (it.k==='now'?bdg('ok','','진행 중'):it.k==='show'?(it.late?bdg('no','alert','늦음'):bdg('','','고정')):'')+'</div>'+
+      '<div class="bdg">'+bdg('','clock',fmt(it.s)+'~'+fmt(it.e))+(it.tr!=null&&it.k!=='now'?bdg('','walk',it.tr+'분'):'')+(it.k==='ride'?bdg('','wait','약 '+it.w+'분'):'')+'</div></div></li>'}).join('')+'</ul></div>';
+  if(unfit.length){h+='<div class="card"><div class="label">시간 부족 · '+unfit.length+'</div><ul class="alist">'+unfit.map(p=>{const a=attrOf(p);return '<li><span class="ptm num no">–</span><div class="ainfo"><div class="arow"><span class="nmw"><span class="nm">'+p.name+'</span>'+(a?chk(aKey(a),true):'')+'</span>'+bdg('no','alert','시간 부족')+'</div><div class="sub">지금 순서로는 들어갈 자리가 없어요. 다른 별표를 풀면 다시 계산돼요.</div></div></li>'}).join('')+'</ul></div>'}
+  h+='<div class="label">시각은 예상 대기 기준이라 달라질 수 있어요.</div>';
+  $('tabPlan').innerHTML=h;
+  const n=items.filter(i=>i.k!=='now').length+unfit.length;$('tbPlan').textContent='계획'+(unfit.length?' !':'');
+}
 function renderLists(){
+  renderPlan();
   const t=now();
   const order=['매직아일랜드','어드벤처 1층','어드벤처 2층','어드벤처 3층','어드벤처 4층','키디존','언더랜드 B1층'];
   let h='';
@@ -457,7 +496,7 @@ function renderLists(){
       '<div class="bdg">'+bdg('','clock',tm)+bdg('','',pl)+bdg('','',cat)+(key?bdg('ok','','추천'):'')+'</div></div>'+(op?perfDetail(r,pi):'')+'</li>';});
   $('tabPerf').innerHTML=ph+'</ul></div><div class="label">공연 사정에 따라 변경·취소될 수 있음 (11/18 공식 사이트 조회)</div>';
 }
-function setTab(k){S.tab=k;['Rec','Attr','Perf'].forEach(x=>{$('tab'+x).classList.toggle('hide',x!==k);$('tb'+x).setAttribute('aria-selected',x===k)});save()}
+function setTab(k){S.tab=k;['Rec','Plan','Attr','Perf'].forEach(x=>{$('tab'+x).classList.toggle('hide',x!==k);$('tb'+x).setAttribute('aria-selected',x===k)});save()}
 function kstSec(){const p=new Intl.DateTimeFormat('en-GB',{timeZone:'Asia/Seoul',hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:false}).formatToParts(new Date());const g=t=>+p.find(x=>x.type===t).value;return g('hour')*3600+g('minute')*60+g('second')}
 function tickLeft(){
   const el=$('cdLeft');if(!el)return;
@@ -469,7 +508,7 @@ let locOpen=false;
 function renderLoc(){
   const box=$('locPick');box.classList.toggle('hide',!locOpen);$('where').setAttribute('aria-expanded',locOpen);
   document.querySelector('.tabs').classList.toggle('hide',locOpen);document.querySelector('main>details').classList.toggle('hide',locOpen);
-  ['Rec','Attr','Perf'].forEach(x=>$('tab'+x).classList.toggle('hide',locOpen||x!==(S.tab||'Rec')));
+  ['Rec','Plan','Attr','Perf'].forEach(x=>$('tab'+x).classList.toggle('hide',locOpen||x!==(S.tab||'Rec')));
   if(!locOpen){box.innerHTML='';return}
   box.innerHTML='<ul class="loclist">'+LOCS.map((l,i)=>'<li><button type="button" data-i="'+i+'"'+(l[0]===S.loc&&l[1]===locName()?' aria-current="true"':'')+'><span>'+l[1]+'</span><small>'+l[2]+'</small></button></li>').join('')+'</ul>';
   box.querySelectorAll('[data-i]').forEach(b=>b.onclick=()=>{const l=LOCS[+b.dataset.i];S.loc=l[0];S.locName=l[1];if(!S.queue){S.sel=null;S.wait=''}locOpen=false;save();render();window.scrollTo({top:0})});
@@ -589,8 +628,6 @@ function render(){
     if(!rest.length)others.classList.add('hide');
   }
 
-  const lg=$('log');lg.innerHTML=S.log.length?'':'<li><span></span><span class="label">아직 없음</span></li>';
-  S.log.slice().reverse().forEach(e=>{const li=document.createElement('li');li.innerHTML='<span class="num">'+e.t+'</span><span></span>';li.lastChild.textContent=e.name;lg.appendChild(li)});
 
   renderLists();
   $('simOn').checked=S.sim;$('simTime').value=S.simTime;$('simTime').disabled=!S.sim;
@@ -612,7 +649,7 @@ function candBtn(c,top){
   return b;
 }
 
-['Rec','Attr','Perf'].forEach(k=>$('tb'+k).onclick=()=>setTab(k));
+['Rec','Plan','Attr','Perf'].forEach(k=>$('tb'+k).onclick=()=>setTab(k));
 $('chips').onclick=()=>setTab('Perf');
 $('where').onclick=()=>{locOpen=!locOpen;renderLoc()};
 $('clock').onclick=()=>{locOpen=false;openKey=null;if(!S.queue){S.sel=null;S.wait=''}S.tab='Rec';save();render();setTab('Rec');window.scrollTo({top:0,behavior:'smooth'})};
