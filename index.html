@@ -209,7 +209,10 @@ main{min-width:0}.pane{min-width:0}
 .badge.ty svg{width:14px;height:14px}
 .badge.ty.rec{background:var(--accent);color:#fff}
 .badge.ty.show{background:var(--warn-bg);color:var(--warn)}
-.cand .nmw{gap:6px}
+.cand{height:148px;padding-top:38px!important;align-content:start!important;min-height:0!important}
+.cand .tys{position:absolute!important;top:8px;left:8px;display:flex;gap:4px;z-index:2}
+.cand .nm{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+.cand .nmw{min-width:0;overflow:hidden}
 .cand.hasimg .badge.ty.rec{background:rgba(15,110,100,.85)}
 .hide{display:none!important}
 </style>
@@ -731,7 +734,7 @@ const TY={rec:'<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke
 const ty=(k,label)=>'<span class="badge ty '+k+'" role="img" aria-label="'+label+'" title="'+label+'">'+TY[k]+'</span>';
 function showBtn(r,f,tr,left){
   const b=document.createElement('button');b.type='button';const fit=left>=10?'ok':left>=0?'tight':'no';b.className='cand '+fit;
-  b.innerHTML='<span class="nmw">'+ty('show','공연')+'<span class="nm"></span>'+chk(pKey(r),S.must[pKey(r)])+'</span>'+bdg(fit,fit==='no'?'alert':'',fit==='no'?'늦음':'여유 '+left+'분')+
+  b.innerHTML='<span class="tys">'+ty('show','공연')+'</span><span class="nmw"><span class="nm"></span>'+chk(pKey(r),S.must[pKey(r)])+'</span>'+bdg(fit,fit==='no'?'alert':'',fit==='no'?'늦음':'여유 '+left+'분')+
     '<div class="bdg">'+bdg('','walk',tr+'분')+bdg('','clock',r[0])+bdg('','',r[2])+'</div>';
   b.querySelector('.nm').textContent=r[1];
   b.setAttribute('aria-label','공연 '+r[1]+', '+r[0]+', 이동 '+tr+'분');
@@ -744,7 +747,7 @@ function candBtn(c,top){
   const isR=!c.p.fixedWait;
   const A0=attrOf(c.p),src=A0&&A0.im?'https://adventure.lotteworld.com/api/upload/'+A0.im:'';
   if(src&&IMGOK[src])b.classList.add('hasimg');
-  b.innerHTML=(src&&IMGOK[src]!==false?'<img class="bgimg" alt="" loading="lazy" decoding="async" src="'+src+'">':'')+'<span class="nmw">'+(c.cur&&c.fit==='ok'?ty('rec','추천'):'')+(A0?ty('attr','어트랙션'):'')+'<span class="nm"></span>'+(attrOf(c.p)?chk(aKey(attrOf(c.p)),c.must):'')+'</span>'+fitBadge(c.fit,c.mw-c.x.e)+
+  b.innerHTML=(src&&IMGOK[src]!==false?'<img class="bgimg" alt="" loading="lazy" decoding="async" src="'+src+'">':'')+'<span class="tys">'+(c.cur&&c.fit==='ok'?ty('rec','추천'):'')+(A0?ty('attr','어트랙션'):'')+'</span><span class="nmw"><span class="nm"></span>'+(attrOf(c.p)?chk(aKey(attrOf(c.p)),c.must):'')+'</span>'+fitBadge(c.fit,c.mw-c.x.e)+
     bar({tr:c.tr,w:c.x.e,lo:isR?c.x.lo:null,hi:isR?c.x.hi:null,ride:c.p.ride,mw:c.mw,fit:c.fit})+
     '<div class="bdg">'+bdg('','walk',c.tr+'분')+bdg('','wait',(isR?c.x.lo+'~'+c.x.hi:c.x.e)+'분')+infoBadges(c.p)+(c.p.flag?bdg('warn','alert',c.p.flag):'')+'</div>';
   b.querySelector('.nm').textContent=c.p.name;
