@@ -176,6 +176,18 @@ img.dimg{width:100%;aspect-ratio:16/9;object-fit:cover;border-radius:10px;margin
 .wait select{min-width:130px;font-family:var(--font-display);font-size:26px;text-align:center;text-align-last:center;border:1px solid var(--line);border-radius:12px;background:var(--bg);color:var(--ink);padding:6px 10px;min-height:48px}
 .ptm.sh{background:var(--warn-bg);color:var(--warn)}.ptm.no{background:var(--bad-bg);color:var(--bad)}
 .tabs button{padding:8px 4px}
+.pset{display:flex;gap:8px;align-items:center;flex-wrap:wrap;padding:12px}
+.pset select{border:1px solid var(--line);border-radius:10px;background:var(--bg);color:var(--ink);padding:6px 8px;min-height:38px;font:inherit}
+.pset .mini{margin-left:auto}
+.plan li{grid-template-columns:auto minmax(0,1fr) auto auto!important;align-items:center}
+.plan .ainfo{grid-column:auto}
+.grip{display:inline-flex;align-items:center;justify-content:center;width:34px;height:44px;color:var(--ink-2);cursor:grab;touch-action:none}
+.grip svg{width:18px;height:18px}
+.prow.drag{position:relative;z-index:5;background:var(--panel);box-shadow:0 6px 18px rgba(0,0,0,.18);border-radius:12px;border-bottom-color:transparent}
+.prow.dropb{box-shadow:inset 0 3px 0 var(--accent)}.prow.dropa{box-shadow:inset 0 -3px 0 var(--accent)}
+.gaprow{padding:6px 0!important;display:block!important}
+.gaprow button{width:100%;display:flex;align-items:center;gap:10px;border:1.5px dashed var(--line);background:transparent;color:var(--ink-2);min-height:44px}
+.gaprow b{color:var(--accent);font-size:20px;line-height:1}.gaprow small{margin-left:auto;font-size:12px}
 .hide{display:none!important}
 </style>
 </head>
@@ -281,22 +293,26 @@ function perfFixed(r,i){
   const n=pl.includes('가든')?'f1_garden':pl.includes('퍼레이드')?'f1_parade':pl.includes('매직캐슬')?'castle':'f1_meet';
   const par=nm.includes('퍼레이드'),gs=nm.includes('마법 성냥'),mp=nm.includes('라이츠업');
   const len=par||gs?30:mp?10:nm.includes('포토')||nm.includes('Smile')?10:30;
-  return {id:gs?'gs':par&&tm==='20:00'?'pr':mp?'mp':'pf'+i,n,name:nm+(gs?' + 도시락':''),z:n==='castle'?'MI':'1F',start:tm,arrive:fmt(m-(par?30:gs?5:0)),end:fmt(m+len),sub:par?'자리 잡고 대기':''};
+  return {id:gs?'gs':par&&tm==='20:00'?'pr':mp?'mp':'pf'+i,n,name:nm+(gs?' + 도시락':''),z:n==='castle'?'MI':'1F',start:tm,arrive:fmt(m-(par?(S.lead??15):gs?5:0)),end:fmt(m+len),sub:par?'자리 잡고 대기':''};
 }
 function allFixed(){return PERF.map((r,i)=>S.must[pKey(r)]?perfFixed(r,i):null).filter(Boolean).concat([MK]).sort((x,y)=>toM(x.start)-toM(y.start))}
 const ZNODE={'매직아일랜드':['castle','MI'],'어드벤처 1층':['f1_meet','1F'],'키디존':['f1_meet','1F'],'어드벤처 2층':['fre','2F'],'어드벤처 3층':['kong','3F'],'어드벤처 4층':['bal','4F'],'언더랜드 B1층':['gate','1F']};
+function placeOf(a){
+  if(!a||a.c23||!a.h)return null;
+  const p0=a.no&&PLACES.find(p=>p.g===a.no);if(p0)return p0;
+  const i=ATTR.indexOf(a),z=ZNODE[a.ar]||['f1_meet','1F'];const nd=a.no&&NODE_OF[a.no]&&TRAVEL[NODE_OF[a.no]]?NODE_OF[a.no]:z[0];
+  return {id:'x'+i,g:a.no,ai:i,close:a.h[1],n:nd,name:a.nm,z:z[1],ride:5,pri:6,kind:'ride',base:a.w||30};
+}
 function allPlaces(){
   const extra=[];
-  ATTR.forEach((a,i)=>{if(!S.must[aKey(a)]||a.c23||!a.h)return;if(a.no&&PLACES.some(p=>p.g===a.no))return;
-    const z=ZNODE[a.ar]||['f1_meet','1F'];const nd=a.no&&NODE_OF[a.no]&&TRAVEL[NODE_OF[a.no]]?NODE_OF[a.no]:z[0];
-    extra.push({id:'x'+i,g:a.no,ai:i,close:a.h[1],n:nd,name:a.nm,z:z[1],ride:5,pri:6,kind:'ride',base:30})});
+  ATTR.forEach(a=>{if(!S.must[aKey(a)])return;const p=placeOf(a);if(p&&!PLACES.includes(p))extra.push(p)});
   return PLACES.concat(extra);
 }
 const attrOf=p=>p.g?INFO(p.g):p.ai!=null?ATTR[p.ai]:null;
 const isMust=p=>{const a=attrOf(p);return !!(a&&S.must[aKey(a)])};
 const CHK='<svg viewBox="0 0 20 20" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" aria-hidden="true"><path d="M10 2.2l2.4 5 5.5.7-4 3.8 1 5.4-4.9-2.7-4.9 2.7 1-5.4-4-3.8 5.5-.7z"/></svg>';
 const chk=(key,on)=>'<span class="chk'+(on?' on':'')+'" role="checkbox" tabindex="0" aria-checked="'+(!!on)+'" aria-label="꼭 하기" data-k="'+key.replace(/"/g,'&quot;')+'">'+CHK+'</span>';
-function toggleMust(k){if(S.must[k])delete S.must[k];else S.must[k]=true;save();render()}
+function toggleMust(k){if(S.must[k]){delete S.must[k];S.order=(S.order||[]).filter(x=>x!==k)}else{S.must[k]=true;if(k[0]==='A'&&!(S.order||[]).includes(k))(S.order=S.order||[]).push(k)}save();render()}
 document.addEventListener('click',e=>{const c=e.target.closest&&e.target.closest('.chk');if(c){e.stopPropagation();e.preventDefault();toggleMust(c.dataset.k)}},true);
 document.addEventListener('keydown',e=>{if((e.key===' '||e.key==='Enter')&&e.target.classList&&e.target.classList.contains('chk')){e.preventDefault();e.stopPropagation();toggleMust(e.target.dataset.k)}},true);
 
@@ -305,6 +321,7 @@ const ATTR=[{"no":28,"nm":"콩X고질라더라이드","ar":"어드벤처 3층","
 const PERF=[["12:30","로티스 페어리테일 매지컬 타임","키디존 어린이 동화극장","스테이지"],["12:30","Smile, with Friends (캐릭터 포토타임)","어드벤처 1층 만남의 광장","포토타임"],["14:00","해피 크리스마스 퍼레이드","어드벤처 1층 퍼레이드 코스","퍼레이드"],["15:30","로티스 페어리테일 매지컬 타임","키디존 어린이 동화극장","스테이지"],["15:30","쿠키런 Smile with Friend","어드벤처 1층 만남의 광장","포토타임"],["16:30","Smile, with Friends (연기자 포토타임)","키즈토리아","포토타임"],["17:00","쿠키런 Smile with Friend","어드벤처 1층 만남의 광장","포토타임"],["17:30","Smile, with Friends (연기자 포토타임)","키즈토리아","포토타임"],["18:30","마법 성냥과 꿈꾸는 밤","가든스테이지","스테이지"],["20:00","해피 크리스마스 퍼레이드","어드벤처 1층 퍼레이드 코스","퍼레이드"],["20:40","매직캐슬 라이츠업","매직아일랜드 매직캐슬","기타"]];
 const INFO=no=>ATTR.find(a=>a.no===no);
 const pic=(a,cls)=>a&&a.im?'<img class="'+cls+'" loading="lazy" decoding="async" alt="" src="https://adventure.lotteworld.com/api/upload/'+a.im+'" onerror="this.remove()">':'';
+const PS=()=>toM(S.ps||'16:00'),PE=()=>toM(S.pe||'21:00');
 const OUT_CLOSE=toM('21:00');
 const CLOSED=['atl']; /* 11/23 운휴: 아트란티스(정기점검), 회전바구니(일일점검), 어크로스다크(정기운휴) */
 const DAY=0.95;
@@ -320,7 +337,7 @@ function est(p,t){
   return {e:r5(e),lo:r5(e*0.75),hi:r5(e*1.25)};
 }
 
-const fresh=()=>({loc:'gate',locName:'정문',sel:null,wait:'',queue:null,log:[],done:{},sim:false,simTime:'16:00',cal:1,obs:[],must:{'P:18:30마법 성냥과 꿈꾸는 밤':true,'P:20:00해피 크리스마스 퍼레이드':true,'P:20:40매직캐슬 라이츠업':true}});
+const fresh=()=>({ps:'16:00',pe:'21:00',lead:15,order:[],loc:'gate',locName:'정문',sel:null,wait:'',queue:null,log:[],done:{},sim:false,simTime:'16:00',cal:1,obs:[],must:{'P:18:30마법 성냥과 꿈꾸는 밤':true,'P:20:00해피 크리스마스 퍼레이드':true,'P:20:40매직캐슬 라이츠업':true}});
 let S=fresh(),loaded=false;
 try{const s=JSON.parse(localStorage.getItem('lw1123v8')||'null');if(s){S=Object.assign(fresh(),s);loaded=true}}catch(e){}
 S.sim=false;
@@ -328,14 +345,14 @@ const save=()=>{try{localStorage.setItem('lw1123v5',JSON.stringify(S))}catch(e){
 
 function kst(){const p=new Intl.DateTimeFormat('en-GB',{timeZone:'Asia/Seoul',hour:'2-digit',minute:'2-digit',hour12:false}).formatToParts(new Date());const g=t=>+p.find(x=>x.type===t).value;return g('hour')*60+g('minute')}
 const now=()=>S.sim?toM(S.simTime):kst();
-const eff=()=>Math.max(now(),toM('16:00'));
+const eff=()=>Math.max(now(),PS());
 const fixedList=()=>allFixed().filter(f=>!S.done[f.id]);
 function nextFixed(t){return fixedList().find(f=>toM(f.end)>t)}
 function deadlineFor(p,t){
   let dl=Infinity;const nf=nextFixed(t);
   if(nf)dl=toM(nf.arrive)-travel(p.n,nf.n);
   if(p.close)dl=Math.min(dl,toM(p.close));
-  return Math.min(dl,toM('21:00'));
+  return Math.min(dl,PE());
 }
 
 function observe(p,t,actual){
@@ -435,43 +452,96 @@ document.addEventListener('click',e=>{
   const li=e.target.closest&&e.target.closest('[data-o]');
   if(li&&!e.target.closest('.detail')){openKey=openKey===li.dataset.o?null:li.dataset.o;renderLists()}
 });
+function planRides(){
+  const ord=S.order||[],ks=Object.keys(S.must).filter(k=>k[0]==='A');
+  const keys=ord.filter(k=>S.must[k]).concat(ks.filter(k=>!ord.includes(k)));
+  return keys.map(k=>{const a=ATTR.find(x=>aKey(x)===k),p=placeOf(a);return p?{k,p}:null}).filter(Boolean)
+    .filter(r=>!S.done[r.p.id]&&!CLOSED.includes(r.p.id)&&!(S.queue&&S.queue.id===r.p.id));
+}
 function planSim(){
   const items=[];let t=eff(),loc=S.loc;
   if(S.queue){items.push({k:'now',name:S.queue.name,s:S.queue.start??t,e:Math.max(S.queue.end,t)});t=Math.max(S.queue.end,t);loc=S.queue.n}
-  let rides=allPlaces().filter(p=>isMust(p)&&!S.done[p.id]&&!CLOSED.includes(p.id)&&!(S.queue&&S.queue.id===p.id));
-  let fx=fixedList().filter(f=>toM(f.end)>t&&!(S.queue&&S.queue.id===f.id));
-  let best=null,nodes=0;
-  (function go(t,loc,rs,fi,acc,cnt){
-    if(++nodes>30000)return;
-    const nf=fx[fi];let moved=false;
-    for(const p of rs){const tr=travel(loc,p.n),arr=t+tr,w=est(p,arr).e,fin=arr+w+p.ride;
-      let dl=p.close?toM(p.close):toM('21:00');if(nf)dl=Math.min(dl,toM(nf.arrive)-travel(p.n,nf.n));
-      if(fin<=dl){moved=true;go(fin,p.n,rs.filter(x=>x!==p),fi,acc.concat([{k:'ride',p,name:p.name,s:arr,e:fin,tr,w}]),cnt+1)}}
-    if(nf){const tr=travel(loc,nf.n),mk=nf.id==='mk',st=mk?Math.max(toM(nf.start),t+tr):toM(nf.start);
-      go(Math.max(t+tr,toM(nf.end)),nf.n,rs,fi+1,acc.concat([{k:'show',f:nf,name:nf.name,s:st,e:toM(nf.end),tr,late:!mk&&t+tr>toM(nf.start)}]),cnt)}
-    else if(!moved||!rs.length){const endT=acc.length?acc[acc.length-1].e:t;
-      const pr=acc.reduce((x,i)=>x+(i.p?i.p.pri:0),0);if(!best||cnt>best.cnt||(cnt===best.cnt&&pr>best.pr))best={cnt,pr,endT,acc,left:rs}}
-  })(t,loc,rides,0,[],0);
-  if(best){best.acc.forEach(x=>items.push(x));rides=best.left}
-  return {items,unfit:rides};
+  const fx=fixedList().filter(f=>toM(f.end)>t&&!(S.queue&&S.queue.id===f.id)),unfit=[];let c=t,pos=0;
+  const gap=(to,toLoc)=>{if(to-c>=15)items.push({k:'gap',s:c,e:to,loc,pos})};
+  const show=()=>{const nf=fx.shift(),tr=travel(loc,nf.n),mk=nf.id==='mk',st=mk?Math.max(toM(nf.start),t+tr):toM(nf.start);
+    gap(toM(nf.arrive)-tr);items.push({k:'show',f:nf,name:nf.name,s:st,e:toM(nf.end),tr,late:!mk&&t+tr>toM(nf.start)});t=Math.max(t+tr,toM(nf.end));c=t;loc=nf.n};
+  const fits=(p,t0,loc0,nf)=>{const tr=travel(loc0,p.n),arr=t0+tr,w=est(p,arr).e,fin=arr+w+p.ride;
+    let dl=Math.min(p.close?toM(p.close):1e9,PE());if(nf)dl=Math.min(dl,toM(nf.arrive)-travel(p.n,nf.n));return fin<=dl?{tr,arr,w,fin}:null};
+  planRides().forEach(r=>{const p=r.p;
+    let k=0,tt=t,ll=loc,ok=null;
+    for(;;){const nf=fx[k];ok=fits(p,tt,ll,nf);if(ok||!nf||nf.id==='mk')break;tt=Math.max(tt+travel(ll,nf.n),toM(nf.end));ll=nf.n;k++}
+    if(!ok){unfit.push(r);pos++;return}
+    while(k-->0)show();
+    const f=fits(p,t,loc,fx[0]);items.push({k:'ride',key:r.k,p,name:p.name,s:f.arr,e:f.fin,tr:f.tr,w:f.w});t=f.fin;c=t;loc=p.n;pos++});
+  while(fx.length){if(fx[0].id==='mk')gap(Math.min(PE(),toM(fx[0].arrive)));show()}
+  return {items,unfit};
 }
+function autoOrder(){
+  const rides=planRides().map(r=>r.p),fx=fixedList().filter(f=>toM(f.end)>eff()&&f.id!=='mk');let best=null,nodes=0;
+  (function go(t,loc,rs,fi,acc){
+    if(++nodes>30000)return;const nf=fx[fi];let moved=false;
+    for(const p of rs){const tr=travel(loc,p.n),arr=t+tr,fin=arr+est(p,arr).e+p.ride;
+      let dl=Math.min(p.close?toM(p.close):1e9,PE());if(nf)dl=Math.min(dl,toM(nf.arrive)-travel(p.n,nf.n));
+      if(fin<=dl){moved=true;go(fin,p.n,rs.filter(x=>x!==p),fi,acc.concat([p]))}}
+    if(nf)go(Math.max(t+travel(loc,nf.n),toM(nf.end)),nf.n,rs,fi+1,acc);
+    else if(!moved||!rs.length){const pr=acc.reduce((x,p)=>x+p.pri,0);if(!best||acc.length>best.n||(acc.length===best.n&&pr>best.pr))best={n:acc.length,pr,acc,left:rs}}
+  })(eff(),S.loc,rides,0,[]);
+  if(best)S.order=best.acc.concat(best.left).map(p=>aKey(attrOf(p)));
+}
+let gapSel=null,dragging=false;
+const GRIP='<svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><circle cx="5.5" cy="4" r="1.3"/><circle cx="10.5" cy="4" r="1.3"/><circle cx="5.5" cy="8" r="1.3"/><circle cx="10.5" cy="8" r="1.3"/><circle cx="5.5" cy="12" r="1.3"/><circle cx="10.5" cy="12" r="1.3"/></svg>';
+const tOpts=(from,to,sel)=>{let h='';for(let m=from;m<=to;m+=30)h+='<option'+(fmt(m)===sel?' selected':'')+'>'+fmt(m)+'</option>';return h};
 function renderPlan(){
+  if(dragging)return;
+  const box=$('tabPlan');
+  if(gapSel){return renderGap(box)}
   const {items,unfit}=planSim();
-  const tm=(s,e)=>'<span class="ptm num">'+fmt(s)+'</span>';
-  let h='';
-  if(S.log.length){h+='<div class="card"><div class="label">완료 · '+S.log.length+'</div><ul class="alist">'+S.log.map(e=>'<li class="off"><span class="ptm num">'+e.t+'</span><div class="ainfo"><div class="arow"><span class="nm">'+e.name+'</span>'+bdg('end','','완료')+'</div></div></li>').join('')+'</ul></div>'}
-  h+='<div class="card"><div class="label">앞으로 · '+items.length+'</div>';
-  if(!items.length&&!unfit.length)h+='<div class="sub">어트랙션·공연 탭에서 별표를 누르면 계획이 만들어져요.</div>';
-  h+='<ul class="alist">'+items.map(it=>{
-    const a=it.p?attrOf(it.p):null;
-    const star=it.k==='ride'&&a?chk(aKey(a),true):it.k==='show'&&it.f.id!=='mk'?chk(pKey(PERF.find(r=>perfFixed(r,PERF.indexOf(r)).id===it.f.id)),true):'';
-    return '<li><span class="ptm num'+(it.k==='show'?' sh':'')+'">'+fmt(it.s)+'</span><div class="ainfo"><div class="arow"><span class="nmw"><span class="nm">'+it.name+'</span>'+star+'</span>'+
-      (it.k==='now'?bdg('ok','','진행 중'):it.k==='show'?(it.late?bdg('no','alert','늦음'):bdg('','','고정')):'')+'</div>'+
-      '<div class="bdg">'+bdg('','clock',fmt(it.s)+'~'+fmt(it.e))+(it.tr!=null&&it.k!=='now'?bdg('','walk',it.tr+'분'):'')+(it.k==='ride'?bdg('','wait','약 '+it.w+'분'):'')+'</div></div></li>'}).join('')+'</ul></div>';
-  if(unfit.length){h+='<div class="card"><div class="label">시간 부족 · '+unfit.length+'</div><ul class="alist">'+unfit.map(p=>{const a=attrOf(p);return '<li><span class="ptm num no">–</span><div class="ainfo"><div class="arow"><span class="nmw"><span class="nm">'+p.name+'</span>'+(a?chk(aKey(a),true):'')+'</span>'+bdg('no','alert','시간 부족')+'</div><div class="sub">지금 순서로는 들어갈 자리가 없어요. 다른 별표를 풀면 다시 계산돼요.</div></div></li>'}).join('')+'</ul></div>'}
-  h+='<div class="label">시각은 예상 대기 기준이라 달라질 수 있어요.</div>';
-  $('tabPlan').innerHTML=h;
-  const n=items.filter(i=>i.k!=='now').length+unfit.length;$('tbPlan').textContent='계획'+(unfit.length?' !':'');
+  let h='<div class="card pset"><select id="pS" aria-label="시작 시각">'+tOpts(600,1200,S.ps)+'</select><span>~</span><select id="pE" aria-label="종료 시각">'+tOpts(660,1260,S.pe)+'</select>'+
+    '<select id="pL" aria-label="퍼레이드 자리 잡기"><option value="0"'+(S.lead===0?' selected':'')+'>퍼레이드 직전</option><option value="15"'+(S.lead===15?' selected':'')+'>퍼레이드 15분 전</option><option value="30"'+(S.lead===30?' selected':'')+'>퍼레이드 30분 전</option></select>'+
+    '<button type="button" class="ghost mini" id="pAuto">자동 정렬</button></div>';
+  h+='<div class="card"><ul class="alist plan">';
+  S.log.forEach(e=>{h+='<li class="off"><span class="ptm num">'+e.t+'</span><div class="ainfo"><div class="arow"><span class="nm">'+e.name+'</span>'+bdg('end','','완료')+'</div></div></li>'});
+  const rideRow=(it,un)=>'<li class="prow" data-ride="'+it.key.replace(/"/g,'&quot;')+'"><span class="ptm num'+(un?' no':'')+'">'+(un?'–':fmt(it.s))+'</span><div class="ainfo"><div class="arow"><span class="nm">'+it.name+'</span>'+(un?bdg('no','alert','시간 부족'):'')+'</div>'+
+    (un?'':'<div class="bdg">'+bdg('','clock',fmt(it.s)+'~'+fmt(it.e))+bdg('','walk',it.tr+'분')+bdg('','wait','약 '+it.w+'분')+'</div>')+'</div>'+chk(it.key,true)+'<span class="grip" aria-label="끌어서 순서 바꾸기">'+GRIP+'</span></li>';
+  items.forEach((it,i)=>{
+    if(it.k==='gap')h+='<li class="gaprow"><button type="button" data-gap="'+i+'"><b>+</b><span class="num">'+fmt(it.s)+' ~ '+fmt(it.e)+'</span><small>'+(it.e-it.s)+'분 비어 있음</small></button></li>';
+    else if(it.k==='ride')h+=rideRow(it);
+    else{const pr=it.k==='show'&&it.f.id!=='mk'?PERF.find((r,j)=>perfFixed(r,j).id===it.f.id):null;
+      h+='<li><span class="ptm num sh">'+fmt(it.s)+'</span><div class="ainfo"><div class="arow"><span class="nm">'+it.name+'</span>'+(it.k==='now'?bdg('ok','','진행 중'):it.late?bdg('no','alert','늦음'):'')+'</div><div class="bdg">'+bdg('','clock',fmt(it.s)+'~'+fmt(it.e))+(it.k==='show'?bdg('','walk',it.tr+'분'):'')+'</div></div>'+(pr?chk(pKey(pr),true):'')+'</li>'}
+  });
+  unfit.forEach(r=>{h+=rideRow({key:r.k,name:r.p.name},true)});
+  h+='</ul></div>';
+  box.innerHTML=h;
+  $('tbPlan').textContent='계획'+(unfit.length?' !':'');
+  $('pS').onchange=e=>{S.ps=e.target.value;if(toM(S.pe)<toM(S.ps)+60)S.pe=fmt(toM(S.ps)+60);save();render()};
+  $('pE').onchange=e=>{S.pe=e.target.value;if(toM(S.pe)<toM(S.ps)+60)S.ps=fmt(toM(S.pe)-60);save();render()};
+  $('pL').onchange=e=>{S.lead=+e.target.value;save();render()};
+  $('pAuto').onclick=()=>{autoOrder();save();render()};
+  box.querySelectorAll('[data-gap]').forEach(b=>b.onclick=()=>{gapSel=items[+b.dataset.gap];renderPlan();window.scrollTo({top:0})});
+  box.querySelectorAll('.grip').forEach(g=>g.onpointerdown=ev=>startDrag(ev,g.closest('.prow')));
+}
+function renderGap(box){
+  const g=gapSel,len=g.e-g.s;
+  const shows=PERF.map((r,i)=>({r,f:perfFixed(r,i)})).filter(x=>!S.must[pKey(x.r)]&&toM(x.r[0])>=g.s&&toM(x.r[0])<g.e);
+  const planned=new Set(planRides().map(r=>r.k));
+  const rides=ATTR.map(a=>({a,p:placeOf(a)})).filter(x=>x.p&&!planned.has(aKey(x.a))&&!S.done[x.p.id]&&!CLOSED.includes(x.p.id)).map(x=>{
+    const tr=travel(g.loc,x.p.n),w=est(x.p,g.s+tr).e,d=tr+w+x.p.ride,ok=g.s+d<=Math.min(g.e,x.p.close?toM(x.p.close):1e9);return {...x,d,ok}}).filter(x=>x.ok).sort((x,y)=>y.p.pri-x.p.pri||x.d-y.d);
+  box.innerHTML='<div class="card"><div class="bar"><div class="label num">'+fmt(g.s)+' ~ '+fmt(g.e)+' · '+len+'분</div><button type="button" class="ghost mini" id="gBack">닫기</button></div>'+
+    '<ul class="loclist">'+shows.map((x,i)=>'<li><button type="button" data-ps="'+i+'"><span>'+x.r[1]+'</span><small class="num">'+x.r[0]+' 공연</small></button></li>').join('')+
+    rides.map((x,i)=>'<li><button type="button" data-pr="'+i+'"><span>'+x.a.nm+'</span><small class="num">약 '+x.d+'분</small></button></li>').join('')+
+    (!shows.length&&!rides.length?'<li><div class="sub" style="padding:12px 4px">이 시간에 들어갈 수 있는 것이 없어요.</div></li>':'')+'</ul></div>';
+  $('gBack').onclick=()=>{gapSel=null;renderPlan()};
+  box.querySelectorAll('[data-ps]').forEach(b=>b.onclick=()=>{S.must[pKey(shows[+b.dataset.ps].r)]=true;gapSel=null;save();render()});
+  box.querySelectorAll('[data-pr]').forEach(b=>b.onclick=()=>{const k=aKey(rides[+b.dataset.pr].a);S.must[k]=true;
+    const cur=planRides().map(r=>r.k).filter(x=>x!==k);cur.splice(Math.min(g.pos,cur.length),0,k);S.order=cur;gapSel=null;save();render()});
+}
+function startDrag(ev,row){
+  ev.preventDefault();dragging=true;const y0=ev.clientY,grip=ev.currentTarget;grip.setPointerCapture(ev.pointerId);row.classList.add('drag');
+  const rows=[...document.querySelectorAll('#tabPlan .prow')];
+  const idxOf=()=>{const r=row.getBoundingClientRect(),cy=r.top+r.height/2;return rows.filter(x=>x!==row).filter(x=>{const b=x.getBoundingClientRect();return b.top+b.height/2<cy}).length};
+  grip.onpointermove=e=>{row.style.transform='translateY('+(e.clientY-y0)+'px)';const i=idxOf();rows.forEach(x=>x.classList.remove('dropa','dropb'));const others=rows.filter(x=>x!==row);if(others[i])others[i].classList.add('dropb');else if(others.length)others[others.length-1].classList.add('dropa')};
+  const end=()=>{const i=idxOf(),keys=rows.filter(x=>x!==row).map(x=>x.dataset.ride);keys.splice(i,0,row.dataset.ride);S.order=keys;dragging=false;grip.onpointermove=grip.onpointerup=grip.onpointercancel=null;save();render()};
+  grip.onpointerup=end;grip.onpointercancel=end;
 }
 function renderLists(){
   renderPlan();
@@ -496,13 +566,13 @@ function renderLists(){
       '<div class="bdg">'+bdg('','clock',tm)+bdg('','',pl)+bdg('','',cat)+(key?bdg('ok','','추천'):'')+'</div></div>'+(op?perfDetail(r,pi):'')+'</li>';});
   $('tabPerf').innerHTML=ph+'</ul></div><div class="label">공연 사정에 따라 변경·취소될 수 있음 (11/18 공식 사이트 조회)</div>';
 }
-function setTab(k){S.tab=k;['Rec','Plan','Attr','Perf'].forEach(x=>{$('tab'+x).classList.toggle('hide',x!==k);$('tb'+x).setAttribute('aria-selected',x===k)});save()}
+function setTab(k){S.tab=k;gapSel=null;['Rec','Plan','Attr','Perf'].forEach(x=>{$('tab'+x).classList.toggle('hide',x!==k);$('tb'+x).setAttribute('aria-selected',x===k)});save()}
 function kstSec(){const p=new Intl.DateTimeFormat('en-GB',{timeZone:'Asia/Seoul',hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:false}).formatToParts(new Date());const g=t=>+p.find(x=>x.type===t).value;return g('hour')*3600+g('minute')*60+g('second')}
 function tickLeft(){
   const el=$('cdLeft');if(!el)return;
-  const ns=S.sim?toM(S.simTime)*60:kstSec(),left=Math.max(0,21*3600-ns);
+  const ns=S.sim?toM(S.simTime)*60:kstSec(),left=Math.max(0,PE()*60-ns);
   const p=n=>String(n).padStart(2,'0');
-  el.textContent=ns>=21*3600?'종료':'종료까지 '+p(Math.floor(left/3600))+':'+p(Math.floor(left%3600/60))+':'+p(left%60);
+  el.textContent=ns>=PE()*60?'종료':'종료까지 '+p(Math.floor(left/3600))+':'+p(Math.floor(left%3600/60))+':'+p(left%60);
 }
 let locOpen=false;
 function renderLoc(){
@@ -523,7 +593,7 @@ function render(){
    stage:'<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 12.5V3l7-1.5v9.5"/><circle cx="4.2" cy="12.5" r="1.8"/><circle cx="11.2" cy="11" r="1.8"/></svg>',
    parade:'<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 15V1.5M3 2.5h10l-2.5 3 2.5 3H3"/></svg>',
    star:'<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" aria-hidden="true"><path d="M8 1.5l1.9 4.1 4.6.5-3.4 3 .9 4.4L8 11.3l-4 2.2.9-4.4-3.4-3 4.6-.5z"/></svg>'};
-  const T0=toM('16:00'),T1=toM('21:00'),left=Math.max(0,T1-Math.max(t,T0)),pct=left/(T1-T0)*100;
+  const T0=PS(),T1=Math.max(PE(),PS()+30),left=Math.max(0,T1-Math.max(t,T0)),pct=left/(T1-T0)*100;
   const pre=t<T0;
   let ch='<div class="cd1'+(left<=30?' hot':'')+'" role="img" aria-label="21:00 종료까지 '+dur(left)+'"><div class="cdt"><span class="cdi">'+IC.clock+'</span><b class="num" id="cdLeft"></b></div>'+
     '<div class="cdb"><i style="width:'+pct.toFixed(1)+'%"></i>'+
