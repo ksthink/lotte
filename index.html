@@ -347,9 +347,10 @@ function est(p,t){
 
 const fresh=()=>({ps:'16:00',pe:'21:00',lead:15,order:[],loc:'gate',locName:'정문',sel:null,wait:'',queue:null,log:[],done:{},sim:false,simTime:'16:00',cal:1,obs:[],must:{'P:18:30마법 성냥과 꿈꾸는 밤':true,'P:20:00해피 크리스마스 퍼레이드':true,'P:20:40매직캐슬 라이츠업':true}});
 let S=fresh(),loaded=false;
-try{const s=JSON.parse(localStorage.getItem('lw1123v8')||'null');if(s){S=Object.assign(fresh(),s);loaded=true}}catch(e){}
+const SKEY='lotte-state';
+try{const s=JSON.parse(localStorage.getItem(SKEY)||localStorage.getItem('lw1123v5')||'null');if(s){S=Object.assign(fresh(),s);loaded=true}}catch(e){}
 S.sim=false;
-const save=()=>{try{localStorage.setItem('lw1123v5',JSON.stringify(S))}catch(e){}};
+const save=()=>{try{localStorage.setItem(SKEY,JSON.stringify(S))}catch(e){}};
 
 function kst(){const p=new Intl.DateTimeFormat('en-GB',{timeZone:'Asia/Seoul',hour:'2-digit',minute:'2-digit',hour12:false}).formatToParts(new Date());const g=t=>+p.find(x=>x.type===t).value;return g('hour')*60+g('minute')}
 const now=()=>S.sim?toM(S.simTime):kst();
