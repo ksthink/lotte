@@ -164,7 +164,13 @@ img.dimg{width:100%;aspect-ratio:16/9;object-fit:cover;border-radius:10px;margin
 .cand.hasimg .rng{border-color:#fff}.cand.hasimg .dl{background:#fff}
 .cand.hasimg .chk{color:#fff}.cand.hasimg .chk.on{color:#ffd24a}
 .cand.hasimg.top{box-shadow:0 0 0 2px var(--accent)}
-.wherebtn{min-height:34px;padding:4px 12px;border-radius:999px;font-size:14px;font-weight:600;margin-top:6px;border-color:var(--accent);color:var(--accent);background:var(--accent-soft)}
+.lcol{display:inline-grid;justify-items:start}
+.wherebtn{display:flex;align-items:center;gap:4px;width:0;min-width:100%;min-height:32px;padding:4px 10px;border-radius:999px;font-size:13px;font-weight:600;margin-top:6px;border-color:var(--accent);color:var(--accent);background:var(--accent-soft);white-space:nowrap}
+.wl{flex:none}.wv{flex:1;min-width:0;overflow:hidden;text-align:left}
+#whereTxt{display:inline-block;white-space:nowrap}
+@keyframes mq{0%,18%{transform:translateX(0)}82%,100%{transform:translateX(var(--mq))}}
+@media (prefers-reduced-motion:no-preference){#whereTxt.mq{animation:mq 6s ease-in-out infinite alternate}}
+#simTag{margin-top:2px}
 .mini{min-height:32px;padding:4px 12px;font-size:13px}
 .loclist{list-style:none;margin:0;padding:0}
 .loclist li{border-bottom:1px solid var(--line)}.loclist li:last-child{border-bottom:0}
@@ -194,9 +200,9 @@ img.dimg{width:100%;aspect-ratio:16/9;object-fit:cover;border-radius:10px;margin
 <body>
 <main>
   <div class="bar">
-    <div>
+    <div class="lcol">
       <div class="clock num" id="clock">--:--</div>
-      <button type="button" class="wherebtn" id="where" aria-expanded="false">현재 위치 : 정문</button> <span class="label hide" id="simTag">연습</span>
+      <button type="button" class="wherebtn" id="where" aria-expanded="false"><span class="wl">현재 위치 :</span><span class="wv"><span id="whereTxt">정문 부근</span></span></button><span class="label hide" id="simTag">연습</span>
     </div>
     <div class="cds" id="chips"></div>
   </div>
@@ -580,7 +586,7 @@ function addLog(name){S.log.push({t:fmt(now()),name})}
 function render(){
   const t=now();
   $('clock').textContent=fmt(t);
-  $('where').textContent='현재 위치 : '+locName();$('simTag').classList.toggle('hide',!S.sim);renderLoc();
+  {const tx=$('whereTxt'),v=locName()+' 부근';if(tx.textContent!==v||!tx.dataset.m){tx.textContent=v;tx.dataset.m='1';tx.classList.remove('mq');const o=tx.scrollWidth-tx.parentNode.clientWidth;if(o>2){tx.style.setProperty('--mq',(-o-2)+'px');tx.style.animationDuration=Math.max(4,o/14+3)+'s';tx.classList.add('mq')}}$('where').setAttribute('aria-label','현재 위치 '+v+', 눌러서 변경');}$('simTag').classList.toggle('hide',!S.sim);renderLoc();
   const CI={door:'<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 14.5V2.5h7v12M1.5 14.5h13M10 4.5l3 1v9M7.5 8.5v.5"/></svg>',
    stage:'<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 12.5V3l7-1.5v9.5"/><circle cx="4.2" cy="12.5" r="1.8"/><circle cx="11.2" cy="11" r="1.8"/></svg>',
    parade:'<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 15V1.5M3 2.5h10l-2.5 3 2.5 3H3"/></svg>',
