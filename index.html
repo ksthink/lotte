@@ -205,6 +205,12 @@ main{min-width:0}.pane{min-width:0}
 .cand .bdg{gap:3px}
 .cand .bdg .badge{font-size:11px;padding:3px 6px;gap:2px;flex:none;letter-spacing:-.02em}
 .cand .bdg .badge svg{width:11px;height:11px}
+.badge.ty{padding:0;width:24px;height:24px;justify-content:center;border-radius:50%;flex:none;background:var(--bg);color:var(--ink-2)}
+.badge.ty svg{width:14px;height:14px}
+.badge.ty.rec{background:var(--accent);color:#fff}
+.badge.ty.show{background:var(--warn-bg);color:var(--warn)}
+.cand .nmw{gap:6px}
+.cand.hasimg .badge.ty.rec{background:rgba(15,110,100,.85)}
 .hide{display:none!important}
 </style>
 </head>
@@ -318,7 +324,7 @@ function placeOf(a){
   if(!a||a.c23||!a.h)return null;
   const p0=a.no&&PLACES.find(p=>p.g===a.no);if(p0)return p0;
   const i=ATTR.indexOf(a),z=ZNODE[a.ar]||['f1_meet','1F'];const nd=a.no&&NODE_OF[a.no]&&TRAVEL[NODE_OF[a.no]]?NODE_OF[a.no]:z[0];
-  return {id:'x'+i,g:a.no,ai:i,close:a.h[1],n:nd,name:a.nm,z:z[1],ride:5,pri:6,kind:'ride',base:a.w||30};
+  return {id:'x'+i,g:a.no,ai:i,close:a.h[1],n:nd,name:a.nm,z:z[1],ride:5,pri:a.ks?1:3,kind:'ride',base:a.w||30};
 }
 function allPlaces(){
   const extra=[];
@@ -384,7 +390,8 @@ function observe(p,t,actual){
 
 function candidates(tOv,fromOv,exId){
   const t=tOv??eff(),from=fromOv??S.loc,out=[];
-  allPlaces().forEach(p=>{
+  const allP=PLACES.concat(ATTR.map(placeOf).filter(p=>p&&!PLACES.includes(p)));
+  allP.forEach(p=>{
     if(CLOSED.includes(p.id)||p.id===exId)return;
     const n=S.done[p.id]||0;if(n>=(p.repeat||1))return;
     const tr=travel(from,p.n),arr=t+tr;
@@ -396,7 +403,7 @@ function candidates(tOv,fromOv,exId){
     if(p.flag)sc-=8;
     const must=isMust(p);if(must)sc+=80;
     if(fit==='tight')sc-=25;
-    out.push({p,mw,sc,tr,x,fit,must});
+    out.push({p,mw,sc,tr,x,fit,must,cur:PLACES.includes(p)&&!!p.g});
   });
   const rank={ok:0,tight:1,no:2};
   const grp=c=>c.fit==='no'?3:c.must?0:rank[c.fit]+1;
@@ -634,8 +641,8 @@ function render(){
     others.classList.add('hide');
   }
   else if(S.sel){
-    const fx=allFixed().find(x=>x.id===S.sel);
-    const p=fx||allPlaces().find(x=>x.id===S.sel);
+    const fx=PERF.map((r,i)=>perfFixed(r,i)).concat([MK]).find(x=>x.id===S.sel);
+    const p=fx||allPlaces().concat(ATTR.map(placeOf).filter(Boolean)).find(x=>x.id===S.sel);
     if(!p){S.sel=null;save();return render()}
     const isFixed=!!fx;
     const tr=travel(S.loc,p.n);
@@ -700,12 +707,16 @@ function render(){
       usable.slice(0,3).forEach((c,i)=>$('topList').appendChild(candBtn(c,i===0)));
     }
     const ol=$('otherList');ol.innerHTML='';
-    const rest=(due?cs:cs.filter(c=>!usable.slice(0,3).includes(c))).filter(c=>c.mw>=5);
+    const top3=due?[]:usable.slice(0,3);
+    const rest=cs.filter(c=>!top3.includes(c)).map(c=>({c,w:c.x.e,cl:toM(c.p.close||'23:59'),el:()=>candBtn(c)}));
+    const te=eff();
+    PERF.forEach((r,i)=>{const f=perfFixed(r,i);if(toM(f.end)<=te||S.done[f.id])return;const tr=travel(S.loc,f.n),left=toM(r[0])-te-tr;
+      rest.push({show:true,w:Math.max(0,toM(r[0])-te),cl:toM(r[0]),el:()=>showBtn(r,f,tr,left)})});
     const sk=S.sort||'rec';
-    if(sk==='wait')rest.sort((a,b)=>a.x.e-b.x.e||a.tr-b.tr);
-    if(sk==='close')rest.sort((a,b)=>toM(a.p.close||'23:59')-toM(b.p.close||'23:59')||a.x.e-b.x.e);
+    if(sk==='wait')rest.sort((a,b)=>a.w-b.w);
+    if(sk==='close')rest.sort((a,b)=>a.cl-b.cl||a.w-b.w);
     document.querySelectorAll('.sorts button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.sort===sk));
-    rest.forEach(c=>ol.appendChild(candBtn(c)));
+    rest.forEach(x=>ol.appendChild(x.el()));
     if(!rest.length)others.classList.add('hide');
   }
 
@@ -714,13 +725,26 @@ function render(){
   $('simOn').checked=S.sim;$('simTime').value=S.simTime;$('simTime').disabled=!S.sim;
 }
 
+const TY={rec:'<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5.5 14V7.2L8.3 2c1 .1 1.7.9 1.5 2L9.4 6.2h3.1c.9 0 1.5.8 1.3 1.7l-1 4.7c-.2.8-.8 1.4-1.7 1.4zM2.2 7.2h3.3V14H2.2z"/></svg>',
+ attr:'<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="8" cy="6.8" r="5"/><path d="M8 1.8v10M3 6.8h10M4.5 3.3l7 7M11.5 3.3l-7 7M5.5 14.5l2.5-4 2.5 4M4 14.5h8"/></svg>',
+ show:'<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 12.5V3l7-1.5v9.5"/><circle cx="4.2" cy="12.5" r="1.8"/><circle cx="11.2" cy="11" r="1.8"/></svg>'};
+const ty=(k,label)=>'<span class="badge ty '+k+'" role="img" aria-label="'+label+'" title="'+label+'">'+TY[k]+'</span>';
+function showBtn(r,f,tr,left){
+  const b=document.createElement('button');b.type='button';const fit=left>=10?'ok':left>=0?'tight':'no';b.className='cand '+fit;
+  b.innerHTML='<span class="nmw">'+ty('show','공연')+'<span class="nm"></span>'+chk(pKey(r),S.must[pKey(r)])+'</span>'+bdg(fit,fit==='no'?'alert':'',fit==='no'?'늦음':'여유 '+left+'분')+
+    '<div class="bdg">'+bdg('','walk',tr+'분')+bdg('','clock',r[0])+bdg('','',r[2])+'</div>';
+  b.querySelector('.nm').textContent=r[1];
+  b.setAttribute('aria-label','공연 '+r[1]+', '+r[0]+', 이동 '+tr+'분');
+  b.onclick=()=>{S.sel=f.id;S.wait='';save();render();window.scrollTo({top:0,behavior:'smooth'})};
+  return b;
+}
 const IMGOK={};
 function candBtn(c,top){
   const b=document.createElement('button');b.type='button';b.className='cand '+c.fit+(top?' top':'');
   const isR=!c.p.fixedWait;
   const A0=attrOf(c.p),src=A0&&A0.im?'https://adventure.lotteworld.com/api/upload/'+A0.im:'';
   if(src&&IMGOK[src])b.classList.add('hasimg');
-  b.innerHTML=(src&&IMGOK[src]!==false?'<img class="bgimg" alt="" decoding="async" src="'+src+'">':'')+'<span class="nmw"><span class="nm"></span>'+(attrOf(c.p)?chk(aKey(attrOf(c.p)),c.must):'')+'</span>'+fitBadge(c.fit,c.mw-c.x.e)+
+  b.innerHTML=(src&&IMGOK[src]!==false?'<img class="bgimg" alt="" loading="lazy" decoding="async" src="'+src+'">':'')+'<span class="nmw">'+(c.cur&&c.fit==='ok'?ty('rec','추천'):'')+(A0?ty('attr','어트랙션'):'')+'<span class="nm"></span>'+(attrOf(c.p)?chk(aKey(attrOf(c.p)),c.must):'')+'</span>'+fitBadge(c.fit,c.mw-c.x.e)+
     bar({tr:c.tr,w:c.x.e,lo:isR?c.x.lo:null,hi:isR?c.x.hi:null,ride:c.p.ride,mw:c.mw,fit:c.fit})+
     '<div class="bdg">'+bdg('','walk',c.tr+'분')+bdg('','wait',(isR?c.x.lo+'~'+c.x.hi:c.x.e)+'분')+infoBadges(c.p)+(c.p.flag?bdg('warn','alert',c.p.flag):'')+'</div>';
   b.querySelector('.nm').textContent=c.p.name;
