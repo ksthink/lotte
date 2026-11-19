@@ -426,7 +426,7 @@
     "20:50"
    ],
    "status_1118_evening": "운행마침",
-   "closed_1123": "정기점검",
+   "closed_1123": null,
    "map_page": 4,
    "map_xy": [
     795,
@@ -612,7 +612,7 @@
     "19:50"
    ],
    "status_1118_evening": "운행마침",
-   "closed_1123": "일일점검",
+   "closed_1123": null,
    "map_page": 2,
    "map_xy": [
     734,
@@ -795,7 +795,7 @@
    "kids_ride": false,
    "hours_1118": null,
    "status_1118_evening": "정기운휴",
-   "closed_1123": "정기운휴",
+   "closed_1123": null,
    "map_page": 3,
    "map_xy": [
     1281,
