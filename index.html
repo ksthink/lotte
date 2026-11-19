@@ -207,8 +207,11 @@ main{min-width:0}.pane{min-width:0}
 .cand .bdg .badge svg{width:11px;height:11px}
 .badge.ty{padding:0;width:24px;height:24px;justify-content:center;border-radius:50%;flex:none;background:var(--bg);color:var(--ink-2)}
 .badge.ty svg{width:14px;height:14px}
-.badge.ty.rec{background:var(--accent);color:#fff}
-.badge.ty.show{background:var(--warn-bg);color:var(--warn)}
+.badge.ty{color:#fff!important;border:0!important;box-shadow:0 0 0 2px var(--panel)}
+.badge.ty.rec{background:#F59E0B!important}
+.badge.ty.attr{background:#2563EB!important}
+.badge.ty.show{background:#9333EA!important}
+.cand.hasimg .badge.ty{box-shadow:0 0 0 2px rgba(255,255,255,.85);-webkit-backdrop-filter:none;backdrop-filter:none}
 .cand{height:148px;padding-top:38px!important;align-content:start!important;min-height:0!important}
 .cand .tys{position:absolute!important;top:8px;left:8px;display:flex;gap:4px;z-index:2}
 .cand .nm{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
