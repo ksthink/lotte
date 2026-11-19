@@ -533,7 +533,7 @@ function render(){
         '<div class="bdg">'+bdg('','walk',tr+'분')+bdg('','wait',(isRide?x.lo+'~'+x.hi:x.e)+'분')+infoBadges(p)+(p.flag?bdg('warn','alert',p.flag):'')+'</div>'+
         (p.g&&INFO(p.g)&&INFO(p.g).d?'<div class="sub">'+INFO(p.g).d+'</div>':'')+
         '<div id="res"></div>'+
-        (isRide?'<div class="label">앱에 뜬 실제 대기 (선택)</div><div class="wait"><select id="wIn" aria-label="실제 대기시간(분)"><option value="">예상 '+x.e+'</option>'+[0,5,10,15,20,25,30,35,40,45,50,55,60,65,70,75,80,85,90,100,110,120,130,140,150,180].map(v=>'<option value="'+v+'">'+v+'</option>').join('')+'</select><span>분</span></div>':'')+
+        (isRide?'<div class="label">앱에 뜬 실제 대기 (선택)</div><div class="wait"><select id="wIn" aria-label="실제 대기시간(분)"><option value="">'+x.e+'</option>'+[0,5,10,15,20,25,30,35,40,45,50,55,60,65,70,75,80,85,90,100,110,120,130,140,150,180].map(v=>'<option value="'+v+'">'+v+'</option>').join('')+'</select><span>분</span></div>':'')+
         '<div class="btns"><button class="ghost" id="bBack">다른 곳</button><button class="go" id="bQ">'+(isRide?'줄 서기':'시작')+'</button></div>';
       const wIn=$('wIn');
       if(wIn){
