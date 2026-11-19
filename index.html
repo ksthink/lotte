@@ -196,6 +196,8 @@ img.dimg{width:100%;aspect-ratio:16/9;object-fit:cover;border-radius:10px;margin
 .gaprow{padding:6px 0!important;display:block!important}
 .gaprow button{width:100%;display:flex;align-items:center;gap:10px;border:1.5px dashed var(--line);background:transparent;color:var(--ink-2);min-height:44px}
 .gaprow b{color:var(--accent);font-size:20px;line-height:1}.gaprow small{margin-left:auto;font-size:12px}
+.plan .ptm{position:relative}
+.pnum{position:absolute;top:-7px;left:-7px;min-width:20px;height:20px;padding:0 5px;border-radius:10px;background:tomato;color:#fff;font:600 12px/20px var(--font-body);font-style:normal;text-align:center;box-shadow:0 0 0 2px var(--panel)}
 .hide{display:none!important}
 </style>
 </head>
@@ -509,13 +511,14 @@ function renderPlan(){
     '<button type="button" class="ghost mini" id="pAuto">자동 정렬</button></div>';
   h+='<div class="card"><ul class="alist plan">';
   S.log.forEach(e=>{h+='<li class="off"><span class="ptm num">'+e.t+'</span><div class="ainfo"><div class="arow"><span class="nm">'+e.name+'</span>'+bdg('end','','완료')+'</div></div></li>'});
-  const rideRow=(it,un)=>'<li class="prow" data-ride="'+it.key.replace(/"/g,'&quot;')+'"><span class="ptm num'+(un?' no':'')+'">'+(un?'–':fmt(it.s))+'</span><div class="ainfo"><div class="arow"><span class="nm">'+it.name+'</span>'+(un?bdg('no','alert','시간 부족'):'')+'</div>'+
+  let pn=0;const nb=()=>'<i class="pnum">'+(++pn)+'</i>';
+  const rideRow=(it,un)=>'<li class="prow" data-ride="'+it.key.replace(/"/g,'&quot;')+'"><span class="ptm num'+(un?' no':'')+'">'+(un?'':nb())+(un?'–':fmt(it.s))+'</span><div class="ainfo"><div class="arow"><span class="nm">'+it.name+'</span>'+(un?bdg('no','alert','시간 부족'):'')+'</div>'+
     (un?'':'<div class="bdg">'+bdg('','clock',fmt(it.s)+'~'+fmt(it.e))+bdg('','walk',it.tr+'분')+bdg('','wait','약 '+it.w+'분')+'</div>')+'</div>'+chk(it.key,true)+'<span class="updn"><button type="button" data-mv="-1" aria-label="위로">'+ARW+'</button><button type="button" data-mv="1" aria-label="아래로" class="dn">'+ARW+'</button></span></li>';
   items.forEach((it,i)=>{
     if(it.k==='gap')h+='<li class="gaprow"><button type="button" data-gap="'+i+'"><b>+</b><span class="num">'+fmt(it.s)+' ~ '+fmt(it.e)+'</span><small>'+(it.e-it.s)+'분 비어 있음</small></button></li>';
     else if(it.k==='ride')h+=rideRow(it);
     else{const pr=it.k==='show'&&it.f.id!=='mk'?PERF.find((r,j)=>perfFixed(r,j).id===it.f.id):null;
-      h+='<li><span class="ptm num sh">'+fmt(it.s)+'</span><div class="ainfo"><div class="arow"><span class="nm">'+it.name+'</span>'+(it.k==='now'?bdg('ok','','진행 중'):it.late?bdg('no','alert','늦음'):'')+'</div><div class="bdg">'+bdg('','clock',fmt(it.s)+'~'+fmt(it.e))+(it.k==='show'?bdg('','walk',it.tr+'분'):'')+'</div></div>'+(pr?chk(pKey(pr),true):'')+'</li>'}
+      h+='<li><span class="ptm num sh">'+nb()+fmt(it.s)+'</span><div class="ainfo"><div class="arow"><span class="nm">'+it.name+'</span>'+(it.k==='now'?bdg('ok','','진행 중'):it.late?bdg('no','alert','늦음'):'')+'</div><div class="bdg">'+bdg('','clock',fmt(it.s)+'~'+fmt(it.e))+(it.k==='show'?bdg('','walk',it.tr+'분'):'')+'</div></div>'+(pr?chk(pKey(pr),true):'')+'</li>'}
   });
   unfit.forEach(r=>{h+=rideRow({key:r.k,name:r.p.name},true)});
   h+='</ul></div>';
