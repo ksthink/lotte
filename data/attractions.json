@@ -217,7 +217,7 @@
    ],
    "avg_wait_2025_min": null,
    "magic_pass": null,
-   "note": null,
+   "note": "11/18 점검. 11/23은 운행으로 가정(사용자 판단), 운영시간 10:00~20:50 가정",
    "image_url": "https://adventure.lotteworld.com/api/upload/202604/03/2026040319d5130f8ae70"
   },
   {
@@ -1262,7 +1262,7 @@
    ],
    "avg_wait_2025_min": 44,
    "magic_pass": null,
-   "note": null,
+   "note": "11/18 점검. 11/23은 운행으로 가정(사용자 판단), 운영시간 10:00~20:50 가정",
    "image_url": "https://adventure.lotteworld.com/api/upload/202509/19/2025091919961247daa50"
   },
   {
