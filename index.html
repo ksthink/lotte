@@ -90,7 +90,7 @@ summary{cursor:pointer;padding:6px 0}
 .cand .tbar,.cand .bdg{grid-column:1/-1}
 .prog{height:14px;border-radius:7px;background:var(--bg);overflow:hidden}
 .prog>div{height:100%;background:var(--accent)}
-.tabs{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.tabs{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
 .tabs button{min-height:42px;font-weight:600;color:var(--ink-2)}
 .tabs button[aria-selected="true"]{background:var(--accent);color:#fff;border-color:var(--accent)}
 :root[data-theme="dark"] .tabs button[aria-selected="true"]{color:#0E1420}
@@ -212,12 +212,16 @@ main{min-width:0}.pane{min-width:0}
 .badge.ty.attr{background:#2563EB!important}
 .badge.ty.show{background:#9333EA!important}
 .cand.hasimg .badge.ty{box-shadow:0 0 0 2px rgba(255,255,255,.85);-webkit-backdrop-filter:none;backdrop-filter:none}
-.cand{height:148px;padding-top:38px!important;align-content:start!important;min-height:0!important}
+.cand{height:112px;padding-top:38px!important;align-content:start!important;min-height:0!important}
 .cand .tys{position:absolute!important;top:8px;left:8px;display:flex;gap:4px;z-index:2}
 .cand .nm{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
 .cand .nmw{min-width:0;overflow:hidden}
 .cand.hasimg .badge.ty.rec{background:rgba(15,110,100,.85)}
 .morebtn{width:100%;color:var(--ink-2);font-weight:600}
+.thr{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;border-radius:14px;padding:14px 16px;background:var(--ok-bg);color:var(--ok)}
+.thr b{font-family:var(--font-display);font-weight:400;font-size:44px;line-height:1}
+.thr.tight{background:var(--warn-bg);color:var(--warn)}.thr.no{background:var(--bad-bg);color:var(--bad)}
+.cand.top{height:128px}.cand.top .nm{font-size:20px}
 .hide{display:none!important}
 </style>
 </head>
@@ -234,9 +238,8 @@ main{min-width:0}.pane{min-width:0}
   <section class="card hide" id="locPick"></section>
 
   <div class="tabs" role="tablist">
-    <button type="button" role="tab" id="tbRec" aria-selected="true">추천</button>
-    <button type="button" role="tab" id="tbAttr" aria-selected="false">어트랙션</button>
-    <button type="button" role="tab" id="tbPerf" aria-selected="false">공연</button>
+    <button type="button" role="tab" id="tbRec" aria-selected="true">지금</button>
+    <button type="button" role="tab" id="tbAttr" aria-selected="false">둘러보기</button>
     <button type="button" role="tab" id="tbPlan" aria-selected="false">계획</button>
   </div>
   <div id="tabRec" class="pane">
@@ -252,8 +255,8 @@ main{min-width:0}.pane{min-width:0}
 
 
   </div>
-  <div id="tabAttr" class="pane hide"></div>
   <div id="tabPerf" class="pane hide"></div>
+  <div id="tabAttr" class="pane hide"></div>
   <div id="tabPlan" class="pane hide"></div>
 
   <details>
@@ -465,11 +468,11 @@ const PDESC=n=>n.includes('매지컬')?'어린이를 위한 캐릭터 라이브 
 const row=(k,v)=>v?'<div class="drow"><span>'+k+'</span><b>'+v+'</b></div>':'';
 function attrDetail(a){
   const pl=allPlaces().find(p=>attrOf(p)===a);
-  let est1='';if(pl&&a.h&&!a.c23){const tr=travel(S.loc,pl.n),x=est(pl,eff()+tr);est1=row('지금 가면','이동 '+tr+'분 · 예상 대기 '+x.lo+'~'+x.hi+'분')}
+  let est1='';if(pl&&a.h&&!a.c23){const tr=travel(S.loc,pl.n),x=est(pl,eff()+tr);est1=row('지금 위치에서','이동 '+tr+'분')}
   return '<div class="detail">'+pic(a,'dimg')+
     row('위치',a.ar)+row('운영(11/18)',a.h?a.h[0]+' ~ '+a.h[1]:a.st)+row('11/23',a.c23?'운휴 · '+a.c23:'')+
     row('키 제한',hTxt(a)||'제한 없음')+row('보호자 동반',a.gd?'동반 탑승 가능':'')+row('싱글라이더',a.sg?'운영':'')+row('탑승예약',a.rv?'예약제':'')+
-    row('유아 놀이시설',a.ks?'해당':'')+row('2025 평균 대기',a.w?a.w+'분':'')+est1+
+    row('유아 놀이시설',a.ks?'해당':'')+est1+
     (pl&&a.h&&!a.c23?'<button type="button" class="go gobtn" data-go="'+pl.id+'">여기로 가기</button>':'')+'</div>';
 }
 function perfDetail(r,i){
@@ -534,12 +537,12 @@ function renderPlan(){
   S.log.forEach(e=>{h+='<li class="off"><span class="ptm num">'+e.t+'</span><div class="ainfo"><div class="arow"><span class="nm">'+e.name+'</span>'+bdg('end','','완료')+'</div></div></li>'});
   let pn=0;const nb=()=>'<i class="pnum">'+(++pn)+'</i>';
   const rideRow=(it,un)=>'<li class="prow" data-ride="'+it.key.replace(/"/g,'&quot;')+'"><span class="ptm num'+(un?' no':'')+'">'+(un?'':nb())+(un?'–':fmt(it.s))+'</span><div class="ainfo"><div class="arow"><span class="nm">'+it.name+'</span>'+(un?bdg('no','alert','시간 부족'):'')+'</div>'+
-    (un?'':'<div class="bdg">'+bdg('','clock',fmt(it.s)+'~'+fmt(it.e))+bdg('','walk',it.tr+'분')+bdg('','wait','약 '+it.w+'분')+'</div>')+'</div>'+chk(it.key,true)+'<span class="updn"><button type="button" data-mv="-1" aria-label="위로">'+ARW+'</button><button type="button" data-mv="1" aria-label="아래로" class="dn">'+ARW+'</button></span></li>';
+    (un?'':'<div class="bdg">'+bdg('','clock',fmt(it.s)+'~'+fmt(it.e))+'</div>')+'</div>'+chk(it.key,true)+'<span class="updn"><button type="button" data-mv="-1" aria-label="위로">'+ARW+'</button><button type="button" data-mv="1" aria-label="아래로" class="dn">'+ARW+'</button></span></li>';
   items.forEach((it,i)=>{
     if(it.k==='gap')h+='<li class="gaprow"><button type="button" data-gap="'+i+'"><b>+</b><span class="num">'+fmt(it.s)+' ~ '+fmt(it.e)+'</span><small>'+(it.e-it.s)+'분 비어 있음</small></button></li>';
     else if(it.k==='ride')h+=rideRow(it);
     else{const pr=it.k==='show'&&it.f.id!=='mk'?PERF.find((r,j)=>perfFixed(r,j).id===it.f.id):null;
-      h+='<li><span class="ptm num sh">'+nb()+fmt(it.s)+'</span><div class="ainfo"><div class="arow"><span class="nm">'+it.name+'</span>'+(it.k==='now'?bdg('ok','','진행 중'):it.late?bdg('no','alert','늦음'):'')+'</div><div class="bdg">'+bdg('','clock',fmt(it.s)+'~'+fmt(it.e))+(it.k==='show'?bdg('','walk',it.tr+'분'):'')+'</div></div>'+(pr?chk(pKey(pr),true):'')+'</li>'}
+      h+='<li><span class="ptm num sh">'+nb()+fmt(it.s)+'</span><div class="ainfo"><div class="arow"><span class="nm">'+it.name+'</span>'+(it.k==='now'?bdg('ok','','진행 중'):it.late?bdg('no','alert','늦음'):'')+'</div><div class="bdg">'+bdg('','clock',fmt(it.s)+'~'+fmt(it.e))+'</div></div>'+(pr?chk(pKey(pr),true):'')+'</li>'}
   });
   unfit.forEach(r=>{h+=rideRow({key:r.k,name:r.p.name},true)});
   h+='</ul></div>';
@@ -591,7 +594,8 @@ function renderLists(){
       '<div class="bdg">'+bdg('','clock',tm)+bdg('','',pl)+bdg('','',cat)+(key?bdg('ok','','추천'):'')+'</div></div>'+(op?perfDetail(r,pi):'')+'</li>';});
   $('tabPerf').innerHTML=ph+'</ul></div><div class="label">공연 사정에 따라 변경·취소될 수 있음 (11/18 공식 사이트 조회)</div>';
 }
-function setTab(k){S.tab=k;gapSel=null;['Rec','Plan','Attr','Perf'].forEach(x=>{$('tab'+x).classList.toggle('hide',x!==k);$('tb'+x).setAttribute('aria-selected',x===k)});save()}
+const paneOn=(x,k)=>x===k||(x==='Perf'&&k==='Attr');
+function setTab(k){if(k==='Perf')k='Attr';S.tab=k;gapSel=null;['Rec','Plan','Attr','Perf'].forEach(x=>$('tab'+x).classList.toggle('hide',!paneOn(x,k)));['Rec','Attr','Plan'].forEach(x=>$('tb'+x).setAttribute('aria-selected',x===k));save()}
 function kstSec(){const p=new Intl.DateTimeFormat('en-GB',{timeZone:'Asia/Seoul',hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:false}).formatToParts(new Date());const g=t=>+p.find(x=>x.type===t).value;return g('hour')*3600+g('minute')*60+g('second')}
 function tickLeft(){
   const el=$('cdLeft');if(!el)return;
@@ -603,7 +607,7 @@ let locOpen=false;
 function renderLoc(){
   const box=$('locPick');box.classList.toggle('hide',!locOpen);$('where').setAttribute('aria-expanded',locOpen);
   document.querySelector('.tabs').classList.toggle('hide',locOpen);document.querySelector('main>details').classList.toggle('hide',locOpen);
-  ['Rec','Plan','Attr','Perf'].forEach(x=>$('tab'+x).classList.toggle('hide',locOpen||x!==(S.tab||'Rec')));
+  ['Rec','Plan','Attr','Perf'].forEach(x=>$('tab'+x).classList.toggle('hide',locOpen||!paneOn(x,S.tab==='Perf'?'Attr':(S.tab||'Rec'))));
   if(!locOpen){box.innerHTML='';return}
   box.innerHTML='<ul class="loclist">'+LOCS.map((l,i)=>'<li><button type="button" data-i="'+i+'"'+(l[0]===S.loc&&l[1]===locName()?' aria-current="true"':'')+'><span>'+l[1]+'</span><small>'+l[2]+'</small></button></li>').join('')+'</ul>';
   box.querySelectorAll('[data-i]').forEach(b=>b.onclick=()=>{const l=LOCS[+b.dataset.i];S.loc=l[0];S.locName=l[1];if(!S.queue){S.sel=null;S.wait=''}locOpen=false;save();render();window.scrollTo({top:0})});
@@ -664,26 +668,24 @@ function render(){
       const x=est(p,arr);
       const isRide=p.kind==='ride'&&!p.fixedWait;
       A.innerHTML='<div class="herow">'+pic(attrOf(p),'hero')+'<div><div class="label">'+ZN[p.z]+'</div><div class="big">'+p.name+'</div></div>'+(attrOf(p)?chk(aKey(attrOf(p)),isMust(p)):'')+'</div>'+
-        '<div class="bdg">'+bdg('','walk',tr+'분')+bdg('','wait',(isRide?x.lo+'~'+x.hi:x.e)+'분')+infoBadges(p)+(p.flag?bdg('warn','alert',p.flag):'')+'</div>'+
+        '<div class="bdg">'+bdg('','walk',tr+'분')+infoBadges(p)+(p.flag?bdg('warn','alert',p.flag):'')+'</div>'+
         (p.g&&INFO(p.g)&&INFO(p.g).d?'<div class="sub">'+INFO(p.g).d+'</div>':'')+
+        (isRide?'<div class="thr '+(mw>=10?'ok':mw>=0?'tight':'no')+'">'+(mw>=0?'<span>대기</span><b class="num">'+mw+'분</b><span>이하면 줄 서도 돼요</span>':'<span>지금은 다음 일정에 맞추기 어려워요</span>')+'</div>':'')+
+        (isRide?'<div class="wait"><span class="label">지금 대기</span><select id="wIn" aria-label="지금 대기시간(분)"><option value="">–</option>'+[0,5,10,15,20,25,30,35,40,45,50,55,60,65,70,75,80,85,90,100,110,120,130,140,150,180].map(v=>'<option value="'+v+'">'+v+'</option>').join('')+'</select><span>분</span></div>':'')+
         '<div id="res"></div>'+
-        (isRide?'<div class="label">앱에 뜬 실제 대기 (선택)</div><div class="wait"><select id="wIn" aria-label="실제 대기시간(분)"><option value="">'+x.e+'</option>'+[0,5,10,15,20,25,30,35,40,45,50,55,60,65,70,75,80,85,90,100,110,120,130,140,150,180].map(v=>'<option value="'+v+'">'+v+'</option>').join('')+'</select><span>분</span></div>':'')+
         '<div class="btns"><button class="ghost" id="bBack">다른 곳</button><button class="go" id="bQ">'+(isRide?'줄 서기':'시작')+'</button></div>';
       const wIn=$('wIn');
       if(wIn){
         wIn.value=String(S.wait);wIn.onchange=()=>{S.wait=wIn.value===''?'':+wIn.value;save();upd()};
       }
       function upd(){
-        const r=$('res');const has=S.wait!=='';
-        const w=has?+S.wait:x.e;
-        const fit=fitFor(w,mw);
-        let h=bar({tr:S.sim?tr:0,w,lo:has||!isRide?null:x.lo,hi:has||!isRide?null:x.hi,ride:p.ride,mw,big:true,t0:eff()})+
-          '<div class="bdg">'+fitBadge(fit,mw-w,true)+bdg('',has?'wait':'clock',has?'실제 '+w+'분':'예상 '+w+'분')+'</div>';
-        if(fit==='no'){
-          const alt=candidates().filter(c=>c.p.id!==p.id&&c.fit==='ok').sort((a,b)=>(a.p.z===p.z?0:1)-(b.p.z===p.z?0:1)||a.tr-b.tr||b.sc-a.sc).slice(0,3);
-          h+=alt.length?'<div class="label">대신</div><div class="list" id="alts"></div>':'';
-          r.innerHTML=h;alt.forEach(c=>$('alts').appendChild(candBtn(c)));
-        }else r.innerHTML=h;
+        const r=$('res');if(!r)return;const has=S.wait!=='';
+        if(!has||!isRide){r.innerHTML='';return}
+        const w=+S.wait;
+        if(w<=mw){r.innerHTML='<div class="res ok num">줄 서도 돼요<span>'+fmt(arr+w+p.ride)+'쯤 끝나요</span></div>';return}
+        const alt=candidates().filter(c=>c.p.id!==p.id&&c.fit==='ok').sort((a,b)=>(a.p.z===p.z?0:1)-(b.p.z===p.z?0:1)||a.tr-b.tr||b.sc-a.sc).slice(0,3);
+        r.innerHTML='<div class="res bad num">'+(w-mw)+'분 늦어요</div>'+(alt.length?'<div class="label">대신</div><div class="list" id="alts"></div>':'');
+        alt.forEach(c=>$('alts').appendChild(candBtn(c)));
       }
       upd();
       $('bQ').onclick=()=>{
@@ -709,23 +711,17 @@ function render(){
     }else if(!usable.length){
       A.innerHTML='<div class="big">오늘 일정 끝</div><div class="label">수고했어요</div>';
     }else{
-      const mleft=allPlaces().filter(p=>isMust(p)&&!S.done[p.id]&&!CLOSED.includes(p.id)).length;
-      A.innerHTML='<div class="bar"><div class="label">다음 추천'+(mleft?' · 꼭 탈 것 '+mleft+'개 남음':'')+'</div>'+LEGEND+'</div><div class="list" id="topList"></div>';
-      usable.slice(0,3).forEach((c,i)=>$('topList').appendChild(candBtn(c,i===0)));
+      const nxt=planSim().items.find(i=>i.k==='ride'||i.k==='show');
+      let list=usable.slice();
+      if(nxt&&nxt.k==='ride'){const i=list.findIndex(c=>c.p.id===nxt.p.id);if(i>0)list.unshift(list.splice(i,1)[0])}
+      const nf=nextFixed(eff());
+      A.innerHTML='<div class="label">다음 할 일</div><div class="list" id="topList"></div>'+
+        (nf&&nf.id!=='mk'?'<div class="bdg">'+bdg('warn','clock',nf.start)+bdg('','',nf.name.replace(' + 도시락',''))+bdg('','flag',fmt(toM(nf.arrive)-travel(S.loc,nf.n))+' 출발')+'</div>':'')+
+        (list.length>1?'<div class="label">대신 갈 만한 곳</div><div class="list" id="altList"></div>':'');
+      $('topList').appendChild(candBtn(list[0],true));
+      list.slice(1,4).forEach(c=>$('altList').appendChild(candBtn(c)));
     }
-    const ol=$('otherList');ol.innerHTML='';
-    const top3=due?[]:usable.slice(0,3);
-    const rest=cs.filter(c=>!top3.includes(c)).map(c=>({c,w:c.x.e,cl:toM(c.p.close||'23:59'),el:()=>candBtn(c)}));
-    const te=eff();
-    PERF.forEach((r,i)=>{const f=perfFixed(r,i);if(toM(f.end)<=te||S.done[f.id])return;const tr=travel(S.loc,f.n),left=toM(r[0])-te-tr;
-      rest.push({show:true,w:Math.max(0,toM(r[0])-te),cl:toM(r[0]),el:()=>showBtn(r,f,tr,left)})});
-    const sk=S.sort||'rec';
-    if(sk==='wait')rest.sort((a,b)=>a.w-b.w);
-    if(sk==='close')rest.sort((a,b)=>a.cl-b.cl||a.w-b.w);
-    document.querySelectorAll('.sorts button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.sort===sk));
-    (moreOpen?rest:rest.slice(0,10)).forEach(x=>ol.appendChild(x.el()));
-    if(rest.length>10){const mb=document.createElement('button');mb.type='button';mb.className='ghost morebtn';mb.textContent=moreOpen?'접기':'더 보기 ('+(rest.length-10)+')';mb.onclick=()=>{moreOpen=!moreOpen;render()};ol.appendChild(mb)}
-    if(!rest.length)others.classList.add('hide');
+    others.classList.add('hide');
   }
 
 
@@ -753,18 +749,18 @@ function candBtn(c,top){
   const isR=!c.p.fixedWait;
   const A0=attrOf(c.p),src=A0&&A0.im?'https://adventure.lotteworld.com/api/upload/'+A0.im:'';
   if(src&&IMGOK[src])b.classList.add('hasimg');
-  b.innerHTML=(src&&IMGOK[src]!==false?'<img class="bgimg" alt="" loading="lazy" decoding="async" src="'+src+'">':'')+'<span class="tys">'+(c.cur&&c.fit==='ok'?ty('rec','추천'):'')+(A0?ty('attr','어트랙션'):'')+'</span><span class="nmw"><span class="nm"></span>'+(attrOf(c.p)?chk(aKey(attrOf(c.p)),c.must):'')+'</span>'+fitBadge(c.fit,c.mw-c.x.e)+
-    bar({tr:c.tr,w:c.x.e,lo:isR?c.x.lo:null,hi:isR?c.x.hi:null,ride:c.p.ride,mw:c.mw,fit:c.fit})+
-    '<div class="bdg">'+bdg('','walk',c.tr+'분')+bdg('','wait',(isR?c.x.lo+'~'+c.x.hi:c.x.e)+'분')+infoBadges(c.p)+(c.p.flag?bdg('warn','alert',c.p.flag):'')+'</div>';
+  const st=c.fit==='ok'?'가도 됨':c.fit==='tight'?'빠듯':'어려움';
+  b.innerHTML=(src&&IMGOK[src]!==false?'<img class="bgimg" alt="" loading="lazy" decoding="async" src="'+src+'">':'')+'<span class="tys">'+(c.cur&&c.fit==='ok'?ty('rec','추천'):'')+(A0?ty('attr','어트랙션'):'')+'</span><span class="nmw"><span class="nm"></span>'+(A0?chk(aKey(A0),c.must):'')+'</span>'+bdg(c.fit,c.fit==='no'?'alert':'',st)+
+    '<div class="bdg">'+bdg('','walk',c.tr+'분')+(isR&&c.mw>=0?bdg('','wait','대기 '+c.mw+'분 이하면 OK'):'')+(c.p.flag?bdg('warn','alert',c.p.flag):'')+'</div>';
   b.querySelector('.nm').textContent=c.p.name;
   const im=b.querySelector('.bgimg');if(im){im.onload=()=>{IMGOK[src]=true;b.classList.add('hasimg')};im.onerror=()=>{IMGOK[src]=false;im.remove();b.classList.remove('hasimg')}}
-  b.setAttribute('aria-label',c.p.name+', '+FITTXT[c.fit]+', 이동 '+c.tr+'분, 예상 대기 '+c.x.e+'분');
+  b.setAttribute('aria-label',c.p.name+', '+st+', 이동 '+c.tr+'분'+(c.mw>=0?', 대기 '+c.mw+'분 이하면 가능':''));
   b.onclick=()=>{S.sel=c.p.id;S.wait='';save();render();window.scrollTo({top:0,behavior:'smooth'})};
   return b;
 }
 
-['Rec','Plan','Attr','Perf'].forEach(k=>$('tb'+k).onclick=()=>setTab(k));
-$('chips').onclick=()=>setTab('Perf');
+['Rec','Attr','Plan'].forEach(k=>$('tb'+k).onclick=()=>setTab(k));
+$('chips').onclick=()=>setTab('Attr');
 $('where').onclick=()=>{locOpen=!locOpen;renderLoc()};
 $('clock').onclick=()=>{locOpen=false;openKey=null;if(!S.queue){S.sel=null;S.wait=''}S.tab='Rec';save();render();setTab('Rec');window.scrollTo({top:0,behavior:'smooth'})};
 $('clock').setAttribute('role','button');$('clock').setAttribute('tabindex','0');$('clock').setAttribute('aria-label','첫 화면으로');
