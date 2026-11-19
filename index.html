@@ -269,12 +269,11 @@ main{min-width:0}.pane{min-width:0}
   <details>
     <summary>공지 · 설정</summary>
     <div class="card notice">
-      <div class="label">공지 · 11월 23일 (월)</div>
+      <div class="label">공지</div>
       <ul>
-        <li><b>운행 종료</b> 스페인해적선은 11/22까지 운행 후 리뉴얼 공사</li>
-        <li><b>파라오의 분노 · 와일드 밸리 · 스톤익스프레스</b> 11/18에는 점검이었지만 23일은 운행하는 것으로 보고 계산(운영시간 10:00~20:50 가정). 당일 확인</li>
-        <li><b>야외</b> 매직아일랜드 기구는 대부분 20:50 종료, 날씨에 따라 중단될 수 있음</li>
-        <li><b>콩X고질라</b> 20:10 종료, 매직패스 대상 아님</li>
+        <li><b>운행 종료</b> 스페인해적선은 2026-11-22까지 운행 후 리뉴얼 공사</li>
+        <li><b>야외</b> 매직아일랜드 기구는 날씨에 따라 중단될 수 있음</li>
+        <li><b>콩X고질라</b> 매직패스 대상 아님</li>
         <li><b>싱글라이더</b> 후렌치레볼루션만 해당</li>
       </ul>
     </div>
@@ -282,7 +281,7 @@ main{min-width:0}.pane{min-width:0}
       <label class="set" for="simOn"><input type="checkbox" id="simOn"> 연습 모드 (시각 직접 입력)</label>
       <input type="time" id="simTime" aria-label="연습 시각">
     </div>
-    <div class="label">운영시간·공연은 11/18 공식 사이트 기준. 사진 © 롯데월드(공식 사이트 이미지 연결). 당일 값은 <a href="https://adventure.lotteworld.com/enjoy/attrctn/list">어트랙션</a> · <a href="https://adventure.lotteworld.com/enjoy/performance/list">공연</a>에서 확인.</div>
+    <div class="label">운영시간·운행 상태·공연 시간표는 공식 사이트에서 그날 값을 불러옴(불러오지 못하면 2026-11-18 조회값). 사진 © 롯데월드(공식 사이트 이미지 연결). 원본은 <a href="https://adventure.lotteworld.com/enjoy/attrctn/list">어트랙션</a> · <a href="https://adventure.lotteworld.com/enjoy/performance/list">공연</a>에서 확인.</div>
     <div><button type="button" id="reset" class="ghost">기록 지우고 처음부터</button></div>
     <div id="resetBox" style="display:grid;gap:8px"></div>
   </details>
@@ -328,12 +327,13 @@ const pKey=r=>'P:'+r[0]+r[1];
 const aKey=a=>'A:'+a.nm;
 function perfFixed(r,i){
   const [tm,nm,pl]=r,m=toM(tm);
-  const n=pl.includes('가든')?'f1_garden':pl.includes('퍼레이드')?'f1_parade':pl.includes('매직캐슬')?'castle':'f1_meet';
+  const n=pl.includes('가든')?'f1_garden':pl.includes('퍼레이드')?'f1_parade':pl.includes('매직캐슬')||pl.includes('매직아일랜드')?'castle':'f1_meet';
   const par=nm.includes('퍼레이드'),gs=nm.includes('마법 성냥'),mp=nm.includes('라이츠업');
-  const len=par||gs?30:mp?10:nm.includes('포토')||nm.includes('Smile')?10:30;
-  return {id:gs?'gs':par&&tm==='20:00'?'pr':mp?'mp':'pf'+i,n,name:nm+(gs?' + 도시락':''),z:n==='castle'?'MI':'1F',start:tm,arrive:fmt(m-(par?(S.lead??15):gs?5:0)),end:fmt(m+len),sub:par?'자리 잡고 대기':''};
+  const st=(r[3]||'').includes('스테이지');
+  const len=+r[4]||(par||gs?30:mp?10:nm.includes('포토')||nm.includes('Smile')?10:30);
+  return {id:'pf:'+tm+':'+nm,n,name:nm,z:n==='castle'?'MI':'1F',start:tm,arrive:fmt(m-(par?(S.lead??15):st?5:0)),end:fmt(m+len),sub:par?'자리 잡고 대기':''};
 }
-function allFixed(){return PERF.map((r,i)=>S.must[pKey(r)]?perfFixed(r,i):null).filter(Boolean).concat([MK]).sort((x,y)=>toM(x.start)-toM(y.start))}
+function allFixed(){return PERF.map((r,i)=>S.must[pKey(r)]?perfFixed(r,i):null).filter(Boolean).sort((x,y)=>toM(x.start)-toM(y.start))}
 const ZNODE={'매직아일랜드':['castle','MI'],'어드벤처 1층':['f1_meet','1F'],'키디존':['f1_meet','1F'],'어드벤처 2층':['fre','2F'],'어드벤처 3층':['kong','3F'],'어드벤처 4층':['bal','4F'],'언더랜드 B1층':['gate','1F']};
 function placeOf(a){
   if(!a||a.c23||!a.h)return null;
@@ -356,7 +356,7 @@ document.addEventListener('keydown',e=>{if((e.key===' '||e.key==='Enter')&&e.tar
 
 /* official site snapshot 2026-11-18 (data/attractions.json, data/performances.json) */
 const ATTR=[{"no":28,"nm":"콩X고질라더라이드","ar":"어드벤처 3층","d":"히브 비행선을 타고 콩X고질라와 미지의 세계로!","lo":110,"hi":195,"sg":false,"rv":false,"h":["10:00","20:10"],"st":"운행마침","c23":null,"im":"202607/24/2026072419f916e803840","gd":true,"w":null,"ks":false,"id":"6292"},{"no":null,"nm":"호러환타지드림","ar":"매직아일랜드","d":null,"lo":110,"hi":null,"sg":false,"rv":false,"h":["18:00","20:50"],"st":"운행마침","c23":null,"im":"202609/26/202609261a0dadb12b890","gd":false,"w":null,"ks":null,"id":"6386"},{"no":null,"nm":"마도신당","ar":"매직아일랜드","d":null,"lo":null,"hi":null,"sg":false,"rv":false,"h":["11:30","20:30"],"st":"운행마침","c23":null,"im":"202606/29/2026062919f1121408820","gd":true,"w":null,"ks":null,"id":"6360"},{"no":41,"nm":"아르카나라이드","ar":"매직아일랜드","d":"정령의 나무를 치유하러 떠나는 마법여행","lo":110,"hi":null,"sg":false,"rv":false,"h":["10:00","20:50"],"st":"운행마침","c23":null,"im":"202604/03/2026040319d5132150920","gd":true,"w":null,"ks":true,"id":"6315"},{"no":null,"nm":"귀담","ar":"매직아일랜드","d":null,"lo":null,"hi":null,"sg":false,"rv":false,"h":["11:30","20:30"],"st":"운행마침","c23":null,"im":"202606/29/2026062919f112472bb40","gd":true,"w":null,"ks":null,"id":"6006"},{"no":42,"nm":"에오스타워","ar":"매직아일랜드","d":"타워 꼭대기를 열어 핑크빈을 찾아 떠나는 모험","lo":120,"hi":null,"sg":false,"rv":false,"h":["10:00","20:50"],"st":"운행마침","c23":null,"im":"202604/03/2026040319d513a268d60","gd":false,"w":null,"ks":false,"id":"6314"},{"no":40,"nm":"스톤익스프레스","ar":"매직아일랜드","d":"돌의 정령을 따라 핑크빈을 찾아 떠나는 모험","lo":110,"hi":null,"sg":false,"rv":false,"h":["10:00","20:50"],"st":"정상운행(가정)","c23":null,"im":"202604/03/2026040319d5130f8ae70","gd":true,"w":null,"ks":true,"id":"6313"},{"no":11,"nm":"배틀그라운드 월드 에이전트","ar":"어드벤처 1층","d":"적들에게 맞서 생존을 위한 섬 탈출기 워크스루 슈팅 시어터","lo":130,"hi":null,"sg":false,"rv":false,"h":["10:00","20:40"],"st":"정상운행","c23":null,"im":"202507/04/20250704197d43a8f1150","gd":true,"w":54,"ks":false,"id":"5997"},{"no":25,"nm":"카트라이더레이싱월드","ar":"어드벤처 1층","d":"롯데월드에서 즐기는 카트라이더 레이싱","lo":130,"hi":180,"sg":false,"rv":false,"h":["10:00","20:50"],"st":"대기마감","c23":null,"im":"202507/04/20250704197d43b21c180","gd":true,"w":60,"ks":false,"id":"5962"},{"no":29,"nm":"월드모노레일(실내운영)","ar":"어드벤처 3층","d":"로티,로리로 변신한 모노레일을 타고 어드벤처 한바퀴","lo":null,"hi":null,"sg":false,"rv":false,"h":["10:30","20:45"],"st":"대기마감","c23":null,"im":"202507/04/20250704197d43bc81a90","gd":true,"w":null,"ks":false,"id":"1201"},{"no":36,"nm":"자이로드롭","ar":"매직아일랜드","d":"상공 70m 높이에서 100km/h 속도로 자유낙하하는 공포와 스릴","lo":130,"hi":190,"sg":false,"rv":false,"h":["10:00","20:50"],"st":"운행마침","c23":null,"im":"202606/08/2026060819ea5a3d0e010","gd":false,"w":45,"ks":false,"id":"1206"},{"no":34,"nm":"자이로스윙","ar":"매직아일랜드","d":"석촌호수에 떨어질 듯 말 듯 아찔한 스윙","lo":130,"hi":190,"sg":false,"rv":false,"h":["10:00","20:50"],"st":"운행마침","c23":null,"im":"202507/04/20250704197d451c8a670","gd":false,"w":60,"ks":false,"id":"1204"},{"no":39,"nm":"자이로스핀","ar":"매직아일랜드","d":"거대한 나침반을 타고 돌고 도는 아찔한 서핑타임","lo":125,"hi":null,"sg":false,"rv":false,"h":["10:00","20:40"],"st":"운행마침","c23":null,"im":"202604/06/2026040619d60e6a2ad80","gd":false,"w":48,"ks":false,"id":"4735"},{"no":33,"nm":"아트란티스","ar":"매직아일랜드","d":"급발진하는 보트를 타고 미스터리 신전 속으로!","lo":135,"hi":190,"sg":false,"rv":false,"h":["10:00","20:50"],"st":"운행마침","c23":"","im":"202606/09/2026060919eaa89e36120","gd":false,"w":87,"ks":false,"id":"2286"},{"no":38,"nm":"혜성특급","ar":"매직아일랜드","d":"좌석이 회전하는 혜성특급열차를 타고 떠나는 어둠속 우주여행","lo":120,"hi":null,"sg":false,"rv":false,"h":["10:00","20:50"],"st":"운행마침","c23":null,"im":"202509/09/202509091992da302a720","gd":false,"w":81,"ks":false,"id":"1214"},{"no":7,"nm":"스페인해적선","ar":"어드벤처 1층","d":"75도 각도까지 올라가는 스릴 넘치는 해적선","lo":110,"hi":null,"sg":true,"rv":false,"h":["10:00","20:55"],"st":"정상운행","c23":"2026-11-22 운행 종료(리뉴얼)","im":"202509/09/202509091992da3b2c830","gd":false,"w":null,"ks":false,"id":"1190"},{"no":6,"nm":"신밧드의모험","ar":"어드벤처 1층","d":"보트를 타고 떠나는 지하 속 신밧드의 모험 이야기","lo":110,"hi":null,"sg":false,"rv":false,"h":["10:00","20:30"],"st":"정상운행","c23":null,"im":"202606/07/2026060719ea056cd4030","gd":true,"w":55,"ks":false,"id":"1188"},{"no":13,"nm":"회전목마","ar":"어드벤처 1층","d":"64필의 아름다운 백마를 타고 보내는 로맨틱한 시간","lo":100,"hi":null,"sg":false,"rv":false,"h":["10:00","20:55"],"st":"정상운행","c23":null,"im":"202509/09/202509091992da521ab50","gd":true,"w":null,"ks":false,"id":"1189"},{"no":8,"nm":"후룸라이드","ar":"어드벤처 1층","d":"보트를 타고 급류에 밀려 폭포에서 떨어지는 스릴!","lo":110,"hi":null,"sg":false,"rv":false,"h":["10:00","20:50"],"st":"대기마감","c23":null,"im":"202606/08/2026060819ea5b7fec970","gd":true,"w":74,"ks":false,"id":"1192"},{"no":9,"nm":"회전바구니","ar":"어드벤처 1층","d":"빙글빙글 손잡이를 돌릴수록 빠르게 회전하는 바구니","lo":110,"hi":null,"sg":false,"rv":false,"h":["11:00","19:50"],"st":"운행마침","c23":"","im":"202606/09/2026060919eaaa7fd2a90","gd":true,"w":null,"ks":false,"id":"1193"},{"no":16,"nm":"드래곤 와일드슈팅","ar":"어드벤처 1층","d":"로티성에 쳐들어온 드래곤들을 슈팅건으로 무찔러봐요","lo":110,"hi":null,"sg":false,"rv":false,"h":["10:00","20:50"],"st":"정상운행","c23":null,"im":"202507/04/20250704197d4587df020","gd":true,"w":null,"ks":false,"id":"4731"},{"no":12,"nm":"플라이벤처","ar":"어드벤처 1층","d":"괴짜과학자가 발명한 플라잉머신을 타고 떠나는 시공간 초월 비행","lo":140,"hi":195,"sg":false,"rv":false,"h":["11:00","20:40"],"st":"정상운행","c23":null,"im":"202606/07/2026060719ea0c3b5ee50","gd":true,"w":42,"ks":false,"id":"5360"},{"no":14,"nm":"3D 황야의 무법자 Ⅱ","ar":"어드벤처 1층","d":"서부시대 보안관이 되어 악당을 물리치는 슈팅 배틀","lo":120,"hi":null,"sg":false,"rv":false,"h":["10:00","19:45"],"st":"운행마침","c23":null,"im":"202507/04/20250704197d45a439940","gd":true,"w":null,"ks":false,"id":"3874"},{"no":26,"nm":"후렌치레볼루션","ar":"어드벤처 2층","d":"어드벤처 실내를 질주하는 롤러코스터","lo":120,"hi":null,"sg":true,"rv":false,"h":["10:00","20:55"],"st":"대기마감","c23":null,"im":"202507/04/20250704197d45b155b70","gd":true,"w":67,"ks":false,"id":"1198"},{"no":27,"nm":"범퍼카(어드벤처)","ar":"어드벤처 2층","d":"앞에서 쾅! 뒤에서 쾅! 좌충우돌 범퍼카","lo":140,"hi":null,"sg":false,"rv":false,"h":["10:00","20:50"],"st":"대기마감","c23":null,"im":"202507/04/20250704197d45bdbba80","gd":true,"w":66,"ks":false,"id":"1197"},{"no":32,"nm":"어크로스다크","ar":"어드벤처 4층","d":"잃어버린 유물을 찾아 우주로 떠나는 모험","lo":110,"hi":null,"sg":false,"rv":false,"h":null,"st":"정기운휴","c23":"","im":"202507/04/20250704197d45c72dd90","gd":true,"w":null,"ks":false,"id":"5574"},{"no":31,"nm":"파라오의 분노","ar":"어드벤처 4층","d":"파라오의 보물을 찾아 떠나는 스릴만점 다크 라이드!","lo":110,"hi":195,"sg":false,"rv":false,"h":["10:00","20:50"],"st":"정상운행(가정)","c23":null,"im":"202507/04/20250704197d45d1b8310","gd":true,"w":81,"ks":false,"id":"2444"},{"no":30,"nm":"풍선비행","ar":"어드벤처 4층","d":"열기구를 타고 하늘 위에서 바라보는 어드벤처","lo":null,"hi":null,"sg":false,"rv":false,"h":["10:00","20:40"],"st":"대기마감","c23":null,"im":"202601/07/2026010719b9666609350","gd":true,"w":78,"ks":false,"id":"1199"},{"no":10,"nm":"로티트레인","ar":"어드벤처 1층","d":"꼬마 기차를 타고 떠나는 어드벤처 한바퀴","lo":null,"hi":null,"sg":false,"rv":false,"h":["10:00","16:45"],"st":"운행마침","c23":null,"im":"202606/08/2026060819ea4c3177a30","gd":true,"w":30,"ks":true,"id":"4154"},{"no":15,"nm":"키즈토리아","ar":"어드벤처 1층","d":"맨발로 마음껏 뛰어 놀 수 있는 거대한 동화 속 세상","lo":null,"hi":125,"sg":false,"rv":true,"h":["11:00","19:15"],"st":"운행마침","c23":null,"im":"202606/09/2026060919eaad86f4980","gd":true,"w":null,"ks":true,"id":"4342"},{"no":35,"nm":"쁘띠빵빵","ar":"매직아일랜드","d":"호숫가를 드라이브 하는 귀여운 자동차","lo":110,"hi":null,"sg":false,"rv":false,"h":["11:00","19:50"],"st":"운행마침","c23":null,"im":"202509/09/202509091992da83ec880","gd":true,"w":null,"ks":true,"id":"4470"},{"no":37,"nm":"환타지드림","ar":"매직아일랜드","d":"꼬마 기차를 타고 떠나는 동화속 세상","lo":110,"hi":null,"sg":false,"rv":false,"h":["11:00","17:00"],"st":"운행마침","c23":null,"im":"202609/26/202609261a0dadef69960","gd":true,"w":null,"ks":false,"id":"1209"},{"no":20,"nm":"언더씨킹덤","ar":"키디존","d":"맨발로 마음껏 뛰어 놀 수 있는 바다왕국 놀이터","lo":null,"hi":125,"sg":false,"rv":false,"h":["11:00","19:50"],"st":"운행마침","c23":null,"im":"202606/09/2026060919eab07feb050","gd":true,"w":null,"ks":true,"id":"5797"},{"no":17,"nm":"어린이범퍼카","ar":"키디존","d":"뛰뛰빵빵! 어린이들을 위한 범퍼카","lo":110,"hi":125,"sg":false,"rv":false,"h":["10:00","20:50"],"st":"대기마감","c23":null,"im":"202509/09/202509091992daa6b0d20","gd":true,"w":null,"ks":true,"id":"1196"},{"no":23,"nm":"매직붕붕카","ar":"키디존","d":"좌충우돌 색색깔의 복어범퍼카","lo":125,"hi":140,"sg":false,"rv":false,"h":["11:00","19:50"],"st":"운행마침","c23":null,"im":"202509/25/202509251997fb04b9d80","gd":true,"w":30,"ks":false,"id":"4162"},{"no":21,"nm":"유레카","ar":"키디존","d":"영차!영차! 하늘을 나는 꼬마 요술배","lo":110,"hi":null,"sg":false,"rv":false,"h":["11:00","19:50"],"st":"운행마침","c23":null,"im":"202509/09/202509091992dac288240","gd":true,"w":null,"ks":true,"id":"2146"},{"no":18,"nm":"햇님달님","ar":"키디존","d":"호랑이를 피해 햇님달님 오누이와 하늘 위로 점프!","lo":90,"hi":140,"sg":false,"rv":false,"h":["10:00","20:50"],"st":"대기마감","c23":null,"im":"202606/09/2026060919eab0d3a8120","gd":true,"w":null,"ks":true,"id":"4116"},{"no":22,"nm":"스윙팡팡","ar":"키디존","d":"로티와 친구들과 함께 위,아래로 통통 튀기는 바구니","lo":110,"hi":null,"sg":false,"rv":false,"h":["11:00","19:50"],"st":"운행마침","c23":null,"im":"202509/09/202509091992db1abc240","gd":true,"w":30,"ks":true,"id":"4161"},{"no":19,"nm":"점핑피쉬","ar":"키디존","d":"무서운 상어를 피해 빙글빙글 점프하는 물고기","lo":110,"hi":null,"sg":false,"rv":false,"h":["11:00","19:50"],"st":"운행마침","c23":null,"im":"202509/09/202509091992db23be430","gd":true,"w":null,"ks":true,"id":"4613"},{"no":1,"nm":"드림보트","ar":"언더랜드 B1층","d":"신비한 요정의 숲으로 떠나는 판타지 보트 라이드","lo":110,"hi":null,"sg":false,"rv":false,"h":["11:00","19:50"],"st":"운행마침","c23":null,"im":"202606/07/2026060719ea0dad3de70","gd":true,"w":null,"ks":true,"id":"5029"},{"no":3,"nm":"와일드 밸리","ar":"언더랜드 B1층","d":"보트를 타고 급류를 지나는 미스터리 동굴 모험","lo":110,"hi":null,"sg":false,"rv":false,"h":["10:00","20:50"],"st":"정상운행(가정)","c23":null,"im":"202509/19/2025091919961247daa50","gd":true,"w":44,"ks":false,"id":"5092"},{"no":4,"nm":"와일드 정글","ar":"언더랜드 B1층","d":"지프차를 타고 고대 유적을 찾아 떠나는 신전 탐험","lo":110,"hi":null,"sg":false,"rv":false,"h":["10:00","20:50"],"st":"정상운행","c23":null,"im":"202509/19/2025091919961177e3e80","gd":true,"w":40,"ks":false,"id":"5093"},{"no":5,"nm":"와일드 윙","ar":"언더랜드 B1층","d":"강렬한 바람을 가르며 하늘을 비행하는 아찔한 체험","lo":110,"hi":null,"sg":false,"rv":false,"h":["10:00","20:50"],"st":"정상운행","c23":null,"im":"202507/04/20250704197d4718dce70","gd":true,"w":null,"ks":false,"id":"5091"},{"no":2,"nm":"4D슈팅시어터","ar":"언더랜드 B1층","d":"4D로 즐기는 짜릿한 슈팅 어드벤처","lo":120,"hi":null,"sg":false,"rv":false,"h":["10:00","20:40"],"st":"정상운행","c23":null,"im":"202507/04/20250704197d473ff5480","gd":true,"w":null,"ks":false,"id":"4704"},{"no":24,"nm":"어린이 동화극장","ar":"키디존","d":"어린이 뮤지컬이 펼쳐지는 극장","lo":null,"hi":null,"sg":false,"rv":false,"h":null,"st":"정기휴연","c23":null,"im":"202606/11/2026061119eb55e26d320","gd":true,"w":null,"ks":true,"id":"1173"},{"no":null,"nm":"월드모노레일(매직아일랜드)","ar":"어드벤처 3층","d":null,"lo":null,"hi":null,"sg":false,"rv":false,"h":["10:30","18:00"],"st":"정기운휴","c23":null,"im":"202604/22/2026042219db2a228e850","gd":true,"w":null,"ks":null,"id":"1801"}];
-const PERF=[["12:30","로티스 페어리테일 매지컬 타임","키디존 어린이 동화극장","스테이지"],["12:30","Smile, with Friends (캐릭터 포토타임)","어드벤처 1층 만남의 광장","포토타임"],["14:00","해피 크리스마스 퍼레이드","어드벤처 1층 퍼레이드 코스","퍼레이드"],["15:30","로티스 페어리테일 매지컬 타임","키디존 어린이 동화극장","스테이지"],["15:30","쿠키런 Smile with Friend","어드벤처 1층 만남의 광장","포토타임"],["16:30","Smile, with Friends (연기자 포토타임)","키즈토리아","포토타임"],["17:00","쿠키런 Smile with Friend","어드벤처 1층 만남의 광장","포토타임"],["17:30","Smile, with Friends (연기자 포토타임)","키즈토리아","포토타임"],["18:30","마법 성냥과 꿈꾸는 밤","가든스테이지","스테이지"],["20:00","해피 크리스마스 퍼레이드","어드벤처 1층 퍼레이드 코스","퍼레이드"],["20:40","매직캐슬 라이츠업","매직아일랜드 매직캐슬","기타"]];
+let PERF=[["12:30","로티스 페어리테일 매지컬 타임","키디존 어린이 동화극장","스테이지"],["12:30","Smile, with Friends (캐릭터 포토타임)","어드벤처 1층 만남의 광장","포토타임"],["14:00","해피 크리스마스 퍼레이드","어드벤처 1층 퍼레이드 코스","퍼레이드"],["15:30","로티스 페어리테일 매지컬 타임","키디존 어린이 동화극장","스테이지"],["15:30","쿠키런 Smile with Friend","어드벤처 1층 만남의 광장","포토타임"],["16:30","Smile, with Friends (연기자 포토타임)","키즈토리아","포토타임"],["17:00","쿠키런 Smile with Friend","어드벤처 1층 만남의 광장","포토타임"],["17:30","Smile, with Friends (연기자 포토타임)","키즈토리아","포토타임"],["18:30","마법 성냥과 꿈꾸는 밤","가든스테이지","스테이지"],["20:00","해피 크리스마스 퍼레이드","어드벤처 1층 퍼레이드 코스","퍼레이드"],["20:40","매직캐슬 라이츠업","매직아일랜드 매직캐슬","기타"]];
 const INFO=no=>ATTR.find(a=>a.no===no);
 const pic=(a,cls)=>a&&a.im?'<img class="'+cls+'" loading="lazy" decoding="async" alt="" src="https://adventure.lotteworld.com/api/upload/'+a.im+'" onerror="this.remove()">':'';
 const PS=()=>toM(S.ps||'10:00'),PE=()=>toM(S.pe||'21:00');
@@ -375,7 +375,7 @@ function est(p,t){
   return {e:r5(e),lo:r5(e*0.75),hi:r5(e*1.25)};
 }
 
-const fresh=()=>({v:2,ps:'10:00',pe:'21:00',lead:15,order:[],loc:'gate',locName:'정문',sel:null,wait:'',queue:null,log:[],done:{},sim:false,simTime:'10:00',cal:1,obs:[],must:{'P:18:30마법 성냥과 꿈꾸는 밤':true,'P:20:00해피 크리스마스 퍼레이드':true,'P:20:40매직캐슬 라이츠업':true}});
+const fresh=()=>({v:2,ps:'10:00',pe:'21:00',lead:15,order:[],loc:'gate',locName:'정문',sel:null,wait:'',queue:null,log:[],done:{},sim:false,simTime:'10:00',cal:1,obs:[],must:{}});
 let S=fresh(),loaded=false;
 const SKEY='lotte-state';
 try{const s=JSON.parse(localStorage.getItem(SKEY)||localStorage.getItem('lw1123v5')||'null');if(s){S=Object.assign(fresh(),s);if(!s.v){if(S.ps==='16:00')S.ps='10:00';S.v=2}loaded=true}}catch(e){}
@@ -478,7 +478,7 @@ function attrDetail(a){
   const pl=allPlaces().find(p=>attrOf(p)===a);
   let est1='';if(pl&&a.h&&!a.c23){const tr=travel(S.loc,pl.n),x=est(pl,eff()+tr);est1=row('지금 가면','이동 '+tr+'분 · 예상 대기 '+x.lo+'~'+x.hi+'분')}
   return '<div class="detail">'+pic(a,'dimg')+
-    row('현재 상태',liveOf(a))+row('위치',a.ar)+row('운영(11/18)',a.h?a.h[0]+' ~ '+a.h[1]:a.st)+row('운영 종료',a.c23)+
+    row('현재 상태',liveOf(a))+row('위치',a.ar)+row('운영',a.h?a.h[0]+' ~ '+a.h[1]:a.st)+row('운영 종료',a.c23)+
     row('키 제한',hTxt(a)||'제한 없음')+row('보호자 동반',a.gd?'동반 탑승 가능':'')+row('싱글라이더',a.sg?'운영':'')+row('탑승예약',a.rv?'예약제':'')+
     row('유아 놀이시설',a.ks?'해당':'')+row('2025 평균 대기',a.w?a.w+'분':'')+est1+
     (pl&&a.h&&!a.c23?'<button type="button" class="go gobtn" data-go="'+pl.id+'">여기로 가기</button>':'')+'</div>';
@@ -486,7 +486,7 @@ function attrDetail(a){
 function perfDetail(r,i){
   const f=perfFixed(r,i);
   return '<div class="detail">'+row('시각',r[0])+row('장소',r[2])+row('구분',r[3])+
-    row('지금 위치에서','이동 '+travel(S.loc,f.n)+'분')+row('도착 권장',f.arrive+(f.arrive!==f.start?' (자리 잡기)':''))+row('종료(추정)',f.end)+
+    row('지금 위치에서','이동 '+travel(S.loc,f.n)+'분')+row('도착 권장',f.arrive+(f.arrive!==f.start?' (자리 잡기)':''))+row(r[4]?'종료':'종료(추정)',f.end)+
     (r[1].includes('매지컬')?row('입장','공연 10분 전'):'')+'</div>';
 }
 document.addEventListener('click',e=>{
@@ -592,16 +592,15 @@ function renderLists(){
         (a.d?'<div class="sub">'+a.d+'</div>':'')+
         '<div class="bdg">'+(a.h?bdg('','clock',a.h[0]+'~'+a.h[1]):'')+(hTxt(a)?bdg('','',hTxt(a)):'')+(a.sg?bdg('ok','','싱글라이더'):'')+(a.rv?bdg('warn','','예약제'):'')+'</div></div>'+(op?attrDetail(a):'')+'</li>';});
     h+='</ul></div>';});
-  $('tabAttr').innerHTML=h+'<div class="label">운영시간은 11/18 공식 사이트 기준'+(LIVEAT?' · 운영 상태는 실시간('+new Intl.DateTimeFormat('ko-KR',{timeZone:'Asia/Seoul',hour:'2-digit',minute:'2-digit',hour12:false}).format(new Date(LIVEAT))+' 갱신)':'')+'</div>';
-  let dayOf=S.sim;try{dayOf=dayOf||new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Seoul'}).format(new Date())==='2026-11-23'}catch(e){}
+  $('tabAttr').innerHTML=h+'<div class="label">'+(HRAT?'운영시간은 오늘 공식 값':'운영시간은 2026-11-18 공식 사이트 기준')+(LIVEAT?' · 운영 상태는 실시간('+new Intl.DateTimeFormat('ko-KR',{timeZone:'Asia/Seoul',hour:'2-digit',minute:'2-digit',hour12:false}).format(new Date(LIVEAT))+' 갱신)':'')+'</div>';
   const pUp=[],pDone=[];
   PERF.forEach((r,pi)=>{let ph='';const [tm,nm,pl,cat]=r,pf=perfFixed(r,pi),past=t>=toM(pf.end),live=!past&&t>=toM(tm),op=openKey==='p'+pi;
-    const key=['마법 성냥','퍼레이드','라이츠업','쿠키런'].some(k=>nm.includes(k));
+    const key=/퍼레이드|스테이지/.test(cat)||nm.includes('라이츠업');
     ph+='<li data-o="p'+pi+'" class="tap'+(past?' off':'')+(op?' open':'')+'"><span class="ptm num">'+tm+'</span><div class="ainfo"><div class="arow"><span class="nmw"><span class="nm">'+nm+'</span>'+chk(pKey(r),S.must[pKey(r)])+'</span>'+(past?bdg('end','clock','종료'):live?bdg('ok','','진행 중'):'')+'</div>'+
-      (PDESC(nm)?'<div class="sub">'+PDESC(nm)+'</div>':'')+
+      ((r[6]||PDESC(nm))?'<div class="sub">'+(r[6]||PDESC(nm))+'</div>':'')+
       '<div class="bdg">'+bdg('','clock',tm)+bdg('','',pl)+bdg('','',cat)+(key?bdg('ok','','추천'):'')+'</div></div>'+(op?perfDetail(r,pi):'')+'</li>';(past?pDone:pUp).push([toM(tm),ph]);});
   const pSort=L=>L.sort((x,y)=>x[0]-y[0]).map(x=>x[1]).join('');
-  $('tabPerf').innerHTML=(pUp.length?'<div class="card"><div class="label">11월 23일 (월) · 진행·예정 '+pUp.length+'</div><ul class="alist">'+pSort(pUp)+'</ul></div>':'')+(pDone.length?'<div class="card"><div class="label">종료 · '+pDone.length+'</div><ul class="alist">'+pSort(pDone)+'</ul></div>':'')+'<div class="label">공연 사정에 따라 변경·취소될 수 있음 (11/18 공식 사이트 조회)</div>';
+  $('tabPerf').innerHTML=(pUp.length?'<div class="card"><div class="label">'+PERFDAY+' · 진행·예정 '+pUp.length+'</div><ul class="alist">'+pSort(pUp)+'</ul></div>':'')+(pDone.length?'<div class="card"><div class="label">종료 · '+pDone.length+'</div><ul class="alist">'+pSort(pDone)+'</ul></div>':'')+'<div class="label">'+(PERFAT?'공식 사이트 공연 시간표(오늘)':'공식 시간표를 불러오지 못해 예시(2026-11-23) 표시')+' · 공연 사정에 따라 변경·취소될 수 있음</div>';
 }
 function setTab(k){S.tab=k;gapSel=null;['Rec','Plan','Attr','Perf'].forEach(x=>{$('tab'+x).classList.toggle('hide',x!==k);$('tb'+x).setAttribute('aria-selected',x===k)});save()}
 function kstSec(){const p=new Intl.DateTimeFormat('en-GB',{timeZone:'Asia/Seoul',hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:false}).formatToParts(new Date());const g=t=>+p.find(x=>x.type===t).value;return g('hour')*3600+g('minute')*60+g('second')}
@@ -655,12 +654,12 @@ function render(){
       else if(!nx.length)h+='<div class="label">남은 후보 없음</div>';
       const box=document.createElement('div');box.className='list nextprev';box.innerHTML=h;A.appendChild(box);
       if(!(nf&&lb-t1<=5))nx.forEach(c=>{const b=candBtn(c);b.disabled=true;b.onclick=null;box.appendChild(b)});}
-    $('bDone').onclick=()=>{if(S.sim)S.simTime=fmt(Math.max(now(),q.end));S.done[q.id]=(S.done[q.id]||0)+1;S.loc=q.n;S.locName=q.name.replace(' + 도시락','');addLog(q.name);S.queue=null;S.sel=null;S.wait='';save();render()};
+    $('bDone').onclick=()=>{if(S.sim)S.simTime=fmt(Math.max(now(),q.end));S.done[q.id]=(S.done[q.id]||0)+1;S.loc=q.n;S.locName=q.name;addLog(q.name);S.queue=null;S.sel=null;S.wait='';save();render()};
     $('bQuit').onclick=()=>{S.queue=null;S.sel=null;S.wait='';save();render()};
     others.classList.add('hide');
   }
   else if(S.sel){
-    const fx=PERF.map((r,i)=>perfFixed(r,i)).concat([MK]).find(x=>x.id===S.sel);
+    const fx=PERF.map((r,i)=>perfFixed(r,i)).find(x=>x.id===S.sel);
     const p=fx||allPlaces().concat(ATTR.map(placeOf).filter(Boolean)).find(x=>x.id===S.sel);
     if(!p){S.sel=null;save();return render()}
     const isFixed=!!fx;
@@ -669,7 +668,7 @@ function render(){
       A.innerHTML='<div class="label">'+ZN[p.z]+'</div><div class="big">'+p.name+'</div>'+
         '<div class="bdg">'+bdg('','walk',tr+'분')+bdg('warn','clock',p.start+' 시작')+(p.sub?bdg('','',p.sub):'')+'</div>'+
         '<div class="btns"><button class="ghost" id="bBack">다른 곳</button><button class="go" id="bArr">도착</button></div>';
-      $('bArr').onclick=()=>{if(S.sim)S.simTime=fmt(Math.max(now()+tr,toM(p.arrive)));S.queue={id:p.id,name:p.name,n:p.n,start:toM(p.start),end:toM(p.end),kind:'fixed'};S.loc=p.n;S.locName=p.name.replace(' + 도시락','');save();render()};
+      $('bArr').onclick=()=>{if(S.sim)S.simTime=fmt(Math.max(now()+tr,toM(p.arrive)));S.queue={id:p.id,name:p.name,n:p.n,start:toM(p.start),end:toM(p.end),kind:'fixed'};S.loc=p.n;S.locName=p.name;save();render()};
     }else{
       const arr=S.sim?eff()+tr:eff();
       const mw=Math.floor(deadlineFor(p,eff())-arr-p.ride);
@@ -750,17 +749,27 @@ const TY={rec:'<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke
  show:'<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 12.5V3l7-1.5v9.5"/><circle cx="4.2" cy="12.5" r="1.8"/><circle cx="11.2" cy="11" r="1.8"/></svg>'};
 const ty=(k,label)=>'<span class="badge ty '+k+'" role="img" aria-label="'+label+'" title="'+label+'">'+TY[k]+'</span>';
 function showBtn(r,f,tr,left){
-  const b=document.createElement('button');b.type='button';const fit=left>=10?'ok':left>=0?'tight':'no';b.className='cand hasimg grad '+fit;
-  b.innerHTML='<span class="tys">'+ty('show','공연')+'</span><span class="nmw"><span class="nm"></span>'+chk(pKey(r),S.must[pKey(r)])+'</span>'+bdg(fit,fit==='no'?'alert':'',fit==='no'?'늦음':'여유 '+left+'분')+
+  const b=document.createElement('button');b.type='button';const fit=left>=10?'ok':left>=0?'tight':'no';const src=r[5]?'https://adventure.lotteworld.com/api/upload'+r[5]:'',img=src&&IMGOK[src]!==false;b.className='cand hasimg '+(img?'':'grad ')+fit;
+  b.innerHTML=(img?'<img class="bgimg" alt="" loading="lazy" decoding="async" src="'+src+'">':'')+'<span class="tys">'+ty('show','공연')+'</span><span class="nmw"><span class="nm"></span>'+chk(pKey(r),S.must[pKey(r)])+'</span>'+bdg(fit,fit==='no'?'alert':'',fit==='no'?'늦음':'여유 '+left+'분')+
     '<div class="bdg">'+bdg('','','이동 '+tr+'분')+bdg('','','시작 '+r[0])+bdg('','','마감 '+f.end)+bdg('','',r[2])+'</div>';
   b.querySelector('.nm').textContent=r[1];
+  const im=b.querySelector('.bgimg');if(im){im.onload=()=>{IMGOK[src]=true};im.onerror=()=>{IMGOK[src]=false;im.remove();b.classList.add('grad')}}
   b.setAttribute('aria-label','공연 '+r[1]+', '+r[0]+', 이동 '+tr+'분');
   b.onclick=()=>{S.sel=f.id;S.wait='';save();render();window.scrollTo({top:0,behavior:'smooth'})};
   return b;
 }
 let moreOpen=false;
 /* live status from the official attraction list (status only; refreshed every 3 min while visible) */
-let LIVE={},LIVEAT=0;
+let LIVE={},LIVEAT=0,HRAT=0,PERFAT=0,PERFKEY='',PERFDAY='2026년 11월 23일 예시';
+const kstDay=()=>{try{return new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Seoul'}).format(new Date())}catch(e){return ''}};
+async function loadPerf(){
+  const day=kstDay();if(!day||(PERFAT&&PERFKEY===day&&Date.now()-PERFAT<1800000))return;
+  try{const r=await fetch('https://adventure.lotteworld.com/api/enjoy/performance/listTime',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({srchDate:day.replace(/-/g,''),srchPlyCsfCd:'ALL',srchPlySeq:'',srchTime:'',storeCd:'HC01801',langCd:'HC01701',isActiveTab:1,deviceType:'mobile'})});
+    if(!r.ok)return;const d=await r.json(),L=d.pifPlyMstVoList;if(!Array.isArray(L))return;
+    PERF=L.filter(x=>/^\d\d:\d\d$/.test(x.plyBgnTmFrm||'')).map(x=>[x.plyBgnTmFrm,x.plyNm,x.pstnDesc||x.pstnCdNm||'',x.plyCsfCdNm||'',x.prgrsTmCntn||'',((x.thmbFileList||[])[0]||{}).flPath||'',x.introCntn||'']).sort((a,b)=>toM(a[0])-toM(b[0]));
+    PERFAT=Date.now();PERFKEY=day;const [y,mo,dd]=day.split('-').map(Number);PERFDAY=mo+'월 '+dd+'일 ('+'일월화수목금토'[new Date(y,mo-1,dd).getDay()]+')';
+    if(!['INPUT','SELECT'].includes(document.activeElement?.tagName))render()}catch(e){}
+}
 const liveOf=a=>a&&LIVE[a.id]||'';
 const liveCls=st=>st==='정상운행'?'ok':/대기/.test(st)?'warn':/점검/.test(st)?'no':st==='운행준비'?'':'end';
 const liveBadge=a=>{const st=liveOf(a);return st?'<span class="badge live '+liveCls(st)+'">'+st+'</span>':''};
@@ -769,6 +778,8 @@ const liveBlocked=a=>{const st=liveOf(a);return liveOn()&&!!st&&st!=='정상운�
 async function loadLive(){
   try{const r=await fetch('https://adventure.lotteworld.com/api/enjoy/attrctn/list',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({storeCd:'HC01801',langCd:'HC01701'})});
     if(!r.ok)return;const d=await r.json(),m={};(d.pifAtrctMstVoList||[]).forEach(x=>{if(x.shopSysCd&&x.atrctSttsCdNm)m[x.shopSysCd]=x.atrctSttsCdNm});
+    const hr={};(d.pifAtrctMstVoList||[]).forEach(x=>{const b=x.atrctBgnTmFrm,e=x.atrctEndTmFrm;if(x.shopSysCd&&/^\d\d:\d\d$/.test(b||'')&&/^\d\d:\d\d$/.test(e||''))hr[x.shopSysCd]=[b,e]});
+    if(Object.keys(hr).length){ATTR.forEach(a=>{if(hr[a.id])a.h=hr[a.id]});PLACES.forEach(p=>{const a=p.g&&INFO(p.g);if(a&&a.h)p.close=a.h[1]});HRAT=Date.now()}
     if(Object.keys(m).length){LIVE=m;LIVEAT=Date.now();if(!['INPUT','SELECT'].includes(document.activeElement?.tagName))render()}}catch(e){}
 }
 const IMGOK={};
@@ -813,7 +824,7 @@ $('reset').onclick=()=>{resetCode=String(10+Math.floor(Math.random()*90));resetU
 render();setTab(S.tab||'Rec');
 setInterval(()=>{if(!S.sim&&!['INPUT','SELECT'].includes(document.activeElement?.tagName))render()},10000);
 setInterval(tickLeft,1000);
-loadLive();setInterval(()=>{if(!document.hidden)loadLive()},180000);
+loadLive();loadPerf();setInterval(()=>{if(!document.hidden){loadLive();loadPerf()}},180000);
 document.addEventListener('visibilitychange',()=>{if(!document.hidden&&Date.now()-LIVEAT>180000)loadLive()});
 document.addEventListener('visibilitychange',()=>{if(!document.hidden&&!S.sim)render()});
 </script>
