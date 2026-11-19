@@ -148,6 +148,24 @@ img.dimg{width:100%;aspect-ratio:16/9;object-fit:cover;border-radius:10px;margin
 .nextprev .chk{pointer-events:auto}
 .rcode{font-family:var(--font-display);font-size:24px;color:var(--ink);margin:0 4px}
 #resetIn{width:72px;text-align:center;font-family:var(--font-display);font-size:22px;border:1px solid var(--line);border-radius:10px;background:var(--bg);padding:6px}
+.sorts{display:flex;gap:4px;flex-wrap:wrap;justify-content:flex-end}
+.sorts button{min-height:32px;padding:4px 10px;font-size:13px;border-radius:999px;color:var(--ink-2)}
+.sorts button[aria-pressed="true"]{background:var(--ink);color:var(--panel);border-color:var(--ink)}
+.cand{position:relative;overflow:hidden}
+.cand .bgimg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity .3s}
+.cand.hasimg{border-color:transparent;background:#101826;min-height:150px;align-content:end;padding:14px}
+.cand.hasimg .bgimg{opacity:1}
+.cand.hasimg::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(8,14,24,.15) 0%,rgba(8,14,24,.55) 45%,rgba(8,14,24,.88) 100%)}
+.cand.hasimg>*:not(.bgimg){position:relative;z-index:1}
+.cand.hasimg .nm{color:#fff;font-size:19px;text-shadow:0 1px 6px rgba(0,0,0,.6)}
+.cand.hasimg .badge{background:rgba(255,255,255,.18);color:#fff;-webkit-backdrop-filter:blur(10px) saturate(1.4);backdrop-filter:blur(10px) saturate(1.4);border:1px solid rgba(255,255,255,.22)}
+.cand.hasimg .badge.ok{background:rgba(46,160,67,.55)}.cand.hasimg .badge.tight,.cand.hasimg .badge.warn{background:rgba(214,140,20,.6)}.cand.hasimg .badge.no{background:rgba(207,54,40,.65)}
+.cand.hasimg .tbar .trk{background:rgba(255,255,255,.22);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
+.cand.hasimg .seg.tr{background:rgba(255,255,255,.55)}.cand.hasimg .seg.rd{background:rgba(255,255,255,.85)}
+.cand.hasimg .seg.ok{background:#4ad06a}.cand.hasimg .seg.tight{background:#f5b53c}.cand.hasimg .seg.no{background:#ff6b5e}
+.cand.hasimg .rng{border-color:#fff}.cand.hasimg .dl{background:#fff}
+.cand.hasimg .chk{color:#fff}.cand.hasimg .chk.on{color:#ffd24a}
+.cand.hasimg.top{box-shadow:0 0 0 2px var(--accent)}
 .hide{display:none!important}
 </style>
 </head>
@@ -170,7 +188,10 @@ img.dimg{width:100%;aspect-ratio:16/9;object-fit:cover;border-radius:10px;margin
   <section class="card" id="action"></section>
 
   <section class="card" id="others">
-    <div class="label">다른 후보</div>
+    <div class="bar"><div class="label">다른 후보</div>
+      <div class="sorts" role="group" aria-label="정렬">
+        <button type="button" data-sort="rec">추천순</button><button type="button" data-sort="wait">대기 짧은 순</button><button type="button" data-sort="close">마감 빠른 순</button>
+      </div></div>
     <div class="list" id="otherList"></div>
   </section>
 
@@ -423,6 +444,13 @@ function renderLists(){
   $('tabPerf').innerHTML=ph+'</ul></div><div class="label">공연 사정에 따라 변경·취소될 수 있음 (11/18 공식 사이트 조회)</div>';
 }
 function setTab(k){S.tab=k;['Rec','Attr','Perf'].forEach(x=>{$('tab'+x).classList.toggle('hide',x!==k);$('tb'+x).setAttribute('aria-selected',x===k)});save()}
+function kstSec(){const p=new Intl.DateTimeFormat('en-GB',{timeZone:'Asia/Seoul',hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:false}).formatToParts(new Date());const g=t=>+p.find(x=>x.type===t).value;return g('hour')*3600+g('minute')*60+g('second')}
+function tickLeft(){
+  const el=$('cdLeft');if(!el)return;
+  const ns=S.sim?toM(S.simTime)*60:kstSec(),left=Math.max(0,21*3600-Math.max(ns,16*3600));
+  const p=n=>String(n).padStart(2,'0');
+  el.textContent=ns>=21*3600?'종료':'종료까지 '+p(Math.floor(left/3600))+':'+p(Math.floor(left%3600/60))+':'+p(left%60);
+}
 function addLog(name){S.log.push({t:fmt(now()),name})}
 
 function render(){
@@ -435,11 +463,11 @@ function render(){
    star:'<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" aria-hidden="true"><path d="M8 1.5l1.9 4.1 4.6.5-3.4 3 .9 4.4L8 11.3l-4 2.2.9-4.4-3.4-3 4.6-.5z"/></svg>'};
   const T0=toM('16:00'),T1=toM('21:00'),left=Math.max(0,T1-Math.max(t,T0)),pct=left/(T1-T0)*100;
   const pre=t<T0;
-  let ch='<div class="cd1'+(left<=30?' hot':'')+'" role="img" aria-label="21:00 종료까지 '+dur(left)+'"><div class="cdt"><span class="cdi">'+IC.clock+'</span><b class="num">'+dur(left)+'</b></div>'+
+  let ch='<div class="cd1'+(left<=30?' hot':'')+'" role="img" aria-label="21:00 종료까지 '+dur(left)+'"><div class="cdt"><span class="cdi">'+IC.clock+'</span><b class="num" id="cdLeft"></b></div>'+
     '<div class="cdb"><i style="width:'+pct.toFixed(1)+'%"></i>'+
     fixedList().filter(f=>f.id!=='mk'&&toM(f.start)>Math.max(t,T0)&&toM(f.start)<T1).map(f=>'<u title="'+f.start+' '+f.name+'" style="right:'+((toM(f.start)-T0)/(T1-T0)*100).toFixed(1)+'%"></u>').join('')+'</div></div>';
   if(S.obs.length){const pct=Math.round((S.cal-1)*100);ch+='<span class="chip num cal">오늘 혼잡 '+(pct>=0?'+':'')+pct+'%</span>'}
-  $('chips').innerHTML=ch;
+  $('chips').innerHTML=ch;tickLeft();
 
   const A=$('action');A.innerHTML='';
   const others=$('others');others.classList.remove('hide');
@@ -479,7 +507,7 @@ function render(){
       const x=est(p,arr);
       const isRide=p.kind==='ride'&&!p.fixedWait;
       A.innerHTML='<div class="herow">'+pic(attrOf(p),'hero')+'<div><div class="label">'+ZN[p.z]+'</div><div class="big">'+p.name+'</div></div>'+(attrOf(p)?chk(aKey(attrOf(p)),isMust(p)):'')+'</div>'+
-        '<div class="bdg">'+bdg('','walk',tr+'분')+bdg('','wait',(isRide?x.lo+'~'+x.hi:x.e)+'분')+bdg('','flag',Math.max(0,mw)+'분 이하 OK')+infoBadges(p)+(p.flag?bdg('warn','alert',p.flag):'')+'</div>'+
+        '<div class="bdg">'+bdg('','walk',tr+'분')+bdg('','wait',(isRide?x.lo+'~'+x.hi:x.e)+'분')+infoBadges(p)+(p.flag?bdg('warn','alert',p.flag):'')+'</div>'+
         (p.g&&INFO(p.g)&&INFO(p.g).d?'<div class="sub">'+INFO(p.g).d+'</div>':'')+
         '<div id="res"></div>'+
         (isRide?'<div class="label">앱에 뜬 실제 대기 (선택)</div><div class="wait"><input type="number" inputmode="numeric" min="0" max="200" id="wIn" placeholder="'+x.e+'" aria-label="실제 대기시간(분)"><span>분</span></div><div class="quick" id="quick"></div>':'')+
@@ -531,6 +559,10 @@ function render(){
     }
     const ol=$('otherList');ol.innerHTML='';
     const rest=(due?cs:cs.filter(c=>!usable.slice(0,3).includes(c))).filter(c=>c.mw>=5);
+    const sk=S.sort||'rec';
+    if(sk==='wait')rest.sort((a,b)=>a.x.e-b.x.e||a.tr-b.tr);
+    if(sk==='close')rest.sort((a,b)=>toM(a.p.close||'23:59')-toM(b.p.close||'23:59')||a.x.e-b.x.e);
+    document.querySelectorAll('.sorts button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.sort===sk));
     rest.forEach(c=>ol.appendChild(candBtn(c)));
     if(!rest.length)others.classList.add('hide');
   }
@@ -542,20 +574,25 @@ function render(){
   $('simOn').checked=S.sim;$('simTime').value=S.simTime;$('simTime').disabled=!S.sim;
 }
 
+const IMGOK={};
 function candBtn(c,top){
   const b=document.createElement('button');b.type='button';b.className='cand '+c.fit+(top?' top':'');
   const isR=!c.p.fixedWait;
-  b.innerHTML='<span class="nmw">'+pic(attrOf(c.p),'tc')+'<span class="nm"></span>'+(attrOf(c.p)?chk(aKey(attrOf(c.p)),c.must):'')+'</span>'+fitBadge(c.fit,c.mw-c.x.e)+
+  const A0=attrOf(c.p),src=A0&&A0.im?'https://adventure.lotteworld.com/api/upload/'+A0.im:'';
+  if(src&&IMGOK[src])b.classList.add('hasimg');
+  b.innerHTML=(src&&IMGOK[src]!==false?'<img class="bgimg" alt="" decoding="async" src="'+src+'">':'')+'<span class="nmw"><span class="nm"></span>'+(attrOf(c.p)?chk(aKey(attrOf(c.p)),c.must):'')+'</span>'+fitBadge(c.fit,c.mw-c.x.e)+
     bar({tr:c.tr,w:c.x.e,lo:isR?c.x.lo:null,hi:isR?c.x.hi:null,ride:c.p.ride,mw:c.mw,fit:c.fit})+
-    '<div class="bdg">'+bdg('','walk',c.tr+'분')+bdg('','wait',(isR?c.x.lo+'~'+c.x.hi:c.x.e)+'분')+bdg('','flag','≤'+c.mw+'분')+infoBadges(c.p)+(c.p.flag?bdg('warn','alert',c.p.flag):'')+'</div>';
+    '<div class="bdg">'+bdg('','walk',c.tr+'분')+bdg('','wait',(isR?c.x.lo+'~'+c.x.hi:c.x.e)+'분')+infoBadges(c.p)+(c.p.flag?bdg('warn','alert',c.p.flag):'')+'</div>';
   b.querySelector('.nm').textContent=c.p.name;
-  b.setAttribute('aria-label',c.p.name+', '+FITTXT[c.fit]+', 이동 '+c.tr+'분, 예상 대기 '+c.x.e+'분, '+c.mw+'분 이하면 가능');
+  const im=b.querySelector('.bgimg');if(im){im.onload=()=>{IMGOK[src]=true;b.classList.add('hasimg')};im.onerror=()=>{IMGOK[src]=false;im.remove();b.classList.remove('hasimg')}}
+  b.setAttribute('aria-label',c.p.name+', '+FITTXT[c.fit]+', 이동 '+c.tr+'분, 예상 대기 '+c.x.e+'분');
   b.onclick=()=>{S.sel=c.p.id;S.wait='';save();render();window.scrollTo({top:0,behavior:'smooth'})};
   return b;
 }
 
 ['Rec','Attr','Perf'].forEach(k=>$('tb'+k).onclick=()=>setTab(k));
 $('chips').onclick=()=>setTab('Perf');
+document.querySelectorAll('.sorts button').forEach(b=>b.onclick=()=>{S.sort=b.dataset.sort;save();render()});
 $('simOn').onchange=e=>{S.sim=e.target.checked;if(S.sim)S.simTime='16:00';save();render()};
 $('simTime').onchange=e=>{if(e.target.value){S.simTime=e.target.value;save();render()}};
 let resetCode=null;
@@ -574,6 +611,7 @@ function resetUI(msg){
 $('reset').onclick=()=>{resetCode=String(10+Math.floor(Math.random()*90));resetUI()};
 render();setTab(S.tab||'Rec');
 setInterval(()=>{if(!S.sim&&document.activeElement?.tagName!=='INPUT')render()},10000);
+setInterval(tickLeft,1000);
 document.addEventListener('visibilitychange',()=>{if(!document.hidden&&!S.sim)render()});
 </script>
 </body>
