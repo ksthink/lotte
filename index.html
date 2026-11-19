@@ -156,6 +156,8 @@ img.dimg{width:100%;aspect-ratio:16/9;object-fit:cover;border-radius:10px;margin
 .cand.hasimg::after{content:"";position:absolute;inset:0;background:rgba(0,0,0,.4)}
 .cand.hasimg.grad{background:linear-gradient(35deg,#2a9d9b 0%,#c99a3e 50%,#c24c57 100%)}
 .cand.hasimg.grad::after{background:rgba(0,0,0,.12)}
+#tabPerf .ptm{background:linear-gradient(35deg,#2a9d9b 0%,#c99a3e 50%,#c24c57 100%);color:#fff;text-shadow:0 1px 4px rgba(0,0,0,.35)}
+#tabPerf .off .ptm{background:var(--bg);color:var(--ink-2);text-shadow:none}
 .cand.hasimg>*:not(.bgimg){position:relative;z-index:1}
 .cand.hasimg .nm{color:#fff;font-size:19px;text-shadow:0 1px 6px rgba(0,0,0,.6)}
 .cand.hasimg .badge{background:rgba(255,255,255,.18);color:#fff;-webkit-backdrop-filter:blur(10px) saturate(1.4);backdrop-filter:blur(10px) saturate(1.4);border:1px solid rgba(255,255,255,.22)}
@@ -747,7 +749,7 @@ const TY={rec:'<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke
  show:'<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 12.5V3l7-1.5v9.5"/><circle cx="4.2" cy="12.5" r="1.8"/><circle cx="11.2" cy="11" r="1.8"/></svg>'};
 const ty=(k,label)=>'<span class="badge ty '+k+'" role="img" aria-label="'+label+'" title="'+label+'">'+TY[k]+'</span>';
 function showBtn(r,f,tr,left){
-  const b=document.createElement('button');b.type='button';const fit=left>=10?'ok':left>=0?'tight':'no';b.className='cand '+fit;
+  const b=document.createElement('button');b.type='button';const fit=left>=10?'ok':left>=0?'tight':'no';b.className='cand hasimg grad '+fit;
   b.innerHTML='<span class="tys">'+ty('show','공연')+'</span><span class="nmw"><span class="nm"></span>'+chk(pKey(r),S.must[pKey(r)])+'</span>'+bdg(fit,fit==='no'?'alert':'',fit==='no'?'늦음':'여유 '+left+'분')+
     '<div class="bdg">'+bdg('','walk',tr+'분')+bdg('','clock',r[0])+bdg('','',r[2])+'</div>';
   b.querySelector('.nm').textContent=r[1];
