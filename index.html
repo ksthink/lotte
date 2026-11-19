@@ -774,7 +774,7 @@ function candBtn(c,top){
   const isR=!c.p.fixedWait;
   const A0=attrOf(c.p),src=A0&&A0.im?'https://adventure.lotteworld.com/api/upload/'+A0.im:'';
   if(src&&IMGOK[src])b.classList.add('hasimg');
-  b.innerHTML=(src&&IMGOK[src]!==false?'<img class="bgimg" alt="" loading="lazy" decoding="async" src="'+src+'">':'')+'<span class="tys">'+(c.cur&&c.fit==='ok'?ty('rec','추천'):'')+(A0?ty('attr','어트랙션'):'')+'</span><span class="nmw"><span class="nm"></span>'+(attrOf(c.p)?chk(aKey(attrOf(c.p)),c.must):'')+'</span><span class="rt">'+fitBadge(c.fit,c.mw-c.x.e)+liveBadge(A0)+'</span>'+
+  b.innerHTML=(src&&IMGOK[src]!==false?'<img class="bgimg" alt="" loading="lazy" decoding="async" src="'+src+'">':'')+'<span class="tys">'+(c.cur&&c.fit==='ok'?ty('rec','추천'):'')+(A0?ty('attr','어트랙션'):'')+'</span><span class="nmw"><span class="nm"></span>'+(attrOf(c.p)?chk(aKey(attrOf(c.p)),c.must):'')+'</span><span class="rt">'+liveBadge(A0)+'</span>'+
     bar({tr:c.tr,w:c.x.e,lo:isR?c.x.lo:null,hi:isR?c.x.hi:null,ride:c.p.ride,mw:c.mw,fit:c.fit})+
     '<div class="bdg">'+bdg('','walk',c.tr+'분')+bdg('','wait',(isR?c.x.lo+'~'+c.x.hi:c.x.e)+'분')+infoBadges(c.p)+(c.p.flag?bdg('warn','alert',c.p.flag):'')+'</div>';
   b.querySelector('.nm').textContent=c.p.name;
