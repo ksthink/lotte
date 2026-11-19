@@ -48,8 +48,6 @@ button:focus-visible,input:focus-visible,summary:focus-visible{outline:2px solid
 .list{display:grid;gap:8px}
 .wait{display:flex;align-items:center;gap:8px}
 .wait input{width:100px;font-family:var(--font-display);font-size:30px;text-align:center;border:1px solid var(--line);border-radius:12px;background:var(--bg);padding:4px}
-.quick{display:flex;gap:6px;flex-wrap:wrap}
-.quick button{min-height:38px;padding:6px 12px;font-size:14px}
 .res{border-radius:12px;padding:12px 14px;font-weight:600}
 .res.ok{background:var(--ok-bg);color:var(--ok)}
 .res.bad{background:var(--bad-bg);color:var(--bad)}
@@ -175,6 +173,7 @@ img.dimg{width:100%;aspect-ratio:16/9;object-fit:cover;border-radius:10px;margin
 .loclist button[aria-current="true"]{color:var(--accent);font-weight:600}
 #locPick{padding:4px 16px}
 #clock{cursor:pointer}
+.wait select{min-width:130px;font-family:var(--font-display);font-size:26px;text-align:center;text-align-last:center;border:1px solid var(--line);border-radius:12px;background:var(--bg);color:var(--ink);padding:6px 10px;min-height:48px}
 .hide{display:none!important}
 </style>
 </head>
@@ -534,12 +533,11 @@ function render(){
         '<div class="bdg">'+bdg('','walk',tr+'분')+bdg('','wait',(isRide?x.lo+'~'+x.hi:x.e)+'분')+infoBadges(p)+(p.flag?bdg('warn','alert',p.flag):'')+'</div>'+
         (p.g&&INFO(p.g)&&INFO(p.g).d?'<div class="sub">'+INFO(p.g).d+'</div>':'')+
         '<div id="res"></div>'+
-        (isRide?'<div class="label">앱에 뜬 실제 대기 (선택)</div><div class="wait"><input type="number" inputmode="numeric" min="0" max="200" id="wIn" placeholder="'+x.e+'" aria-label="실제 대기시간(분)"><span>분</span></div><div class="quick" id="quick"></div>':'')+
+        (isRide?'<div class="label">앱에 뜬 실제 대기 (선택)</div><div class="wait"><select id="wIn" aria-label="실제 대기시간(분)"><option value="">예상 '+x.e+'</option>'+[0,5,10,15,20,25,30,35,40,45,50,55,60,65,70,75,80,85,90,100,110,120,130,140,150,180].map(v=>'<option value="'+v+'">'+v+'</option>').join('')+'</select><span>분</span></div>':'')+
         '<div class="btns"><button class="ghost" id="bBack">다른 곳</button><button class="go" id="bQ">'+(isRide?'줄 서기':'시작')+'</button></div>';
       const wIn=$('wIn');
       if(wIn){
-        const qk=$('quick');[10,20,30,40,50,60,70,80,90].forEach(v=>{const b=document.createElement('button');b.type='button';b.textContent=v;b.onclick=()=>{S.wait=v;save();wIn.value=v;upd()};qk.appendChild(b)});
-        wIn.value=S.wait;wIn.oninput=()=>{S.wait=wIn.value===''?'':Math.max(0,Math.round(+wIn.value));save();upd()};
+        wIn.value=String(S.wait);wIn.onchange=()=>{S.wait=wIn.value===''?'':+wIn.value;save();upd()};
       }
       function upd(){
         const r=$('res');const has=S.wait!=='';
@@ -638,7 +636,7 @@ function resetUI(msg){
 }
 $('reset').onclick=()=>{resetCode=String(10+Math.floor(Math.random()*90));resetUI()};
 render();setTab(S.tab||'Rec');
-setInterval(()=>{if(!S.sim&&document.activeElement?.tagName!=='INPUT')render()},10000);
+setInterval(()=>{if(!S.sim&&!['INPUT','SELECT'].includes(document.activeElement?.tagName))render()},10000);
 setInterval(tickLeft,1000);
 document.addEventListener('visibilitychange',()=>{if(!document.hidden&&!S.sim)render()});
 </script>
