@@ -245,6 +245,10 @@ main{min-width:0}.pane{min-width:0}
 .amap .mtag,.mapbox .mtag{position:absolute;left:8px;top:8px;display:flex;font-size:12px;white-space:nowrap}
 .amap .mtag b,.mapbox .mtag b{flex:none;padding:4px 10px;border-radius:999px;background:var(--accent);color:#fff;font-weight:600;box-shadow:0 1px 4px rgba(0,0,0,.2)}
 .mapbox .mtag{position:fixed;top:62px;left:12px;font-size:13px}
+.closedban{margin:-16px;display:grid;overflow:hidden;border-radius:inherit}
+.closedban img{display:block;width:100%;aspect-ratio:374/220;object-fit:cover;object-position:50% 40%}
+.closedban p{margin:0;min-height:96px;display:flex;align-items:center;justify-content:center;text-align:center;font-size:20px;font-weight:700;line-height:1.4;color:var(--ink)}
+#action.closed{overflow:hidden}
 </style>
 </head>
 <body>
@@ -653,7 +657,7 @@ function render(){
   if(S.obs.length){const pct=Math.round((S.cal-1)*100);ch+='<span class="chip num cal">오늘 혼잡 '+(pct>=0?'+':'')+pct+'%</span>'}
   $('chips').innerHTML=ch;tickLeft();
 
-  const A=$('action');A.innerHTML='';
+  const A=$('action');A.innerHTML='';A.classList.remove('closed');
   const others=$('others');others.classList.remove('hide');
 
   if(S.queue){
@@ -734,7 +738,7 @@ function render(){
       $('bGo').onclick=()=>{S.sel=f.id;save();render()};
       $('bSkip').onclick=()=>{S.done[f.id]=1;addLog(f.name+' (건너뜀)');save();render()};
     }else if(!usable.length){
-      A.innerHTML='<div class="big">오늘 일정 끝</div><div class="label">수고했어요</div>';
+      A.classList.add('closed');A.innerHTML='<div class="closedban"><img src="assets/closed.jpg" alt="손 흔들며 인사하는 로티"><p>마감됐어요. 또 만나요</p></div>';
     }else{
       const mleft=allPlaces().filter(p=>isMust(p)&&!S.done[p.id]&&!CLOSED.includes(p.id)).length;
       A.innerHTML='<div class="bar" style="justify-content:flex-end">'+LEGEND+'</div><div class="list" id="topList"></div>';
