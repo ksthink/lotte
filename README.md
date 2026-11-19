@@ -1,4 +1,4 @@
-# 롯데월드 11/23 동선 판단기
+# 롯데월드 동선짜기
 
 https://ksthink.github.io/lotte/
 
