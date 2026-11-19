@@ -214,6 +214,7 @@ main{min-width:0}.pane{min-width:0}
 .cand .nm{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
 .cand .nmw{min-width:0;overflow:hidden}
 .cand.hasimg .badge.ty.rec{background:rgba(15,110,100,.85)}
+.morebtn{width:100%;color:var(--ink-2);font-weight:600}
 .hide{display:none!important}
 </style>
 </head>
@@ -719,7 +720,8 @@ function render(){
     if(sk==='wait')rest.sort((a,b)=>a.w-b.w);
     if(sk==='close')rest.sort((a,b)=>a.cl-b.cl||a.w-b.w);
     document.querySelectorAll('.sorts button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.sort===sk));
-    rest.forEach(x=>ol.appendChild(x.el()));
+    (moreOpen?rest:rest.slice(0,10)).forEach(x=>ol.appendChild(x.el()));
+    if(rest.length>10){const mb=document.createElement('button');mb.type='button';mb.className='ghost morebtn';mb.textContent=moreOpen?'접기':'더 보기 ('+(rest.length-10)+')';mb.onclick=()=>{moreOpen=!moreOpen;render()};ol.appendChild(mb)}
     if(!rest.length)others.classList.add('hide');
   }
 
@@ -741,6 +743,7 @@ function showBtn(r,f,tr,left){
   b.onclick=()=>{S.sel=f.id;S.wait='';save();render();window.scrollTo({top:0,behavior:'smooth'})};
   return b;
 }
+let moreOpen=false;
 const IMGOK={};
 function candBtn(c,top){
   const b=document.createElement('button');b.type='button';b.className='cand '+c.fit+(top?' top':'');
