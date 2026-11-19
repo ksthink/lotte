@@ -242,9 +242,8 @@ main{min-width:0}.pane{min-width:0}
 .mapov .mapbox .pin{width:30px;height:30px}
 .mapov .x{position:fixed;top:8px;right:12px;z-index:101;width:44px;height:44px;border-radius:50%;border:0;background:#fff;box-shadow:0 1px 6px rgba(0,0,0,.2);color:#111;font-size:22px;line-height:44px;padding:0;cursor:pointer}
 .mapov .mt{position:fixed;left:12px;top:14px;z-index:101;color:#111;font-weight:600;font-size:15px;background:rgba(255,255,255,.92);padding:8px 12px;border-radius:999px;box-shadow:0 1px 6px rgba(0,0,0,.15)}
-.amap .mtag,.mapbox .mtag{position:absolute;left:8px;top:8px;display:flex;align-items:center;gap:6px;max-width:calc(100% - 16px);padding:4px 10px 4px 4px;border-radius:999px;background:rgba(255,255,255,.92);box-shadow:0 1px 4px rgba(0,0,0,.15);font-size:12px;color:#1b2430;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.amap .mtag b,.mapbox .mtag b{flex:none;padding:2px 8px;border-radius:999px;background:var(--accent);color:#fff;font-weight:600}
-.amap .mtag span,.mapbox .mtag span{overflow:hidden;text-overflow:ellipsis}
+.amap .mtag,.mapbox .mtag{position:absolute;left:8px;top:8px;display:flex;font-size:12px;white-space:nowrap}
+.amap .mtag b,.mapbox .mtag b{flex:none;padding:4px 10px;border-radius:999px;background:var(--accent);color:#fff;font-weight:600;box-shadow:0 1px 4px rgba(0,0,0,.2)}
 .mapbox .mtag{position:fixed;top:62px;left:12px;font-size:13px}
 </style>
 </head>
@@ -807,7 +806,7 @@ function mapHTML(a){if(!a||!a.id)return '';const m=MAPS[a.id];if(m===undefined)l
   if(!m||m==='loading')return '<div class="amap ld" data-map="'+a.id+'">지도 불러오는 중</div>';if(m==='none')return '';
   return '<div class="amap" data-map="'+a.id+'" role="button" tabindex="0" aria-label="'+a.nm+' 위치 지도 크게 보기"><img alt="'+a.nm+' 위치 지도" loading="lazy" src="'+m.src+'"><span class="pin" style="left:'+m.px+'%;top:'+m.py+'%"></span><span class="mcap">크게 보기</span>'+mapTag(m)+'</div>'}
 const escH=t=>String(t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
-const mapTag=m=>(m.fl||m.loc)?'<span class="mtag">'+(m.fl?'<b>'+escH(m.fl)+'</b>':'')+(m.loc?'<span>'+escH(m.loc)+'</span>':'')+'</span>':'';
+const mapTag=m=>m.fl?'<span class="mtag"><b>'+escH(m.fl)+'</b></span>':'';
 async function loadMap(id){MAPS[id]='loading';
   try{const r=await fetch('https://adventure.lotteworld.com/api/enjoy/attrctn/detail',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({shopSysCd:String(id),storeCd:'HC01801',langCd:'HC01701'})});
     const v=(await r.json()).pifAtrctDtlVo||{},f=(v.mapFileList||[])[0],x=+v.pstnXcrd,y=+v.pstnYcrd;
