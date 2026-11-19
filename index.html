@@ -165,8 +165,9 @@ img.dimg{width:100%;aspect-ratio:16/9;object-fit:cover;border-radius:10px;margin
 .cand.hasimg .chk{color:#fff}.cand.hasimg .chk.on{color:#ffd24a}
 .cand.hasimg.top{box-shadow:0 0 0 2px var(--accent)}
 .lcol{display:inline-grid;justify-items:start}
-.wherebtn{display:flex;align-items:center;gap:4px;width:0;min-width:100%;min-height:32px;padding:4px 10px;border-radius:999px;font-size:13px;font-weight:600;margin-top:6px;border-color:var(--accent);color:var(--accent);background:var(--accent-soft);white-space:nowrap}
-.wl{flex:none}.wv{flex:1;min-width:0;overflow:hidden;text-align:left}
+.wherebtn{display:flex;align-items:center;gap:4px;width:0;min-width:100%;min-height:32px;padding:4px 10px;border-radius:999px;font-size:13px;font-weight:600;margin-top:2px;border-color:var(--accent);color:var(--accent);background:var(--accent-soft);white-space:nowrap}
+.wlab{font-size:11px;color:var(--ink-2);margin-top:6px;padding-left:2px}
+.wv{flex:1;min-width:0;overflow:hidden;text-align:center}
 #whereTxt{display:inline-block;white-space:nowrap}
 @keyframes mq{0%,18%{transform:translateX(0)}82%,100%{transform:translateX(var(--mq))}}
 @media (prefers-reduced-motion:no-preference){#whereTxt.mq{animation:mq 6s ease-in-out infinite alternate}}
@@ -202,7 +203,8 @@ img.dimg{width:100%;aspect-ratio:16/9;object-fit:cover;border-radius:10px;margin
   <div class="bar">
     <div class="lcol">
       <div class="clock num" id="clock">--:--</div>
-      <button type="button" class="wherebtn" id="where" aria-expanded="false"><span class="wl">현재 위치 :</span><span class="wv"><span id="whereTxt">정문 부근</span></span></button><span class="label hide" id="simTag">연습</span>
+      <div class="wlab">현재 위치</div>
+      <button type="button" class="wherebtn" id="where" aria-expanded="false"><span class="wv"><span id="whereTxt">정문 부근</span></span></button><span class="label hide" id="simTag">연습</span>
     </div>
     <div class="cds" id="chips"></div>
   </div>
