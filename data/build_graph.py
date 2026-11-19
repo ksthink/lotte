@@ -42,6 +42,17 @@ N=[ # id, name, area, x, y (px on 1600-wide render of the official guide map PDF
  ('castle','매직캐슬','MI',580,330),
  ('out','크리스마스 마켓(월드파크)','OUT',0,0),
 ]
+# AUTO-ATTR: add every guide-map attraction that has a marker coordinate
+import os
+_J=json.load(open(os.path.join(os.path.dirname(os.path.abspath(__file__)),'attractions.json')))['attractions']
+KNOWN={6:'sin',10:'trn',8:'flu',12:'fly',11:'pubg',25:'kart',26:'fre',27:'bmp',28:'kong',31:'phr',30:'bal',33:'atl',34:'gsw',36:'gdr',38:'com',39:'gsp'}
+NODE_OF=dict(KNOWN);B1N=[]
+for o in _J:
+    no=o['guide_no']
+    if not no or no in KNOWN or not o['map_xy']:continue
+    ar=o['area'];fl='MI' if o['map_page']==4 else 'B1' if o['map_page']==1 else '1F' if o['map_page']==2 else ('2F' if '2층' in ar else '3F' if '3층' in ar else '4F')
+    nid='g%d'%no;N.append((nid,o['name'],fl,round(o['map_xy'][0]*1600/1920),round(o['map_xy'][1]*1600/1920)));NODE_OF[no]=nid
+    if fl=='B1':B1N.append(nid)
 idx={n[0]:n for n in N}
 E={}
 def add(a,b,w,kind):
@@ -53,7 +64,8 @@ areas={}
 for n in N:areas.setdefault(n[2],[]).append(n[0])
 edges=[]
 for ar,ids in areas.items():
-    if ar in ('OUT','B1'):continue
+    if ar=='OUT':continue
+    if ar=='B1':ids=[i for i in ids if i!='gate']
     for i in range(len(ids)):
         for j in range(i+1,len(ids)):
             a,b=ids[i],ids[j]
@@ -62,6 +74,8 @@ for ar,ids in areas.items():
 for s in ('w','m','e'):
     for f in (1,2,3):
         a,b=f'c{f}_{s}',f'c{f+1}_{s}';add(a,b,VERT,'escalator');edges.append((a,b,VERT,'escalator'))
+for _b in B1N:
+    add('gate',_b,3.0,'walk');edges.append(('gate',_b,3.0,'walk(B1F, 가정)'))
 add('gate','f1_meet',2.0,'escalator');edges.append(('gate','f1_meet',2.0,'escalator(B1F→1F)'))
 add('c2_w','mi_br',BRIDGE,'bridge');edges.append(('c2_w','mi_br',BRIDGE,'bridge'))
 add('gate','out',8.0,'walk');edges.append(('gate','out',8.0,'walk(지하 연결통로)'))
@@ -74,6 +88,7 @@ def dij(src):
             if c+w<d.get(v,1e9):d[v]=c+w;heapq.heappush(pq,(c+w,v))
     return d
 P=['gate','f1_meet','f1_garden','f1_parade','sin','trn','flu','fly','pubg','kart','fre','bmp','kong','phr','bal','atl','gsw','gdr','com','gsp','castle','out']
+P=P[:-1]+['mi_br']+[n[0] for n in N if n[0].startswith('g') and n[0][1:].isdigit()]+['out']
 M={a:{} for a in P}
 for a in P:
     d=dij(a)
@@ -88,6 +103,7 @@ json.dump({'meta':{'source':'롯데월드 어드벤처 2026 가이드맵(국문)
 with open('data/travel-minutes.csv','w',newline='') as f:
     w=csv.writer(f);w.writerow(['from\\to']+P)
     for a in P:w.writerow([a]+[M[a][b] for b in P])
+json.dump(NODE_OF,open('/tmp/nodeof.json','w'))
 open('/tmp/matrix.js','w').write('const TRAVEL='+json.dumps(M,separators=(',',':'))+';\n')
 for a in ['gate','f1_parade','fre','kong','atl']:
     print(a,{b:M[a][b] for b in ['f1_garden','fre','kong','phr','atl','com','gdr','out']})
