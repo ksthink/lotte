@@ -738,7 +738,7 @@ function resetUI(msg){
     '<button type="button" id="resetOk" class="ghost">지우기</button><button type="button" id="resetNo" class="ghost">취소</button></div>'+
     (msg?'<div class="label" style="color:var(--bad)">'+msg+'</div>':'');
   const inp=$('resetIn');inp.focus();
-  const go=()=>{if(inp.value.trim()===resetCode){const mu=S.must,sm=S.sim;S=fresh();S.must=mu;S.sim=sm;resetCode=null;save();render();resetUI()}else resetUI('숫자가 달라요. 다시 입력하세요.')};
+  const go=()=>{if(inp.value.trim()===resetCode){const sm=S.sim,ps=S.ps,pe=S.pe,ld=S.lead;S=fresh();S.must={};S.order=[];S.sim=sm;S.ps=ps;S.pe=pe;S.lead=ld;resetCode=null;save();render();resetUI()}else resetUI('숫자가 달라요. 다시 입력하세요.')};
   $('resetOk').onclick=go;inp.onkeydown=e=>{if(e.key==='Enter')go()};
   $('resetNo').onclick=()=>{resetCode=null;resetUI()};
 }
