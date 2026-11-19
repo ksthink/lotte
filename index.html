@@ -461,7 +461,7 @@ function setTab(k){S.tab=k;['Rec','Attr','Perf'].forEach(x=>{$('tab'+x).classLis
 function kstSec(){const p=new Intl.DateTimeFormat('en-GB',{timeZone:'Asia/Seoul',hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:false}).formatToParts(new Date());const g=t=>+p.find(x=>x.type===t).value;return g('hour')*3600+g('minute')*60+g('second')}
 function tickLeft(){
   const el=$('cdLeft');if(!el)return;
-  const ns=S.sim?toM(S.simTime)*60:kstSec(),left=Math.max(0,21*3600-Math.max(ns,16*3600));
+  const ns=S.sim?toM(S.simTime)*60:kstSec(),left=Math.max(0,21*3600-ns);
   const p=n=>String(n).padStart(2,'0');
   el.textContent=ns>=21*3600?'종료':'종료까지 '+p(Math.floor(left/3600))+':'+p(Math.floor(left%3600/60))+':'+p(left%60);
 }
