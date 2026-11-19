@@ -242,6 +242,10 @@ main{min-width:0}.pane{min-width:0}
 .mapov .mapbox .pin{width:30px;height:30px}
 .mapov .x{position:fixed;top:8px;right:12px;z-index:101;width:44px;height:44px;border-radius:50%;border:0;background:#fff;box-shadow:0 1px 6px rgba(0,0,0,.2);color:#111;font-size:22px;line-height:44px;padding:0;cursor:pointer}
 .mapov .mt{position:fixed;left:12px;top:14px;z-index:101;color:#111;font-weight:600;font-size:15px;background:rgba(255,255,255,.92);padding:8px 12px;border-radius:999px;box-shadow:0 1px 6px rgba(0,0,0,.15)}
+.amap .mtag,.mapbox .mtag{position:absolute;left:8px;top:8px;display:flex;align-items:center;gap:6px;max-width:calc(100% - 16px);padding:4px 10px 4px 4px;border-radius:999px;background:rgba(255,255,255,.92);box-shadow:0 1px 4px rgba(0,0,0,.15);font-size:12px;color:#1b2430;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.amap .mtag b,.mapbox .mtag b{flex:none;padding:2px 8px;border-radius:999px;background:var(--accent);color:#fff;font-weight:600}
+.amap .mtag span,.mapbox .mtag span{overflow:hidden;text-overflow:ellipsis}
+.mapbox .mtag{position:fixed;top:62px;left:12px;font-size:13px}
 </style>
 </head>
 <body>
@@ -801,18 +805,20 @@ async function loadLive(){
 const MAPS={};
 function mapHTML(a){if(!a||!a.id)return '';const m=MAPS[a.id];if(m===undefined)loadMap(a.id);
   if(!m||m==='loading')return '<div class="amap ld" data-map="'+a.id+'">지도 불러오는 중</div>';if(m==='none')return '';
-  return '<div class="amap" data-map="'+a.id+'" role="button" tabindex="0" aria-label="'+a.nm+' 위치 지도 크게 보기"><img alt="'+a.nm+' 위치 지도" loading="lazy" src="'+m.src+'"><span class="pin" style="left:'+m.px+'%;top:'+m.py+'%"></span><span class="mcap">크게 보기</span></div>'}
+  return '<div class="amap" data-map="'+a.id+'" role="button" tabindex="0" aria-label="'+a.nm+' 위치 지도 크게 보기"><img alt="'+a.nm+' 위치 지도" loading="lazy" src="'+m.src+'"><span class="pin" style="left:'+m.px+'%;top:'+m.py+'%"></span><span class="mcap">크게 보기</span>'+mapTag(m)+'</div>'}
+const escH=t=>String(t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const mapTag=m=>(m.fl||m.loc)?'<span class="mtag">'+(m.fl?'<b>'+escH(m.fl)+'</b>':'')+(m.loc?'<span>'+escH(m.loc)+'</span>':'')+'</span>':'';
 async function loadMap(id){MAPS[id]='loading';
   try{const r=await fetch('https://adventure.lotteworld.com/api/enjoy/attrctn/detail',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({shopSysCd:String(id),storeCd:'HC01801',langCd:'HC01701'})});
     const v=(await r.json()).pifAtrctDtlVo||{},f=(v.mapFileList||[])[0],x=+v.pstnXcrd,y=+v.pstnYcrd;
     if(!f||!f.flPath||!(x>=0)||!(y>=0))MAPS[id]='none';
-    else{const z=(f.flNm||'').match(/_(\d+)_(\d+)\./),W=z?+z[1]:570,H=z?+z[2]:427;MAPS[id]={src:'https://adventure.lotteworld.com/api/upload'+f.flPath,px:((x+22)/W*100).toFixed(2),py:((y+58)/H*100).toFixed(2)}}
+    else{const z=(f.flNm||'').match(/_(\d+)_(\d+)\./),W=z?+z[1]:570,H=z?+z[2]:427;MAPS[id]={fl:v.pstnCdNm||'',loc:v.pstnDesc||'',src:'https://adventure.lotteworld.com/api/upload'+f.flPath,px:((x+22)/W*100).toFixed(2),py:((y+58)/H*100).toFixed(2)}}
   }catch(e){MAPS[id]='none'}
   const a=ATTR.find(q=>String(q.id)===String(id));
   document.querySelectorAll('.amap[data-map="'+id+'"]').forEach(el=>{const h=mapHTML(a);if(h)el.outerHTML=h;else el.remove()})}
 function openMap(id){const m=MAPS[id];if(!m||typeof m!=='object')return;const a=ATTR.find(q=>String(q.id)===String(id));
   const ov=document.createElement('div');ov.className='mapov';ov.setAttribute('role','dialog');ov.setAttribute('aria-label',(a?a.nm:'')+' 위치 지도');
-  ov.innerHTML='<div class="mt">'+(a?a.nm:'')+'</div><button type="button" class="x" aria-label="닫기">×</button><div class="mapbox"><img alt="" src="'+m.src+'"><span class="pin" style="left:'+m.px+'%;top:'+m.py+'%"></span></div>';
+  ov.innerHTML='<div class="mt">'+(a?a.nm:'')+'</div><button type="button" class="x" aria-label="닫기">×</button><div class="mapbox"><img alt="" src="'+m.src+'">'+mapTag(m)+'<span class="pin" style="left:'+m.px+'%;top:'+m.py+'%"></span></div>';
   const close=()=>{ov.remove();document.removeEventListener('keydown',esc)},esc=e=>{if(e.key==='Escape')close()};
   ov.querySelector('.x').onclick=close;ov.addEventListener('click',e=>{if(e.target===ov)close()});document.addEventListener('keydown',esc);
   document.body.appendChild(ov);const img=ov.querySelector('img');const ctr=()=>{const b=ov.querySelector('.mapbox');ov.scrollLeft=b.offsetWidth*m.px/100-ov.clientWidth/2;ov.scrollTop=b.offsetHeight*m.py/100-ov.clientHeight/2};if(img.complete)ctr();else img.onload=ctr;ov.querySelector('.x').focus()}
