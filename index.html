@@ -229,6 +229,19 @@ main{min-width:0}.pane{min-width:0}
 .badge.live.ok::before,.badge.live.warn::before,.badge.live.no::before{content:"";width:6px;height:6px;border-radius:50%;background:currentColor}
 .cand.hasimg .badge.live.end{background:rgba(120,130,150,.6)}
 .hide{display:none!important}
+.amap{position:relative;margin-top:10px;border-radius:12px;overflow:hidden;background:var(--bg);border:1px solid var(--line);cursor:zoom-in}
+.amap img{display:block;width:100%;height:auto}
+.amap .pin,.mapbox .pin{position:absolute;width:22px;height:22px;transform:translate(-50%,-50%);border-radius:50%;background:#e5484d;border:3px solid #fff;box-shadow:0 0 0 2px rgba(229,72,77,.45),0 2px 6px rgba(0,0,0,.35)}
+.amap .pin::after,.mapbox .pin::after{content:"";position:absolute;inset:-9px;border-radius:50%;border:2px solid rgba(229,72,77,.6);animation:pinp 1.6s ease-out infinite}
+@keyframes pinp{from{transform:scale(.6);opacity:1}to{transform:scale(1.6);opacity:0}}
+.amap .mcap{position:absolute;right:8px;bottom:8px;font-size:11px;padding:3px 8px;border-radius:999px;background:rgba(0,0,0,.55);color:#fff}
+.amap.ld{min-height:60px;display:flex;align-items:center;justify-content:center;font-size:13px;color:var(--ink-2);cursor:default}
+.mapov{position:fixed;inset:0;z-index:100;background:rgba(10,14,22,.92);overflow:auto;-webkit-overflow-scrolling:touch;touch-action:pan-x pan-y pinch-zoom}
+.mapov .mapbox{position:relative;width:max(100vw,1100px);margin:0 auto}
+.mapov .mapbox img{display:block;width:100%;height:auto}
+.mapov .mapbox .pin{width:30px;height:30px}
+.mapov .x{position:fixed;top:12px;right:12px;z-index:101;width:44px;height:44px;border-radius:50%;border:0;background:rgba(255,255,255,.92);color:#111;font-size:22px;line-height:44px;padding:0;cursor:pointer}
+.mapov .mt{position:fixed;left:12px;top:16px;z-index:101;color:#fff;font-weight:600;font-size:15px;text-shadow:0 1px 4px rgba(0,0,0,.6)}
 </style>
 </head>
 <body>
@@ -481,7 +494,7 @@ function attrDetail(a){
     row('현재 상태',liveOf(a))+row('위치',a.ar)+row('운영',a.h?a.h[0]+' ~ '+a.h[1]:a.st)+row('운영 종료',a.c23)+
     row('키 제한',hTxt(a)||'제한 없음')+row('보호자 동반',a.gd?'동반 탑승 가능':'')+row('싱글라이더',a.sg?'운영':'')+row('탑승예약',a.rv?'예약제':'')+
     row('유아 놀이시설',a.ks?'해당':'')+row('2025 평균 대기',a.w?a.w+'분':'')+est1+
-    (pl&&a.h&&!a.c23?'<button type="button" class="go gobtn" data-go="'+pl.id+'">여기로 가기</button>':'')+'</div>';
+    (pl&&a.h&&!a.c23?'<button type="button" class="go gobtn" data-go="'+pl.id+'">여기로 가기</button>':'')+mapHTML(a)+'</div>';
 }
 function perfDetail(r,i){
   const f=perfFixed(r,i);
@@ -679,7 +692,7 @@ function render(){
         (p.g&&INFO(p.g)&&INFO(p.g).d?'<div class="sub">'+INFO(p.g).d+'</div>':'')+
         '<div id="res"></div>'+
         (isRide?'<div class="label">앱에 뜬 실제 대기 (선택)</div><div class="wait"><select id="wIn" aria-label="실제 대기시간(분)"><option value="">'+x.e+'</option>'+[0,5,10,15,20,25,30,35,40,45,50,55,60,65,70,75,80,85,90,100,110,120,130,140,150,180].map(v=>'<option value="'+v+'">'+v+'</option>').join('')+'</select><span>분</span></div>':'')+
-        '<div class="btns"><button class="ghost" id="bBack">다른 곳</button><button class="go" id="bQ">'+(isRide?'줄 서기':'시작')+'</button></div>';
+        '<div class="btns"><button class="ghost" id="bBack">다른 곳</button><button class="go" id="bQ">'+(isRide?'줄 서기':'시작')+'</button></div>'+mapHTML(attrOf(p));
       const wIn=$('wIn');
       if(wIn){
         wIn.value=String(S.wait);wIn.onchange=()=>{S.wait=wIn.value===''?'':+wIn.value;save();upd()};
@@ -782,6 +795,29 @@ async function loadLive(){
     if(Object.keys(hr).length){ATTR.forEach(a=>{if(hr[a.id])a.h=hr[a.id]});PLACES.forEach(p=>{const a=p.g&&INFO(p.g);if(a&&a.h)p.close=a.h[1]});HRAT=Date.now()}
     if(Object.keys(m).length){LIVE=m;LIVEAT=Date.now();if(!['INPUT','SELECT'].includes(document.activeElement?.tagName))render()}}catch(e){}
 }
+
+/* attraction location map from the official detail page (map image + pin), loaded on demand.
+   official pin icon is 44x58 drawn from (x,y) top-left, so the tip is at (x+22, y+58) */
+const MAPS={};
+function mapHTML(a){if(!a||!a.id)return '';const m=MAPS[a.id];if(m===undefined)loadMap(a.id);
+  if(!m||m==='loading')return '<div class="amap ld" data-map="'+a.id+'">지도 불러오는 중</div>';if(m==='none')return '';
+  return '<div class="amap" data-map="'+a.id+'" role="button" tabindex="0" aria-label="'+a.nm+' 위치 지도 크게 보기"><img alt="'+a.nm+' 위치 지도" loading="lazy" src="'+m.src+'"><span class="pin" style="left:'+m.px+'%;top:'+m.py+'%"></span><span class="mcap">크게 보기</span></div>'}
+async function loadMap(id){MAPS[id]='loading';
+  try{const r=await fetch('https://adventure.lotteworld.com/api/enjoy/attrctn/detail',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({shopSysCd:String(id),storeCd:'HC01801',langCd:'HC01701'})});
+    const v=(await r.json()).pifAtrctDtlVo||{},f=(v.mapFileList||[])[0],x=+v.pstnXcrd,y=+v.pstnYcrd;
+    if(!f||!f.flPath||!(x>=0)||!(y>=0))MAPS[id]='none';
+    else{const z=(f.flNm||'').match(/_(\d+)_(\d+)\./),W=z?+z[1]:570,H=z?+z[2]:427;MAPS[id]={src:'https://adventure.lotteworld.com/api/upload'+f.flPath,px:((x+22)/W*100).toFixed(2),py:((y+58)/H*100).toFixed(2)}}
+  }catch(e){MAPS[id]='none'}
+  const a=ATTR.find(q=>String(q.id)===String(id));
+  document.querySelectorAll('.amap[data-map="'+id+'"]').forEach(el=>{const h=mapHTML(a);if(h)el.outerHTML=h;else el.remove()})}
+function openMap(id){const m=MAPS[id];if(!m||typeof m!=='object')return;const a=ATTR.find(q=>String(q.id)===String(id));
+  const ov=document.createElement('div');ov.className='mapov';ov.setAttribute('role','dialog');ov.setAttribute('aria-label',(a?a.nm:'')+' 위치 지도');
+  ov.innerHTML='<div class="mt">'+(a?a.nm:'')+'</div><button type="button" class="x" aria-label="닫기">×</button><div class="mapbox"><img alt="" src="'+m.src+'"><span class="pin" style="left:'+m.px+'%;top:'+m.py+'%"></span></div>';
+  const close=()=>{ov.remove();document.removeEventListener('keydown',esc)},esc=e=>{if(e.key==='Escape')close()};
+  ov.querySelector('.x').onclick=close;ov.addEventListener('click',e=>{if(e.target===ov)close()});document.addEventListener('keydown',esc);
+  document.body.appendChild(ov);const img=ov.querySelector('img');const ctr=()=>{const b=ov.querySelector('.mapbox');ov.scrollLeft=b.offsetWidth*m.px/100-ov.clientWidth/2;ov.scrollTop=b.offsetHeight*m.py/100-ov.clientHeight/2};if(img.complete)ctr();else img.onload=ctr;ov.querySelector('.x').focus()}
+document.addEventListener('click',e=>{const el=e.target.closest&&e.target.closest('.amap[data-map]');if(el&&!el.classList.contains('ld')){e.stopPropagation();e.preventDefault();openMap(el.dataset.map)}},true);
+document.addEventListener('keydown',e=>{if((e.key==='Enter'||e.key===' ')&&e.target.classList&&e.target.classList.contains('amap')){e.preventDefault();openMap(e.target.dataset.map)}},true);
 const IMGOK={};
 function candBtn(c,top){
   const b=document.createElement('button');b.type='button';b.className='cand '+c.fit+(top?' top':'');
