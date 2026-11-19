@@ -273,7 +273,6 @@ main{min-width:0}.pane{min-width:0}
       <ul>
         <li><b>운행 종료</b> 스페인해적선은 11/22까지 운행 후 리뉴얼 공사</li>
         <li><b>파라오의 분노 · 와일드 밸리 · 스톤익스프레스</b> 11/18에는 점검이었지만 23일은 운행하는 것으로 보고 계산(운영시간 10:00~20:50 가정). 당일 확인</li>
-        <li><b>입장</b> After4 기준 16:00부터 (모든 계산은 16:00 입장 기준). 매표·입장 마감은 20:00</li>
         <li><b>야외</b> 매직아일랜드 기구는 대부분 20:50 종료, 날씨에 따라 중단될 수 있음</li>
         <li><b>콩X고질라</b> 20:10 종료, 매직패스 대상 아님</li>
         <li><b>싱글라이더</b> 후렌치레볼루션만 해당</li>
@@ -360,7 +359,7 @@ const ATTR=[{"no":28,"nm":"콩X고질라더라이드","ar":"어드벤처 3층","
 const PERF=[["12:30","로티스 페어리테일 매지컬 타임","키디존 어린이 동화극장","스테이지"],["12:30","Smile, with Friends (캐릭터 포토타임)","어드벤처 1층 만남의 광장","포토타임"],["14:00","해피 크리스마스 퍼레이드","어드벤처 1층 퍼레이드 코스","퍼레이드"],["15:30","로티스 페어리테일 매지컬 타임","키디존 어린이 동화극장","스테이지"],["15:30","쿠키런 Smile with Friend","어드벤처 1층 만남의 광장","포토타임"],["16:30","Smile, with Friends (연기자 포토타임)","키즈토리아","포토타임"],["17:00","쿠키런 Smile with Friend","어드벤처 1층 만남의 광장","포토타임"],["17:30","Smile, with Friends (연기자 포토타임)","키즈토리아","포토타임"],["18:30","마법 성냥과 꿈꾸는 밤","가든스테이지","스테이지"],["20:00","해피 크리스마스 퍼레이드","어드벤처 1층 퍼레이드 코스","퍼레이드"],["20:40","매직캐슬 라이츠업","매직아일랜드 매직캐슬","기타"]];
 const INFO=no=>ATTR.find(a=>a.no===no);
 const pic=(a,cls)=>a&&a.im?'<img class="'+cls+'" loading="lazy" decoding="async" alt="" src="https://adventure.lotteworld.com/api/upload/'+a.im+'" onerror="this.remove()">':'';
-const PS=()=>toM(S.ps||'16:00'),PE=()=>toM(S.pe||'21:00');
+const PS=()=>toM(S.ps||'10:00'),PE=()=>toM(S.pe||'21:00');
 const OUT_CLOSE=toM('21:00');
 const CLOSED=[]; /* 운휴는 실시간 운행 상태로 판단 */
 const DAY=0.95;
@@ -376,10 +375,10 @@ function est(p,t){
   return {e:r5(e),lo:r5(e*0.75),hi:r5(e*1.25)};
 }
 
-const fresh=()=>({ps:'16:00',pe:'21:00',lead:15,order:[],loc:'gate',locName:'정문',sel:null,wait:'',queue:null,log:[],done:{},sim:false,simTime:'16:00',cal:1,obs:[],must:{'P:18:30마법 성냥과 꿈꾸는 밤':true,'P:20:00해피 크리스마스 퍼레이드':true,'P:20:40매직캐슬 라이츠업':true}});
+const fresh=()=>({v:2,ps:'10:00',pe:'21:00',lead:15,order:[],loc:'gate',locName:'정문',sel:null,wait:'',queue:null,log:[],done:{},sim:false,simTime:'10:00',cal:1,obs:[],must:{'P:18:30마법 성냥과 꿈꾸는 밤':true,'P:20:00해피 크리스마스 퍼레이드':true,'P:20:40매직캐슬 라이츠업':true}});
 let S=fresh(),loaded=false;
 const SKEY='lotte-state';
-try{const s=JSON.parse(localStorage.getItem(SKEY)||localStorage.getItem('lw1123v5')||'null');if(s){S=Object.assign(fresh(),s);loaded=true}}catch(e){}
+try{const s=JSON.parse(localStorage.getItem(SKEY)||localStorage.getItem('lw1123v5')||'null');if(s){S=Object.assign(fresh(),s);if(!s.v){if(S.ps==='16:00')S.ps='10:00';S.v=2}loaded=true}}catch(e){}
 S.sim=false;
 const save=()=>{try{localStorage.setItem(SKEY,JSON.stringify(S))}catch(e){}};
 
@@ -795,7 +794,7 @@ $('clock').onclick=()=>{locOpen=false;openKey=null;if(!S.queue){S.sel=null;S.wai
 $('clock').setAttribute('role','button');$('clock').setAttribute('tabindex','0');$('clock').setAttribute('aria-label','첫 화면으로');
 $('clock').onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();$('clock').click()}};
 document.querySelectorAll('.sorts button').forEach(b=>b.onclick=()=>{S.sort=b.dataset.sort;save();render()});
-$('simOn').onchange=e=>{S.sim=e.target.checked;if(S.sim)S.simTime='16:00';save();render()};
+$('simOn').onchange=e=>{S.sim=e.target.checked;if(S.sim)S.simTime=S.ps||'10:00';save();render()};
 $('simTime').onchange=e=>{if(e.target.value){S.simTime=e.target.value;save();render()}};
 let resetCode=null;
 function resetUI(msg){
