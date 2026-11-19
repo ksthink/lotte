@@ -469,6 +469,8 @@ function bar(o){
 }
 const LEGEND='<div class="legend"><span><i style="background:var(--line)"></i>이동</span><span><i style="background:var(--ok)"></i>대기</span><span><i style="background:var(--ink-2)"></i>탑승</span><span><i style="background:var(--ink);width:3px"></i>마감</span></div>';
 const hTxt=a=>a.lo&&a.hi?a.lo+'~'+a.hi+'cm':a.lo?a.lo+'cm↑':a.hi?a.hi+'cm↓':'';
+function cardInfo(p){const a=p.g&&INFO(p.g);const cl=p.close||(a&&a.h&&a.h[1]);
+  return (cl?bdg('','','마감 '+cl):'')+(a&&a.sg?bdg('ok','','싱글라이더'):'')+(a&&a.rv?bdg('warn','','예약제'):'');}
 function infoBadges(p){const a=p.g&&INFO(p.g);if(!a)return '';
   return (hTxt(a)?bdg('','',hTxt(a)):'')+(p.close?bdg('','clock','~'+p.close):'')+(a.sg?bdg('ok','','싱글라이더'):'')+(a.rv?bdg('warn','','예약제'):'');}
 let openKey=null;
@@ -752,7 +754,7 @@ const ty=(k,label)=>'<span class="badge ty '+k+'" role="img" aria-label="'+label
 function showBtn(r,f,tr,left){
   const b=document.createElement('button');b.type='button';const fit=left>=10?'ok':left>=0?'tight':'no';b.className='cand hasimg grad '+fit;
   b.innerHTML='<span class="tys">'+ty('show','공연')+'</span><span class="nmw"><span class="nm"></span>'+chk(pKey(r),S.must[pKey(r)])+'</span>'+bdg(fit,fit==='no'?'alert':'',fit==='no'?'늦음':'여유 '+left+'분')+
-    '<div class="bdg">'+bdg('','walk',tr+'분')+bdg('','clock',r[0])+bdg('','',r[2])+'</div>';
+    '<div class="bdg">'+bdg('','','이동 '+tr+'분')+bdg('','','시작 '+r[0])+bdg('','','마감 '+f.end)+bdg('','',r[2])+'</div>';
   b.querySelector('.nm').textContent=r[1];
   b.setAttribute('aria-label','공연 '+r[1]+', '+r[0]+', 이동 '+tr+'분');
   b.onclick=()=>{S.sel=f.id;S.wait='';save();render();window.scrollTo({top:0,behavior:'smooth'})};
@@ -779,7 +781,7 @@ function candBtn(c,top){
   b.classList.add('hasimg');if(!(src&&IMGOK[src]!==false))b.classList.add('grad');
   b.innerHTML=(src&&IMGOK[src]!==false?'<img class="bgimg" alt="" loading="lazy" decoding="async" src="'+src+'">':'')+'<span class="tys">'+(c.cur&&c.fit==='ok'?ty('rec','추천'):'')+(A0?ty('attr','어트랙션'):'')+'</span><span class="nmw"><span class="nm"></span>'+(attrOf(c.p)?chk(aKey(attrOf(c.p)),c.must):'')+'</span><span class="rt">'+liveBadge(A0)+'</span>'+
     bar({tr:c.tr,w:c.x.e,lo:isR?c.x.lo:null,hi:isR?c.x.hi:null,ride:c.p.ride,mw:c.mw,fit:c.fit})+
-    '<div class="bdg">'+bdg('','walk',c.tr+'분')+bdg('','wait',(isR?c.x.lo+'~'+c.x.hi:c.x.e)+'분')+infoBadges(c.p)+(c.p.flag?bdg('warn','alert',c.p.flag):'')+'</div>';
+    '<div class="bdg">'+bdg('','','이동 '+c.tr+'분')+bdg('','','대기 '+(isR?c.x.lo+'~'+c.x.hi:c.x.e)+'분')+cardInfo(c.p)+(c.p.flag?bdg('warn','alert',c.p.flag):'')+'</div>';
   b.querySelector('.nm').textContent=c.p.name;
   const im=b.querySelector('.bgimg');if(im){im.onload=()=>{IMGOK[src]=true;b.classList.add('hasimg')};im.onerror=()=>{IMGOK[src]=false;im.remove();b.classList.add('grad')}}
   b.setAttribute('aria-label',c.p.name+', '+FITTXT[c.fit]+', 이동 '+c.tr+'분, 예상 대기 '+c.x.e+'분');
