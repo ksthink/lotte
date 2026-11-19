@@ -184,9 +184,11 @@ img.dimg{width:100%;aspect-ratio:16/9;object-fit:cover;border-radius:10px;margin
 .wait select{min-width:130px;font-family:var(--font-display);font-size:26px;text-align:center;text-align-last:center;border:1px solid var(--line);border-radius:12px;background:var(--bg);color:var(--ink);padding:6px 10px;min-height:48px}
 .ptm.sh{background:var(--warn-bg);color:var(--warn)}.ptm.no{background:var(--bad-bg);color:var(--bad)}
 .tabs button{padding:8px 4px}
-.pset{display:flex;gap:8px;align-items:center;flex-wrap:wrap;padding:12px}
-.pset select{border:1px solid var(--line);border-radius:10px;background:var(--bg);color:var(--ink);padding:6px 8px;min-height:38px;font:inherit}
-.pset .mini{margin-left:auto}
+.pset{display:flex;gap:5px;align-items:center;flex-wrap:nowrap;padding:8px 10px;white-space:nowrap;overflow-x:auto}
+.pset select{-webkit-appearance:none;appearance:none;border:1px solid var(--line);border-radius:10px;background:var(--bg);color:var(--ink);padding:6px 9px;min-height:36px;font:inherit;font-size:14px;text-align:center;text-align-last:center;min-width:0;flex:0 1 auto}
+.pset .pic{display:inline-flex;color:var(--ink-2);margin-left:2px}.pset .pic svg{width:15px;height:15px}
+.pset .mini{margin-left:auto;padding:4px 8px;min-height:36px;font-size:13px;flex:none}
+main{min-width:0}.pane{min-width:0}
 .plan li{grid-template-columns:auto minmax(0,1fr) auto auto!important;align-items:center}
 .plan .ainfo{grid-column:auto}
 .updn{display:grid;gap:4px}
@@ -507,8 +509,8 @@ function renderPlan(){
   if(gapSel){return renderGap(box)}
   const {items,unfit}=planSim();
   let h='<div class="card pset"><select id="pS" aria-label="시작 시각">'+tOpts(600,1200,S.ps)+'</select><span>~</span><select id="pE" aria-label="종료 시각">'+tOpts(660,1260,S.pe)+'</select>'+
-    '<select id="pL" aria-label="퍼레이드 자리 잡기"><option value="0"'+(S.lead===0?' selected':'')+'>퍼레이드 직전</option><option value="15"'+(S.lead===15?' selected':'')+'>퍼레이드 15분 전</option><option value="30"'+(S.lead===30?' selected':'')+'>퍼레이드 30분 전</option></select>'+
-    '<button type="button" class="ghost mini" id="pAuto">자동 정렬</button></div>';
+    '<span class="pic" title="퍼레이드 자리 잡기">'+IC.flag+'</span><select id="pL" aria-label="퍼레이드 자리 잡기"><option value="0"'+(S.lead===0?' selected':'')+'>직전</option><option value="15"'+(S.lead===15?' selected':'')+'>15분 전</option><option value="30"'+(S.lead===30?' selected':'')+'>30분 전</option></select>'+
+    '<button type="button" class="ghost mini" id="pAuto">자동정렬</button></div>';
   h+='<div class="card"><ul class="alist plan">';
   S.log.forEach(e=>{h+='<li class="off"><span class="ptm num">'+e.t+'</span><div class="ainfo"><div class="arow"><span class="nm">'+e.name+'</span>'+bdg('end','','완료')+'</div></div></li>'});
   let pn=0;const nb=()=>'<i class="pnum">'+(++pn)+'</i>';
