@@ -154,6 +154,8 @@ img.dimg{width:100%;aspect-ratio:16/9;object-fit:cover;border-radius:10px;margin
 .cand.hasimg{border-color:transparent;background:#101826;min-height:150px;align-content:end;padding:14px}
 .cand.hasimg .bgimg{opacity:1}
 .cand.hasimg::after{content:"";position:absolute;inset:0;background:rgba(0,0,0,.4)}
+.cand.hasimg.grad{background:linear-gradient(35deg,#2a9d9b 0%,#c99a3e 50%,#c24c57 100%)}
+.cand.hasimg.grad::after{background:rgba(0,0,0,.12)}
 .cand.hasimg>*:not(.bgimg){position:relative;z-index:1}
 .cand.hasimg .nm{color:#fff;font-size:19px;text-shadow:0 1px 6px rgba(0,0,0,.6)}
 .cand.hasimg .badge{background:rgba(255,255,255,.18);color:#fff;-webkit-backdrop-filter:blur(10px) saturate(1.4);backdrop-filter:blur(10px) saturate(1.4);border:1px solid rgba(255,255,255,.22)}
@@ -771,12 +773,12 @@ function candBtn(c,top){
   const b=document.createElement('button');b.type='button';b.className='cand '+c.fit+(top?' top':'');
   const isR=!c.p.fixedWait;
   const A0=attrOf(c.p),src=A0&&A0.im?'https://adventure.lotteworld.com/api/upload/'+A0.im:'';
-  if(src&&IMGOK[src])b.classList.add('hasimg');
+  b.classList.add('hasimg');if(!(src&&IMGOK[src]!==false))b.classList.add('grad');
   b.innerHTML=(src&&IMGOK[src]!==false?'<img class="bgimg" alt="" loading="lazy" decoding="async" src="'+src+'">':'')+'<span class="tys">'+(c.cur&&c.fit==='ok'?ty('rec','추천'):'')+(A0?ty('attr','어트랙션'):'')+'</span><span class="nmw"><span class="nm"></span>'+(attrOf(c.p)?chk(aKey(attrOf(c.p)),c.must):'')+'</span><span class="rt">'+liveBadge(A0)+'</span>'+
     bar({tr:c.tr,w:c.x.e,lo:isR?c.x.lo:null,hi:isR?c.x.hi:null,ride:c.p.ride,mw:c.mw,fit:c.fit})+
     '<div class="bdg">'+bdg('','walk',c.tr+'분')+bdg('','wait',(isR?c.x.lo+'~'+c.x.hi:c.x.e)+'분')+infoBadges(c.p)+(c.p.flag?bdg('warn','alert',c.p.flag):'')+'</div>';
   b.querySelector('.nm').textContent=c.p.name;
-  const im=b.querySelector('.bgimg');if(im){im.onload=()=>{IMGOK[src]=true;b.classList.add('hasimg')};im.onerror=()=>{IMGOK[src]=false;im.remove();b.classList.remove('hasimg')}}
+  const im=b.querySelector('.bgimg');if(im){im.onload=()=>{IMGOK[src]=true;b.classList.add('hasimg')};im.onerror=()=>{IMGOK[src]=false;im.remove();b.classList.add('grad')}}
   b.setAttribute('aria-label',c.p.name+', '+FITTXT[c.fit]+', 이동 '+c.tr+'분, 예상 대기 '+c.x.e+'분');
   b.onclick=()=>{S.sel=c.p.id;S.wait='';save();render();window.scrollTo({top:0,behavior:'smooth'})};
   return b;
